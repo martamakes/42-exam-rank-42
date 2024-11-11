@@ -25,23 +25,15 @@ touch "$LEVEL1_DONE" "$LEVEL2_DONE" "$LEVEL3_DONE" "$LEVEL4_DONE"
 validate_exercise() {
     local level=$1
     local exercise=$2
-    local level_dir="Level${level}"  # Cambiado aquí
+    local level_dir="Level${level}"
     local grademe_dir="${level_dir}/${exercise}/grademe"
     local student_dir="rendu/${exercise}"
     local student_file="${student_dir}/${exercise}.c"
     
+    # Verificar que existe el directorio de tests
     if [ ! -d "$grademe_dir" ]; then
-        echo -e "${YELLOW}Inicializando tests para $exercise...${NC}"
-        if [ -f "./init.sh" ]; then
-            ./init.sh "${level_dir}" "$exercise"  # Cambiado aquí: pasamos "Level1" en lugar de "1"
-            if [ $? -ne 0 ]; then
-                echo -e "${RED}Error al inicializar los tests${NC}"
-                return 1
-            fi
-        else
-            echo -e "${RED}Error: No se encuentra init.sh${NC}"
-            return 1
-        fi
+        echo -e "${RED}Error: No se encuentran los tests para $exercise${NC}"
+        return 1
     fi
 
     if [ ! -f "$student_file" ]; then

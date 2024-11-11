@@ -189,39 +189,31 @@ init_grademe() {
     local level_dir=$1
     local exercise_dir=$2
     
-    echo -e "${BLUE}Inicializando tests para $exercise_dir...${NC}"
+    echo -e "${BLUE}Verificando tests para $exercise_dir...${NC}"
     
-    # Crear directorio grademe si no existe
-    mkdir -p "$level_dir/$exercise_dir/grademe"
-    cd "$level_dir/$exercise_dir/grademe"
+    # Verificar que existe el directorio grademe y sus archivos
+    local grademe_dir="$level_dir/$exercise_dir/grademe"
     
-    # Determinar tipo de ejercicio
-    local is_prog=false
-    local needs_h=false
-    
-    if is_program "../README.md"; then
-        is_prog=true
-        echo "Detectado como: Programa"
-    else
-        echo "Detectado como: Función"
+    if [ ! -d "$grademe_dir" ]; then
+        echo -e "${RED}Error: No se encuentra el directorio de tests para $exercise_dir${NC}"
+        return 1
     fi
     
-    if needs_header "../README.md"; then
-        needs_h=true
-        echo "Necesita archivo .h"
+    if [ ! -f "$grademe_dir/test.sh" ]; then
+        echo -e "${RED}Error: Falta test.sh en $exercise_dir${NC}"
+        return 1
     fi
     
-    # Crear archivos de test apropiados
-    if [ "$is_prog" = true ]; then
-        create_program_main "$exercise_dir"
-    else
-        create_function_main "$exercise_dir" "$needs_h"
+    if [ ! -f "$grademe_dir/test_main.c" ]; then
+        echo -e "${RED}Error: Falta test_main.c en $exercise_dir${NC}"
+        return 1
     fi
     
-    create_test_script "$exercise_dir" "$is_prog"
+    # Asegurar permisos de ejecución
+    chmod +x "$grademe_dir/test.sh"
     
-    echo -e "${GREEN}Tests inicializados correctamente${NC}"
-    cd - > /dev/null
+    echo -e "${GREEN}Tests verificados correctamente${NC}"
+    return 0
 }
 
 # Uso del script
