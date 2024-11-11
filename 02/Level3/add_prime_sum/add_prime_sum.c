@@ -46,7 +46,7 @@ int is_prime(int n)
     return 1; // Si no se encontró ningún divisor, n es primo
 }
 
-// Función para convertir una cadena a un entero
+// Función para convertir una cadena a un entero sin controlar signo
 int ft_atoi(char *str)
 {
     int result = 0;
