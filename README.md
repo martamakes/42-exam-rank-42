@@ -151,5 +151,5 @@ Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más información.
 - A los creadores del sistema de exámenes original
 
 ---
-Made with ❤️ by estudiantes de 42
+Made with ❤️ by mvigara- estudiante de 42 School Madrid
 ```
