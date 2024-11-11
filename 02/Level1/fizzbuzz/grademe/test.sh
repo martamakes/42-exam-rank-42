@@ -7,7 +7,7 @@ NC='\033[0m'
 
 # Directorios
 TESTDIR=$(dirname $0)
-EXERCISE=first_word
+EXERCISE=fizzbuzz
 STUDENT_DIR="../../../rendu/$EXERCISE"
 
 # Verificar que existe el directorio del estudiante
@@ -20,7 +20,7 @@ fi
 cp $STUDENT_DIR/* .
 
 # Compilar el programa del estudiante
-gcc -Wall -Wextra -Werror first_word.c -o first_word
+gcc -Wall -Wextra -Werror fizzbuzz.c -o fizzbuzz
 if [ $? -ne 0 ]; then
     echo -e "${RED}Error de compilación del programa${NC}"
     exit 1
@@ -38,6 +38,6 @@ fi
 result=$?
 
 # Limpiar
-rm -f first_word test_prog *.o
+rm -f fizzbuzz test_prog *.o
 
 exit $result

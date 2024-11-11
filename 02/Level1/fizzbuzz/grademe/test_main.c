@@ -3,78 +3,35 @@
 #include <string.h>
 #include <unistd.h>
 
-/* EXPLICACIÓN DEL TEST:
-* - Usamos pipe() para capturar la salida del programa
-* - fork() para crear un proceso hijo que ejecutará el programa
-* - En el padre, comparamos la salida con el resultado esperado
+/*
+* EXPLICACIÓN DEL TEST:
+* - Generamos la salida esperada con generate_expected_output()
+* - Capturamos la salida del programa del estudiante
+* - Comparamos ambas salidas
 *
 * CASOS DE PRUEBA:
-* 1. String simple con una palabra
-* 2. String con múltiples palabras
-* 3. String con espacios al inicio/fin
-* 4. String vacía
-* 5. Múltiples argumentos
-* 6. String con tabs y espacios múltiples
+* - Números normales (1, 2, 4, etc.)
+* - Múltiplos de 3 (3, 6, 9, etc.)
+* - Múltiplos de 5 (5, 10, etc.)
+* - Múltiplos de 3 y 5 (15, 30, 45, etc.)
+* - Verificar el formato (saltos de línea)
 */
 
-void test_program(char **args, char *expected)
+// Función para generar la salida esperada
+char *generate_expected_output(void)
 {
-    int pipefd[2];
-    char buffer[1024] = {0};
+    static char expected[4096] = {0};
+    char temp[32];
+    int len = 0;
     
-    if (pipe(pipefd) == -1) {
-        printf("Error al crear el pipe\n");
-        return;
+    for (int i = 1; i <= 100; i++)
+    {
+        if (i % 3 == 0 && i % 5 == 0)
+            len += snprintf(expected + len, sizeof(expected) - len, "fizzbuzz\n");
+        else if (i % 3 == 0)
+            len += snprintf(expected + len, sizeof(expected) - len, "fizz\n");
+        else if (i % 5 == 0)
+            len += snprintf(expected + len, sizeof(expected) - len, "buzz\n");
+        else
+            len += snprintf(expected + len, sizeof(expected) - len, "%d\n", i);
     }
-    
-    int pid = fork();
-    if (pid == 0) {
-        // Proceso hijo
-        close(pipefd[0]);
-        dup2(pipefd[1], STDOUT_FILENO);
-        execv("./first_word", args);
-        exit(1);
-    } else {
-        // Proceso padre
-        close(pipefd[1]);
-        read(pipefd[0], buffer, sizeof(buffer));
-        close(pipefd[0]);
-        
-        if (strcmp(buffer, expected) == 0)
-            printf("Test passed ✓: %s\n", args[1] ? args[1] : "null");
-        else {
-            printf("Test failed ✗: %s\n", args[1] ? args[1] : "null");
-            printf("Expected: '%s'\n", expected);
-            printf("Got     : '%s'\n", buffer);
-        }
-    }
-}
-
-int main(void)
-{
-    // Test 1: Palabra simple
-    char *args1[] = {"./first_word", "hello", NULL};
-    test_program(args1, "hello\n");
-    
-    // Test 2: Múltiples palabras
-    char *args2[] = {"./first_word", "FOR PONY", NULL};
-    test_program(args2, "FOR\n");
-    
-    // Test 3: Espacios al inicio/fin
-    char *args3[] = {"./first_word", "  lorem,ipsum  ", NULL};
-    test_program(args3, "lorem,ipsum\n");
-    
-    // Test 4: Solo espacios
-    char *args4[] = {"./first_word", "   ", NULL};
-    test_program(args4, "\n");
-    
-    // Test 5: Múltiples argumentos
-    char *args5[] = {"./first_word", "a", "b", NULL};
-    test_program(args5, "\n");
-    
-    // Test 6: Tabs y espacios múltiples
-    char *args6[] = {"./first_word", "this        ...    is sparta", NULL};
-    test_program(args6, "this\n");
-    
-    return 0;
-}
