@@ -35,6 +35,7 @@ validate_exercise() {
     local grademe_dir="$exercise_dir/grademe"
     local student_dir="$RENDU_DIR/${exercise}"
     local student_file="${student_dir}/${exercise}.c"
+    local test_script="$grademe_dir/test.sh"
     
     # Verificar que existe el directorio de tests
     if [ ! -d "$grademe_dir" ]; then
@@ -48,6 +49,12 @@ validate_exercise() {
         echo -e "${YELLOW}Debes crear el archivo $exercise.c en el directorio $student_dir${NC}"
         mkdir -p "$student_dir"
         return 1
+    fi
+    
+    # Dar permisos de ejecución al script de test si no los tiene
+    if [ ! -x "$test_script" ]; then
+        echo -e "${YELLOW}Dando permisos de ejecución al script de test...${NC}"
+        chmod +x "$test_script"
     fi
     
     echo -e "${BLUE}Ejecutando tests para $exercise...${NC}"
