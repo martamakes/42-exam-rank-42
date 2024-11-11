@@ -3,25 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 
-/*
-* EXPLICACIÓN DEL TEST:
-* - Generamos la salida esperada con generate_expected_output()
-* - Capturamos la salida del programa del estudiante
-* - Comparamos ambas salidas
-*
-* CASOS DE PRUEBA:
-* - Números normales (1, 2, 4, etc.)
-* - Múltiplos de 3 (3, 6, 9, etc.)
-* - Múltiplos de 5 (5, 10, etc.)
-* - Múltiplos de 3 y 5 (15, 30, 45, etc.)
-* - Verificar el formato (saltos de línea)
-*/
-
 // Función para generar la salida esperada
 char *generate_expected_output(void)
 {
     static char expected[4096] = {0};
-    char temp[32];
     int len = 0;
     
     for (int i = 1; i <= 100; i++)
@@ -35,3 +20,92 @@ char *generate_expected_output(void)
         else
             len += snprintf(expected + len, sizeof(expected) - len, "%d\n", i);
     }
+    return expected;
+}
+
+// Función para imprimir una parte de la cadena hasta encontrar una diferencia
+void print_difference_context(const char *expected, const char *got)
+{
+    int i = 0;
+    while (expected[i] && got[i] && i < 50) // Mostramos hasta 50 caracteres de contexto
+    {
+        if (expected[i] != got[i])
+        {
+            printf("Diferencia encontrada en el carácter %d:\n", i);
+            printf("Esperado (siguiente 10 chars): ");
+            for (int j = 0; j < 10 && expected[i + j]; j++)
+            {
+                if (expected[i + j] == '\n')
+                    printf("\\n");
+                else
+                    printf("%c", expected[i + j]);
+            }
+            printf("\nObtenido (siguiente 10 chars): ");
+            for (int j = 0; j < 10 && got[i + j]; j++)
+            {
+                if (got[i + j] == '\n')
+                    printf("\\n");
+                else
+                    printf("%c", got[i + j]);
+            }
+            printf("\n");
+            return;
+        }
+        i++;
+    }
+    
+    if (!expected[i] && got[i])
+        printf("La salida es más larga de lo esperado\n");
+    else if (expected[i] && !got[i])
+        printf("La salida es más corta de lo esperado\n");
+}
+
+int main(void)
+{
+    int pipefd[2];
+    char buffer[4096] = {0};
+    
+    if (pipe(pipefd) == -1)
+    {
+        printf("Error al crear el pipe\n");
+        return 1;
+    }
+    
+    int pid = fork();
+    if (pid == 0)
+    {
+        // Proceso hijo
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        char *args[] = {"./fizzbuzz", NULL};
+        execv("./fizzbuzz", args);
+        exit(1);
+    }
+    else
+    {
+        // Proceso padre
+        close(pipefd[1]);
+        ssize_t bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1);
+        close(pipefd[0]);
+        
+        if (bytes_read > 0)
+            buffer[bytes_read] = '\0';
+        
+        char *expected = generate_expected_output();
+        
+        if (strcmp(buffer, expected) == 0)
+        {
+            printf("\033[0;32mTest passed ✓\033[0m\n");
+            printf("El programa imprime correctamente todos los números del 1 al 100\n");
+            printf("con fizz, buzz y fizzbuzz donde corresponde\n");
+            return 0;
+        }
+        else
+        {
+            printf("\033[0;31mTest failed ✗\033[0m\n");
+            printf("La salida no coincide con el formato esperado\n");
+            print_difference_context(expected, buffer);
+            return 1;
+        }
+    }
+}

@@ -9,8 +9,14 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 
 # Directorios de trabajo
-PROGRESS_DIR="./exam_progress"
+EXAM_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(dirname "$EXAM_DIR")"
+PROGRESS_DIR="$EXAM_DIR/exam_progress"
+RENDU_DIR="$PROJECT_ROOT/rendu"
+
+# Crear directorios necesarios
 mkdir -p "$PROGRESS_DIR"
+mkdir -p "$RENDU_DIR"
 
 # Archivos para almacenar ejercicios completados por nivel
 LEVEL1_DONE="$PROGRESS_DIR/level1_done.txt"
@@ -25,25 +31,31 @@ touch "$LEVEL1_DONE" "$LEVEL2_DONE" "$LEVEL3_DONE" "$LEVEL4_DONE"
 validate_exercise() {
     local level=$1
     local exercise=$2
-    local level_dir="Level${level}"
-    local grademe_dir="${level_dir}/${exercise}/grademe"
-    local student_dir="rendu/${exercise}"
+    local exercise_dir="$EXAM_DIR/Level${level}/${exercise}"
+    local grademe_dir="$exercise_dir/grademe"
+    local student_dir="$RENDU_DIR/${exercise}"
     local student_file="${student_dir}/${exercise}.c"
     
     # Verificar que existe el directorio de tests
     if [ ! -d "$grademe_dir" ]; then
         echo -e "${RED}Error: No se encuentran los tests para $exercise${NC}"
+        echo -e "${YELLOW}Directorio esperado: $grademe_dir${NC}"
         return 1
     fi
 
     if [ ! -f "$student_file" ]; then
         echo -e "${RED}Error: No se encuentra tu solución en $student_file${NC}"
         echo -e "${YELLOW}Debes crear el archivo $exercise.c en el directorio $student_dir${NC}"
+        mkdir -p "$student_dir"
         return 1
     fi
     
     echo -e "${BLUE}Ejecutando tests para $exercise...${NC}"
-    cd "$grademe_dir"
+    if ! cd "$grademe_dir"; then
+        echo -e "${RED}Error: No se puede acceder al directorio de tests${NC}"
+        return 1
+    fi
+    
     ./test.sh
     local result=$?
     cd - > /dev/null
@@ -80,7 +92,7 @@ show_subject() {
     local level=$1
     local exercise=$2
     local subject_path="Level${level}/${exercise}/README.md"
-    local student_dir="rendu/${exercise}"
+    local student_dir="$RENDU_DIR/${exercise}"
     
     clear
     echo -e "${BLUE}=== EJERCICIO NIVEL $level: $exercise ===${NC}\n"
@@ -89,9 +101,8 @@ show_subject() {
     if [ -f "$subject_path" ]; then
         cat "$subject_path"
         echo -e "\n${YELLOW}Para resolver este ejercicio:${NC}"
-        # Usar echo -e para interpretar los colores y escapar las comillas correctamente
-        echo -e "1. ${CYAN}Crea el directorio:${NC} mkdir -p 02/$student_dir"
-        echo -e "2. ${CYAN}Crea tu solución en:${NC} 02/$student_dir/${exercise}.c"
+        echo -e "1. ${CYAN}Crea el directorio:${NC} mkdir -p rendu/$exercise"
+        echo -e "2. ${CYAN}Crea tu solución en:${NC} rendu/$exercise/${exercise}.c"
         mkdir -p "$student_dir"
     else
         echo -e "${RED}Error: No se encuentra el subject en $subject_path${NC}"
@@ -131,6 +142,112 @@ select_random_exercise() {
     
     local random_index=$((RANDOM % count))
     echo "${exercises[$random_index]}"
+}
+
+# Función para listar ejercicios por nivel
+list_level_exercises() {
+    local level=$1
+    local exercises=()
+    local index=1
+    
+    echo -e "\n${BLUE}=== EJERCICIOS NIVEL $level ===${NC}"
+    
+    # Obtener y mostrar todos los ejercicios del nivel
+    for dir in Level${level}/*/; do
+        if [ -d "$dir" ]; then
+            dirname=$(basename "$dir")
+            exercises+=("$dirname")
+            echo "$index) $dirname"
+            ((index++))
+        fi
+    done
+    
+    echo -e "\n${YELLOW}Selecciona un ejercicio (1-$((index-1))) o 0 para volver:${NC}"
+    read -r selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -gt 0 ] && [ "$selection" -lt "$index" ]; then
+        selected_exercise=${exercises[$((selection-1))]}
+        practice_single_exercise "$level" "$selected_exercise"
+    elif [ "$selection" != "0" ]; then
+        echo -e "${RED}Selección inválida${NC}"
+        read -p "Presiona Enter para continuar..."
+    fi
+}
+
+# Función para seleccionar nivel
+select_level() {
+    while true; do
+        clear
+        echo -e "${BLUE}=== SELECCIONAR NIVEL ===${NC}"
+        echo "1. Level 1"
+        echo "2. Level 2"
+        echo "3. Level 3"
+        echo "4. Level 4"
+        echo "0. Volver"
+        
+        read -r level_choice
+        
+        case $level_choice in
+            [1-4])
+                list_level_exercises "$level_choice"
+                ;;
+            0)
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                read -p "Presiona Enter para continuar..."
+                ;;
+        esac
+    done
+}
+
+# Función para practicar un ejercicio específico
+practice_single_exercise() {
+    local level=$1
+    local exercise=$2
+    
+    show_subject $level "$exercise"
+    while true; do
+        echo -e "\n${YELLOW}Opciones:${NC}"
+        echo "1. Validar ejercicio"
+        echo "2. Marcar como completado sin validar"
+        echo "3. Dejar pendiente"
+        echo "4. Salir"
+        read -r option
+        
+        case $option in
+            1)
+                if validate_exercise $level "$exercise"; then
+                    echo -e "${GREEN}¡Tests pasados correctamente!${NC}"
+                    mark_as_completed $level "$exercise"
+                    break
+                else
+                    echo -e "${RED}Los tests han fallado. Sigue intentándolo.${NC}"
+                    echo -e "\n${YELLOW}Presiona Enter para continuar...${NC}"
+                    read
+                fi
+                ;;
+            2)
+                mark_as_completed $level "$exercise"
+                echo -e "${GREEN}¡Ejercicio marcado como completado!${NC}"
+                break
+                ;;
+            3)
+                echo -e "${YELLOW}Ejercicio pendiente para la próxima vez${NC}"
+                break
+                ;;
+            4)
+                return
+                ;;
+            *)
+                echo "Opción inválida"
+                ;;
+        esac
+    done
+    
+    echo -e "\n${YELLOW}Presiona Enter para continuar...${NC}"
+    read
 }
 
 # Función para practicar ejercicios
@@ -239,15 +356,17 @@ init_environment() {
 init_environment
 
 # Menú principal
+# Menú principal
 while true; do
     clear
     echo -e "${BLUE}=== 42 EXAM PRACTICE ===${NC}"
     show_progress
     
     echo -e "\n${YELLOW}Opciones:${NC}"
-    echo "1. Comenzar práctica"
-    echo "2. Resetear todo el progreso"
-    echo "3. Salir"
+    echo "1. Comenzar práctica aleatoria"
+    echo "2. Seleccionar ejercicio específico"
+    echo "3. Resetear todo el progreso"
+    echo "4. Salir"
     
     read -p "Selecciona una opción: " option
 
@@ -256,6 +375,9 @@ while true; do
             practice_exercises
             ;;
         2)
+            select_level
+            ;;
+        3)
             echo -e "${RED}¿Estás seguro de que quieres resetear todo el progreso? (s/n)${NC}"
             read -r response
             if [[ "$response" =~ ^[Ss]$ ]]; then
@@ -266,7 +388,7 @@ while true; do
                 echo "Progreso reseteado"
             fi
             ;;
-        3)
+        4)
             echo "¡Hasta luego!"
             exit 0
             ;;
@@ -275,5 +397,5 @@ while true; do
             ;;
     esac
 
-    [ "$option" != "1" ] && read -p "Presiona Enter para continuar..."
+    [ "$option" != "1" ] && [ "$option" != "2" ] && read -p "Presiona Enter para continuar..."
 done

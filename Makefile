@@ -6,7 +6,7 @@
 #    By: mvigara- <mvigara-@student.42school.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/11 18:44:00 by mvigara-          #+#    #+#              #
-#    Updated: 2024/11/11 18:44:05 by mvigara-         ###   ########.fr        #
+#    Updated: 2024/11/11 20:26:05 by mvigara-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ NC = \033[0m
 
 # Directorios
 EXAM_DIR = 02
+RENDU_DIR = rendu
 
 # Regla principal
 all: check_dir run_exam
@@ -32,6 +33,8 @@ check_dir:
 		echo "$(RED)Error: No se encuentra exam.sh$(NC)"; \
 		exit 1; \
 	fi
+	@mkdir -p $(RENDU_DIR)
+	@mkdir -p $(EXAM_DIR)/exam_progress
 	@chmod +x $(EXAM_DIR)/exam.sh
 	@chmod +x $(EXAM_DIR)/init.sh
 
@@ -43,22 +46,17 @@ run_exam:
 # Limpiar archivos temporales y progreso
 clean:
 	@echo "$(BLUE)Limpiando archivos temporales...$(NC)"
-	@rm -rf $(EXAM_DIR)/exam_progress
-	@rm -rf $(EXAM_DIR)/rendu
+	@rm -rf $(EXAM_DIR)/exam_progress/*
 	@find . -name "*.o" -type f -delete
 	@find . -name "a.out" -type f -delete
 
 # Limpiar todo y resetear el progreso
 fclean: clean
 	@echo "$(BLUE)Reseteando todo el progreso...$(NC)"
-	@rm -rf $(EXAM_DIR)/exam_progress
+	@rm -rf $(EXAM_DIR)/exam_progress/*
+	@rm -rf $(RENDU_DIR)/*
 
 # Reinstalar/Resetear todo
 re: fclean all
 
-# Tests (puedes agregar más tests específicos aquí)
-test: check_dir
-	@echo "$(BLUE)Verificando estructura de directorios...$(NC)"
-	@cd $(EXAM_DIR) && ./init.sh Level1 first_word
-
-.PHONY: all clean fclean re test check_dir run_exam
+.PHONY: all clean fclean re check_dir run_exam
