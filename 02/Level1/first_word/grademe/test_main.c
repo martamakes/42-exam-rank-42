@@ -1,80 +1,80 @@
+// test_main.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-/* EXPLICACIÓN DEL TEST:
-* - Usamos pipe() para capturar la salida del programa
-* - fork() para crear un proceso hijo que ejecutará el programa
-* - En el padre, comparamos la salida con el resultado esperado
-*
-* CASOS DE PRUEBA:
-* 1. String simple con una palabra
-* 2. String con múltiples palabras
-* 3. String con espacios al inicio/fin
-* 4. String vacía
-* 5. Múltiples argumentos
-* 6. String con tabs y espacios múltiples
+/*
+** Función auxiliar para capturar la salida del programa
+** Usa un pipe para redireccionar la salida estándar
 */
-
-void test_program(char **args, char *expected)
-{
+void capture_output(const char *input, char *output, size_t output_size) {
     int pipefd[2];
-    char buffer[1024] = {0};
-    
     if (pipe(pipefd) == -1) {
-        printf("Error al crear el pipe\n");
-        return;
+        perror("pipe");
+        exit(1);
     }
-    
-    int pid = fork();
+
+    pid_t pid = fork();
     if (pid == 0) {
         // Proceso hijo
         close(pipefd[0]);
         dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+
+        // Ejecutar el programa con el input
+        char *args[] = {"./first_word", (char *)input, NULL};
         execv("./first_word", args);
         exit(1);
     } else {
         // Proceso padre
         close(pipefd[1]);
-        read(pipefd[0], buffer, sizeof(buffer));
+        int bytes_read = read(pipefd[0], output, output_size - 1);
+        if (bytes_read > 0)
+            output[bytes_read] = '\0';
         close(pipefd[0]);
-        
-        if (strcmp(buffer, expected) == 0)
-            printf("Test passed ✓: %s\n", args[1] ? args[1] : "null");
-        else {
-            printf("Test failed ✗: %s\n", args[1] ? args[1] : "null");
-            printf("Expected: '%s'\n", expected);
-            printf("Got     : '%s'\n", buffer);
-        }
+        wait(NULL);
     }
 }
 
-int main(void)
-{
-    // Test 1: Palabra simple
-    char *args1[] = {"./first_word", "hello", NULL};
-    test_program(args1, "hello\n");
+/*
+** Función de test que verifica diferentes casos
+*/
+void run_test(const char *input, const char *expected, const char *test_name) {
+    char output[1024] = {0};
     
-    // Test 2: Múltiples palabras
-    char *args2[] = {"./first_word", "FOR PONY", NULL};
-    test_program(args2, "FOR\n");
+    printf("Test %s: ", test_name);
+    capture_output(input, output, sizeof(output));
     
-    // Test 3: Espacios al inicio/fin
-    char *args3[] = {"./first_word", "  lorem,ipsum  ", NULL};
-    test_program(args3, "lorem,ipsum\n");
+    if (strcmp(output, expected) == 0) {
+        printf("\033[0;32mPASS ✓\033[0m\n");
+        printf("Input: \"%s\"\n", input);
+        printf("Expected: \"%s\"\n", expected);
+        printf("Got: \"%s\"\n\n", output);
+    } else {
+        printf("\033[0;31mFAIL ✗\033[0m\n");
+        printf("Input: \"%s\"\n", input);
+        printf("Expected: \"%s\"\n", expected);
+        printf("Got: \"%s\"\n\n", output);
+    }
+}
+
+/*
+** Programa principal que ejecuta todos los tests
+*/
+int main(void) {
+    printf("Running tests for first_word...\n\n");
+
+    // Test casos básicos
+    run_test("FOR PONY", "FOR\n", "Basic");
+    run_test("this        ...    is sparta", "this\n", "Multiple spaces");
+    run_test("   ", "\n", "Only spaces");
+    run_test("lorem,ipsum", "lorem,ipsum\n", "Word with comma");
     
-    // Test 4: Solo espacios
-    char *args4[] = {"./first_word", "   ", NULL};
-    test_program(args4, "\n");
-    
-    // Test 5: Múltiples argumentos
-    char *args5[] = {"./first_word", "a", "b", NULL};
-    test_program(args5, "\n");
-    
-    // Test 6: Tabs y espacios múltiples
-    char *args6[] = {"./first_word", "this        ...    is sparta", NULL};
-    test_program(args6, "this\n");
+    // Test casos especiales
+    run_test("\t\t\tHello", "Hello\n", "Tabs");
+    run_test("OneWord", "OneWord\n", "Single word");
+    run_test("  Hello\tWorld  ", "Hello\n", "Mixed spaces and tabs");
     
     return 0;
 }
