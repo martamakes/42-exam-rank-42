@@ -194,19 +194,34 @@ init_grademe() {
     # Verificar que existe el directorio grademe y sus archivos
     local grademe_dir="$level_dir/$exercise_dir/grademe"
     
+    # Verificar y crear directorio grademe si no existe
     if [ ! -d "$grademe_dir" ]; then
         echo -e "${RED}Error: No se encuentra el directorio de tests para $exercise_dir${NC}"
-        return 1
+        echo -e "${YELLOW}Creando directorio: $grademe_dir${NC}"
+        if ! mkdir -p "$grademe_dir"; then
+            echo -e "${RED}Error: No se pudo crear el directorio de tests${NC}"
+            return 1
+        fi
     fi
     
+    # Verificar y crear test.sh si no existe
     if [ ! -f "$grademe_dir/test.sh" ]; then
         echo -e "${RED}Error: Falta test.sh en $exercise_dir${NC}"
-        return 1
+        echo -e "${YELLOW}Creando archivo: $grademe_dir/test.sh${NC}"
+        create_test_script "$grademe_dir" "$exercise_dir"
+        if [ $? -ne 0 ]; then
+            return 1
+        fi
     fi
     
+    # Verificar y crear test_main.c si no existe 
     if [ ! -f "$grademe_dir/test_main.c" ]; then
         echo -e "${RED}Error: Falta test_main.c en $exercise_dir${NC}"
-        return 1
+        echo -e "${YELLOW}Creando archivo: $grademe_dir/test_main.c${NC}"
+        create_test_main "$grademe_dir" "$exercise_dir"
+        if [ $? -ne 0 ]; then
+            return 1
+        fi
     fi
     
     # Asegurar permisos de ejecución

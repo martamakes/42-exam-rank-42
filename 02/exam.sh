@@ -40,8 +40,12 @@ validate_exercise() {
     # Verificar que existe el directorio de tests
     if [ ! -d "$grademe_dir" ]; then
         echo -e "${RED}Error: No se encuentran los tests para $exercise${NC}"
-        echo -e "${YELLOW}Directorio esperado: $grademe_dir${NC}"
-        return 1
+        echo -e "${YELLOW}Creando directorio: $grademe_dir${NC}"
+        mkdir -p "$grademe_dir"
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Error: No se pudo crear el directorio de tests${NC}"
+            return 1
+        fi
     fi
 
     if [ ! -f "$student_file" ]; then
