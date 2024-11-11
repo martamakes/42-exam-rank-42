@@ -97,8 +97,9 @@ show_subject() {
     if [ -f "$subject_path" ]; then
         cat "$subject_path"
         echo -e "\n${YELLOW}Para resolver este ejercicio:${NC}"
-        echo -e "1. ${CYAN}Crea el directorio:${NC} mkdir -p $student_dir"
-        echo -e "2. ${CYAN}Crea tu solución en:${NC} $student_dir/${exercise}.c"
+        # Usar echo -e para interpretar los colores y escapar las comillas correctamente
+        echo -e "1. ${CYAN}Crea el directorio:${NC} mkdir -p 02/$student_dir"
+        echo -e "2. ${CYAN}Crea tu solución en:${NC} 02/$student_dir/${exercise}.c"
         mkdir -p "$student_dir"
     else
         echo -e "${RED}Error: No se encuentra el subject en $subject_path${NC}"
