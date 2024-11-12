@@ -12,7 +12,7 @@
 int g_tests_failed = 0;
 
 // Función para capturar la salida del programa
-void capture_program_output(char **args, char *output, size_t output_size) {
+void capture_program_output(const char *program_path, char **args, char *output, size_t output_size) {
     int pipefd[2];
     pipe(pipefd);
     
@@ -23,7 +23,7 @@ void capture_program_output(char **args, char *output, size_t output_size) {
         dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[1]);
         
-        execv(args[0], args);
+        execv(program_path, args);
         exit(1);
     } else {
         // Proceso padre
@@ -36,33 +36,24 @@ void capture_program_output(char **args, char *output, size_t output_size) {
     }
 }
 
-// Función para generar la salida esperada
-void generate_expected(const char *input, char *expected) {
-    const char *ptr = input;
-    char *out = expected;
-    
-    while (*ptr) {
-        if ((*ptr >= 'a' && *ptr <= 'z') || (*ptr >= 'A' && *ptr <= 'Z')) {
-            int repeat = (*ptr >= 'a') ? (*ptr - 'a' + 1) : (*ptr - 'A' + 1);
-            for (int i = 0; i < repeat; i++)
-                *out++ = *ptr;
-        } else {
-            *out++ = *ptr;
-        }
-        ptr++;
-    }
-    *out = '\0';
-}
-
 // Función para ejecutar un test individual
-void run_test(const char *test_name, char **args, const char *input) {
+void run_test(const char *test_name, const char *input) {
     printf("Test: %s\n", test_name);
     
     char output[4096] = {0};
     char expected[4096] = {0};
     
-    generate_expected(input, expected);
-    capture_program_output(args, output, sizeof(output));
+    // Preparamos los argumentos para el programa del estudiante
+    char *student_args[] = {"./repeat_alpha", (char *)input, NULL};
+    
+    // Preparamos los argumentos para el programa de referencia
+    char *reference_args[] = {"./reference_repeat_alpha", (char *)input, NULL};
+    
+    // Obtenemos la salida del programa de referencia
+    capture_program_output("./reference_repeat_alpha", reference_args, expected, sizeof(expected));
+    
+    // Obtenemos la salida del programa del estudiante
+    capture_program_output("./repeat_alpha", student_args, output, sizeof(output));
     
     if (strcmp(output, expected) == 0) {
         printf("\033[0;32m[OK]\033[0m Test passed\n");
@@ -87,44 +78,34 @@ void run_test(const char *test_name, char **args, const char *input) {
             ptr++;
         }
         printf("\n");
-        g_tests_failed++; // Incrementamos el contador de fallos
+        g_tests_failed++;
     }
     printf("\n");
 }
 
 int main(void) {
-    char *program_name = "./repeat_alpha";
-    g_tests_failed = 0; // Inicializamos el contador
+    g_tests_failed = 0;
+    
+    // Compilamos el programa de referencia
+    system("gcc -Wall -Wextra -Werror reference_repeat_alpha.c -o reference_repeat_alpha");
     
     // Test 1: Letra minúscula simple
-    {
-        char *args[] = {program_name, "a", NULL};
-        run_test("Letra minúscula simple", args, "a");
-    }
+    run_test("Letra minúscula simple", "a");
     
     // Test 2: Letra mayúscula simple
-    {
-        char *args[] = {program_name, "B", NULL};
-        run_test("Letra mayúscula simple", args, "B");
-    }
+    run_test("Letra mayúscula simple", "B");
     
     // Test 3: Palabra con minúsculas
-    {
-        char *args[] = {program_name, "abc", NULL};
-        run_test("Palabra con minúsculas", args, "abc");
-    }
+    run_test("Palabra con minúsculas", "abc");
     
     // Test 4: Caracteres especiales
-    {
-        char *args[] = {program_name, "a!b", NULL};
-        run_test("Caracteres especiales", args, "a!b");
-    }
+    run_test("Caracteres especiales", "a!b");
     
     // Test 5: String vacío
-    {
-        char *args[] = {program_name, "", NULL};
-        run_test("String vacío", args, "");
-    }
+    run_test("String vacío", "");
     
-    return g_tests_failed; // Retornamos el número de fallos
+    // Limpiamos el programa de referencia
+    system("rm -f reference_repeat_alpha");
+    
+    return g_tests_failed;
 }
