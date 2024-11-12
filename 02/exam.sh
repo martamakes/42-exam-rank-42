@@ -92,7 +92,13 @@ validate_exercise() {
     local result=$?
     cd - > /dev/null
     
-    return $result
+    if [ $result -eq 0 ]; then
+        echo -e "${GREEN}¡Todos los tests han pasado correctamente!${NC}"
+        return 0
+    else
+        echo -e "${RED}Algunos tests han fallado. El ejercicio no está completamente correcto.${NC}"
+        return 1
+    fi
 }
 
 # Función para obtener ejercicios disponibles de un nivel
@@ -361,7 +367,7 @@ practice_exercises() {
     done
 }
 
-# Verificar y preparar el entorno
+# Función para inicializar el entorno
 init_environment() {
     # Verificar que existe init.sh
     if [ ! -f "./init.sh" ]; then
@@ -371,9 +377,6 @@ init_environment() {
     
     # Dar permisos de ejecución si no los tiene
     chmod +x ./init.sh
-    
-    # Crear directorio rendu si no existe
-    mkdir -p rendu
     
     # Verificar estructura de niveles
     for i in {1..4}; do
