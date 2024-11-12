@@ -1,4 +1,4 @@
-# sort_in_tab
+# sort_int_tab
 Assignment name  : sort_int_tab
 Expected files   : sort_int_tab.c
 Allowed functions:

@@ -14,7 +14,10 @@ int	main(int argc, char **argv)
 {
 	(void)argv; //evitar warning unused argv
 
-	ft_putnbr(argc - 1);
+	if(argc == 1)
+		write(1, "0\n", 1);
+	else
+		ft_putnbr(argc - 1);
 	write(1, "\n", 1);
 	return (0);
 }
