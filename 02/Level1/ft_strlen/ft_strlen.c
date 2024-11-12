@@ -1,9 +1,15 @@
-int	ft_strlen(char *str)
+int ft_strlen(char *str)
 {
     int i = 0;
-    while(*str++)
+    int len = 0;
+    
+    while (str[i])
+    {
+        if ((str[i] & 0xC0) != 0x80)  // Si no es un byte de continuación UTF-8
+            len++;
         i++;
-    return (i);
+    }
+    return (len);
 }
 
 //#include <stdio.h>

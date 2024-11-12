@@ -46,6 +46,30 @@ validate_exercise() {
             echo -e "${RED}Error: No se pudo crear el directorio de tests${NC}"
             return 1
         fi
+        
+        # Crear archivos vacíos de test
+        touch "$grademe_dir/test.sh"
+        chmod +x "$grademe_dir/test.sh"
+        echo "echo 'Los tests aún no se han creado'" > "$grademe_dir/test.sh"
+        
+        touch "$grademe_dir/test_main.c"
+        echo "// Tests pendientes de crear" > "$grademe_dir/test_main.c"
+        
+        echo -e "${YELLOW}Tests pendientes de crear. Se han creado archivos vacíos.${NC}"
+        return 1
+    fi
+
+    if [ ! -f "$test_script" ]; then
+        echo -e "${YELLOW}Creando archivos de test vacíos...${NC}"
+        touch "$grademe_dir/test.sh"
+        chmod +x "$grademe_dir/test.sh"
+        echo "echo 'Los tests aún no se han creado'" > "$grademe_dir/test.sh"
+        
+        touch "$grademe_dir/test_main.c"
+        echo "// Tests pendientes de crear" > "$grademe_dir/test_main.c"
+        
+        echo -e "${YELLOW}Tests pendientes de crear. Se han creado archivos vacíos.${NC}"
+        return 1
     fi
 
     if [ ! -f "$student_file" ]; then
@@ -55,11 +79,8 @@ validate_exercise() {
         return 1
     fi
     
-    # Dar permisos de ejecución al script de test si no los tiene
-    if [ ! -x "$test_script" ]; then
-        echo -e "${YELLOW}Dando permisos de ejecución al script de test...${NC}"
-        chmod +x "$test_script"
-    fi
+    # Dar permisos de ejecución al script de test
+    chmod +x "$test_script"
     
     echo -e "${BLUE}Ejecutando tests para $exercise...${NC}"
     if ! cd "$grademe_dir"; then
