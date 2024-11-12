@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h> // Añadido para wait
+
+// Variable global para contar los tests fallidos
+int g_tests_failed = 0;
 
 // Función para generar la salida esperada
 char *generate_expected_output(void)
@@ -62,13 +66,17 @@ void print_difference_context(const char *expected, const char *got)
 
 int main(void)
 {
+    // Inicializamos el contador de fallos
+    g_tests_failed = 0;
+
     int pipefd[2];
     char buffer[4096] = {0};
     
     if (pipe(pipefd) == -1)
     {
         printf("Error al crear el pipe\n");
-        return 1;
+        g_tests_failed++;
+        return g_tests_failed;
     }
     
     int pid = fork();
@@ -87,6 +95,7 @@ int main(void)
         close(pipefd[1]);
         ssize_t bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1);
         close(pipefd[0]);
+        wait(NULL);  // Esperamos al hijo
         
         if (bytes_read > 0)
             buffer[bytes_read] = '\0';
@@ -98,14 +107,16 @@ int main(void)
             printf("\033[0;32mTest passed ✓\033[0m\n");
             printf("El programa imprime correctamente todos los números del 1 al 100\n");
             printf("con fizz, buzz y fizzbuzz donde corresponde\n");
-            return 0;
         }
         else
         {
+            g_tests_failed++; // Incrementamos el contador de fallos
             printf("\033[0;31mTest failed ✗\033[0m\n");
             printf("La salida no coincide con el formato esperado\n");
             print_difference_context(expected, buffer);
-            return 1;
         }
     }
+    
+    // Retornamos el número de tests fallidos
+    return g_tests_failed;
 }

@@ -3,6 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+// Contador global de errores
+int g_tests_failed = 0;
+
 // Prototipo de la función a testear
 char *ft_strcpy(char *s1, char *s2);
 
@@ -13,9 +16,10 @@ void test_strcpy(const char *test_name, char *source) {
     char *dest1 = malloc(len);
     char *dest2 = malloc(len);
     
-    // Si malloc falla, terminar el test
+    // Si malloc falla, incrementar contador y terminar el test
     if (!dest1 || !dest2) {
         printf("\033[0;31m[KO]\033[0m %s: Error de memoria\n", test_name);
+        g_tests_failed++;
         free(dest1);
         free(dest2);
         return;
@@ -33,6 +37,7 @@ void test_strcpy(const char *test_name, char *source) {
     if (content_ok && return_ok) {
         printf("\033[0;32m[OK]\033[0m %s\n", test_name);
     } else {
+        g_tests_failed++;  // Incrementar contador en caso de fallo
         printf("\033[0;31m[KO]\033[0m %s\n", test_name);
         if (!content_ok) {
             printf("  Expected: \"%s\"\n", dest1);
@@ -49,6 +54,9 @@ void test_strcpy(const char *test_name, char *source) {
 }
 
 int main(void) {
+    // Inicializar contador de errores
+    g_tests_failed = 0;
+    
     printf("=== Tests para ft_strcpy ===\n\n");
     
     // Test 1: String normal
@@ -71,6 +79,15 @@ int main(void) {
     
     // Test 7: String alfanumérica
     test_strcpy("Alfanumérica", "abc123DEF456");
+
+    // Resumen final
+    printf("\n=== Resumen de tests ===\n");
+    if (g_tests_failed == 0) {
+        printf("\033[0;32mTodos los tests pasaron correctamente ✓\033[0m\n");
+    } else {
+        printf("\033[0;31mSe encontraron %d errores ✗\033[0m\n", g_tests_failed);
+    }
     
-    return 0;
+    // Retornar el número de tests fallidos
+    return g_tests_failed;
 }

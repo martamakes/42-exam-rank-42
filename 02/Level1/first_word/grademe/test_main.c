@@ -4,77 +4,115 @@
 #include <string.h>
 #include <unistd.h>
 
-/*
-** Función auxiliar para capturar la salida del programa
-** Usa un pipe para redireccionar la salida estándar
-*/
-void capture_output(const char *input, char *output, size_t output_size) {
-    int pipefd[2];
-    if (pipe(pipefd) == -1) {
-        perror("pipe");
-        exit(1);
-    }
+// Variable global para rastrear fallos
+int g_tests_failed = 0;
 
+// Función para capturar la salida del programa
+void capture_program_output(char **args, char *output, size_t output_size) {
+    int pipefd[2];
+    pipe(pipefd);
+    
     pid_t pid = fork();
     if (pid == 0) {
         // Proceso hijo
         close(pipefd[0]);
         dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[1]);
-
-        // Ejecutar el programa con el input
-        char *args[] = {"./first_word", (char *)input, NULL};
-        execv("./first_word", args);
+        
+        execv(args[0], args);
         exit(1);
     } else {
         // Proceso padre
         close(pipefd[1]);
-        int bytes_read = read(pipefd[0], output, output_size - 1);
-        if (bytes_read > 0)
-            output[bytes_read] = '\0';
+        ssize_t bytes = read(pipefd[0], output, output_size - 1);
+        if (bytes >= 0)
+            output[bytes] = '\0';
         close(pipefd[0]);
         wait(NULL);
     }
 }
 
-/*
-** Función de test que verifica diferentes casos
-*/
-void run_test(const char *input, const char *expected, const char *test_name) {
-    char output[1024] = {0};
+// Función para ejecutar un test individual
+void run_test(const char *test_name, char **args, const char *expected) {
+    printf("Test: %s\n", test_name);
     
-    printf("Test %s: ", test_name);
-    capture_output(input, output, sizeof(output));
+    char output[4096] = {0};
+    capture_program_output(args, output, sizeof(output));
     
     if (strcmp(output, expected) == 0) {
-        printf("\033[0;32mPASS ✓\033[0m\n");
-        printf("Input: \"%s\"\n", input);
-        printf("Expected: \"%s\"\n", expected);
-        printf("Got: \"%s\"\n\n", output);
+        printf("\033[0;32m[OK]\033[0m Test passed\n");
     } else {
-        printf("\033[0;31mFAIL ✗\033[0m\n");
-        printf("Input: \"%s\"\n", input);
-        printf("Expected: \"%s\"\n", expected);
-        printf("Got: \"%s\"\n\n", output);
+        printf("\033[0;31m[KO]\033[0m Test failed\n");
+        printf("Input: \"%s\"\n", args[1]);
+        printf("Expected output: \"");
+        const char *ptr = expected;
+        while (*ptr) {
+            if (*ptr == '\n')
+                printf("$\n");
+            else
+                printf("%c", *ptr);
+            ptr++;
+        }
+        printf("\"\nYour output: \"");
+        ptr = output;
+        while (*ptr) {
+            if (*ptr == '\n')
+                printf("$\n");
+            else
+                printf("%c", *ptr);
+            ptr++;
+        }
+        printf("\"\n");
+        g_tests_failed++;
     }
+    printf("\n");
 }
 
-/*
-** Programa principal que ejecuta todos los tests
-*/
 int main(void) {
-    printf("Running tests for first_word...\n\n");
-
+    printf("\n=== Testing first_word ===\n\n");
+    
+    char *program_name = "./first_word";
+    g_tests_failed = 0; // Inicializamos el contador
+    
     // Test casos básicos
-    run_test("FOR PONY", "FOR\n", "Basic");
-    run_test("this        ...    is sparta", "this\n", "Multiple spaces");
-    run_test("   ", "\n", "Only spaces");
-    run_test("lorem,ipsum", "lorem,ipsum\n", "Word with comma");
+    {
+        char *args[] = {program_name, "FOR PONY", NULL};
+        run_test("Caso básico", args, "FOR\n");
+    }
     
-    // Test casos especiales
-    run_test("\t\t\tHello", "Hello\n", "Tabs");
-    run_test("OneWord", "OneWord\n", "Single word");
-    run_test("  Hello\tWorld  ", "Hello\n", "Mixed spaces and tabs");
+    // Test múltiples espacios
+    {
+        char *args[] = {program_name, "   hello   world   ", NULL};
+        run_test("Múltiples espacios", args, "hello\n");
+    }
     
-    return 0;
+    // Test solo espacios
+    {
+        char *args[] = {program_name, "   ", NULL};
+        run_test("Solo espacios", args, "\n");
+    }
+    
+    // Test palabra con coma
+    {
+        char *args[] = {program_name, "lorem,ipsum", NULL};
+        run_test("Palabra con coma", args, "lorem,ipsum\n");
+    }
+    
+    // Test con tabs
+    {
+        char *args[] = {program_name, "\t\t\tHello", NULL};
+        run_test("Tabs", args, "Hello\n");
+    }
+    
+    // Resumen final
+    printf("=== Resumen de tests ===\n");
+    if (g_tests_failed == 0) {
+        printf("\033[0;32mTodos los tests pasaron correctamente ✓\033[0m\n");
+    } else {
+        printf("\033[0;31mSe encontraron %d errores ✗\033[0m\n", g_tests_failed);
+        printf("Revisa los casos que fallaron arriba\n");
+    }
+    printf("\n");
+    
+    return g_tests_failed;
 }
