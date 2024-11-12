@@ -153,7 +153,14 @@ mark_as_completed() {
     local level=$1
     local exercise=$2
     local done_file="$PROGRESS_DIR/level${level}_done.txt"
-    echo "$exercise" >> "$done_file"
+    
+    # Verificar si el ejercicio ya está marcado como completado
+    if ! grep -q "^${exercise}$" "$done_file"; then
+        echo "$exercise" >> "$done_file"
+        echo -e "${GREEN}¡Ejercicio $exercise marcado como completado!${NC}"
+    else
+        echo -e "${YELLOW}El ejercicio $exercise ya estaba marcado como completado${NC}"
+    fi
 }
 
 # Función para mostrar progreso
@@ -162,10 +169,24 @@ show_progress() {
     for i in {1..4}; do
         local done_file="$PROGRESS_DIR/level${i}_done.txt"
         local total=$(count_total_exercises $i)
-        local completed=$(wc -l < "$done_file")
+        # Usar sort y uniq para contar solo ejercicios únicos
+        local completed=$(sort "$done_file" | uniq | wc -l)
         echo -e "${GREEN}Nivel $i: $completed/$total ejercicios completados${NC}"
     done
     echo
+}
+
+# Función para limpiar duplicados de los archivos de progreso
+clean_progress_files() {
+    for i in {1..4}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        if [ -f "$done_file" ]; then
+            # Crear archivo temporal con entradas únicas
+            sort "$done_file" | uniq > "${done_file}.tmp"
+            # Reemplazar archivo original
+            mv "${done_file}.tmp" "$done_file"
+        fi
+    done
 }
 
 # Función para seleccionar un ejercicio aleatorio de un nivel
@@ -385,6 +406,9 @@ init_environment() {
             exit 1
         fi
     done
+    
+    # Limpiar archivos de progreso de duplicados
+    clean_progress_files
 }
 
 # Inicializar el entorno
