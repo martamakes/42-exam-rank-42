@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 // Variable global para rastrear fallos
 int g_tests_failed = 0;

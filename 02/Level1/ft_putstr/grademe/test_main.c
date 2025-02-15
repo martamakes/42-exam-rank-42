@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 
 // Variable global para contar los tests fallidos
 int g_tests_failed = 0;
