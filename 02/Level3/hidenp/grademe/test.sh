@@ -19,8 +19,16 @@ fi
 # Copiar archivos necesarios
 cp "$STUDENT_DIR/$EXERCISE.c" .
 
+# Detectar sistema operativo y establecer flags
+OS=$(uname -s)
+if [ "$OS" = "Linux" ]; then
+    CFLAGS="-Wall -Wextra -Werror -D_GNU_SOURCE"
+else
+    CFLAGS="-Wall -Wextra -Werror"
+fi
+
 # Compilar
-gcc -Wall -Wextra -Werror "$EXERCISE.c" -o "$EXERCISE"
+gcc $CFLAGS "$EXERCISE.c" -o "$EXERCISE"
 if [ $? -ne 0 ]; then
     echo -e "${RED}Error de compilación del programa${NC}"
     exit 1
