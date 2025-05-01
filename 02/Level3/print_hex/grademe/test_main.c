@@ -38,8 +38,8 @@ void capture_output(char *const args[], char *output, size_t size)
     close(pipefd[1]); // Cerramos el extremo de escritura
     
     // Leemos en un bucle para asegurar capturar toda la salida
-    int total_read = 0;
-    int bytes_read;
+    size_t total_read = 0;
+    ssize_t bytes_read;
     char buffer[128];
     
     // Usamos select para esperar la disponibilidad de datos con timeout
@@ -112,7 +112,7 @@ void run_test(char *test_name, char *const args[], const char *expected)
     else {
         printf("\033[0;31m[KO]\033[0m\n");
         printf("Expected: \"");
-        for (int i = 0; expected[i]; i++) {
+        for (size_t i = 0; expected[i]; i++) {
             if (expected[i] == '\n')
                 printf("\\n");
             else
@@ -121,7 +121,7 @@ void run_test(char *test_name, char *const args[], const char *expected)
         printf("\"\n");
         
         printf("Got     : \"");
-        for (int i = 0; output[i]; i++) {
+        for (size_t i = 0; output[i]; i++) {
             if (output[i] == '\n')
                 printf("\\n");
             else
@@ -130,19 +130,19 @@ void run_test(char *test_name, char *const args[], const char *expected)
         printf("\"\n");
         
         // Mostrar donde difieren
-        int i = 0;
+        size_t i = 0;
         while (expected[i] && output[i] && expected[i] == output[i])
             i++;
         
         if (expected[i] || output[i]) {
-            printf("Difference at position %d: ", i);
+            printf("Difference at position %zu: ", i);
             if (expected[i])
-                printf("expected '%c' (%d) ", expected[i], expected[i]);
+                printf("expected '%c' (%d) ", expected[i], (int)expected[i]);
             else
                 printf("expected end of string ");
             
             if (output[i])
-                printf("got '%c' (%d)\n", output[i], output[i]);
+                printf("got '%c' (%d)\n", output[i], (int)output[i]);
             else
                 printf("got end of string\n");
         }
