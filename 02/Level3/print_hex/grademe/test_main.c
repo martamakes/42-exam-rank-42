@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/time.h>
 
 int g_tests_failed = 0;
 
+// Versión mejorada de capture_output que garantiza capturar toda la salida
 void capture_output(char *const args[], char *output, size_t size)
 {
     int pipefd[2];
@@ -21,6 +24,7 @@ void capture_output(char *const args[], char *output, size_t size)
     }
     
     if (pid == 0) {
+        // Proceso hijo
         close(pipefd[0]);
         dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[1]);
@@ -30,14 +34,70 @@ void capture_output(char *const args[], char *output, size_t size)
         exit(1);
     }
     
-    close(pipefd[1]);
+    // Proceso padre
+    close(pipefd[1]); // Cerramos el extremo de escritura
     
-    int n = read(pipefd[0], output, size - 1);
-    output[n] = '\0';
+    // Leemos en un bucle para asegurar capturar toda la salida
+    int total_read = 0;
+    int bytes_read;
+    char buffer[128];
+    
+    // Usamos select para esperar la disponibilidad de datos con timeout
+    fd_set read_fds;
+    struct timeval timeout;
+    
+    while (1) {
+        FD_ZERO(&read_fds);
+        FD_SET(pipefd[0], &read_fds);
+        
+        // Establecemos un pequeño timeout
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 100000; // 100ms
+        
+        int ready = select(pipefd[0] + 1, &read_fds, NULL, NULL, &timeout);
+        
+        if (ready == -1) {
+            perror("select");
+            break;
+        }
+        
+        if (ready == 0) {
+            // Timeout - probablemente ya no hay más datos
+            break;
+        }
+        
+        // Hay datos disponibles para leer
+        bytes_read = read(pipefd[0], buffer, sizeof(buffer) - 1);
+        
+        if (bytes_read <= 0) {
+            // Fin de archivo o error
+            break;
+        }
+        
+        // Aseguramos no desbordar el buffer de salida
+        if (total_read + bytes_read >= size - 1) {
+            memcpy(output + total_read, buffer, size - 1 - total_read);
+            total_read = size - 1;
+            break;
+        }
+        
+        // Copiamos los datos leídos al buffer de salida
+        memcpy(output + total_read, buffer, bytes_read);
+        total_read += bytes_read;
+    }
+    
+    // Terminamos la cadena
+    output[total_read] = '\0';
+    
+    // Cerramos el extremo de lectura
     close(pipefd[0]);
     
+    // Esperamos a que el proceso hijo termine
     int status;
     waitpid(pid, &status, 0);
+    
+    // Pequeña pausa para asegurar que todos los datos sean procesados
+    usleep(10000); // 10ms
 }
 
 void run_test(char *test_name, char *const args[], const char *expected)
@@ -51,8 +111,42 @@ void run_test(char *test_name, char *const args[], const char *expected)
         printf("\033[0;32m[OK]\033[0m\n");
     else {
         printf("\033[0;31m[KO]\033[0m\n");
-        printf("Expected: \"%s\"\n", expected);
-        printf("Got     : \"%s\"\n", output);
+        printf("Expected: \"");
+        for (int i = 0; expected[i]; i++) {
+            if (expected[i] == '\n')
+                printf("\\n");
+            else
+                printf("%c", expected[i]);
+        }
+        printf("\"\n");
+        
+        printf("Got     : \"");
+        for (int i = 0; output[i]; i++) {
+            if (output[i] == '\n')
+                printf("\\n");
+            else
+                printf("%c", output[i]);
+        }
+        printf("\"\n");
+        
+        // Mostrar donde difieren
+        int i = 0;
+        while (expected[i] && output[i] && expected[i] == output[i])
+            i++;
+        
+        if (expected[i] || output[i]) {
+            printf("Difference at position %d: ", i);
+            if (expected[i])
+                printf("expected '%c' (%d) ", expected[i], expected[i]);
+            else
+                printf("expected end of string ");
+            
+            if (output[i])
+                printf("got '%c' (%d)\n", output[i], output[i]);
+            else
+                printf("got end of string\n");
+        }
+        
         g_tests_failed++;
     }
 }
