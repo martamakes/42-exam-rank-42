@@ -1,31 +1,39 @@
-/*
-** swap_bits.c
-** 
-** CONCEPTOS CLAVE:
-** 
-** 1. Bitwise Operations (Operaciones a nivel de bits):
-**    & (AND): Compara bit a bit, devuelve 1 solo si ambos bits son 1
-**    | (OR): Compara bit a bit, devuelve 1 si al menos un bit es 1
-**    >> (right shift): Desplaza bits a la derecha
-**    << (left shift): Desplaza bits a la izquierda
-**
-** 2. Máscaras de bits:
-**    0xF0 = 11110000 en binario (para obtener los 4 bits más significativos)
-**    0x0F = 00001111 en binario (para obtener los 4 bits menos significativos)
-**
-** 3. Ejemplo visual:
-**    Entrada: 0100 0001
-**    Salida:  0001 0100
-*/
-
+/**
+ * swap_bits - Intercambia las mitades de un byte (4 bits altos y 4 bits bajos)
+ * @octet: El byte que queremos manipular
+ *
+ * Return: El byte resultante después de intercambiar sus mitades
+ */
 unsigned char swap_bits(unsigned char octet)
 {
-    // Obtenemos los 4 bits más significativos y los desplazamos a la derecha
-    unsigned char high_nibble = (octet & 0xF0) >> 4;
-    
-    // Obtenemos los 4 bits menos significativos y los desplazamos a la izquierda
-    unsigned char low_nibble = (octet & 0x0F) << 4;
-    
-    // Combinamos ambas partes usando OR
-    return (high_nibble | low_nibble);
+    // Operación compacta: desplaza los 4 bits altos a la derecha y los 4 bits bajos a la izquierda
+    // y los combina con OR bit a bit
+    return ((octet >> 4) | (octet << 4));
 }
+
+/*
+ * EXPLICACIÓN DETALLADA:
+ *
+ * Este código es mucho más simple que mi solución original, y realiza exactamente 
+ * la misma operación, pero de manera más concisa.
+ *
+ * 1. octet >> 4: Desplaza los 4 bits más significativos (izquierda) hacia la derecha
+ *    Ejemplo: Si octet = 0x41 (0100 0001), entonces octet >> 4 = 0x04 (0000 0100)
+ *
+ * 2. octet << 4: Desplaza los 4 bits menos significativos (derecha) hacia la izquierda
+ *    Ejemplo: Si octet = 0x41 (0100 0001), entonces octet << 4 = 0x10 (0001 0000)
+ *
+ * 3. Finalmente, los combinamos con OR (|):
+ *    0000 0100 | 0001 0000 = 0001 0100 (0x14)
+ *
+ * En un unsigned char (8 bits), este enfoque funciona perfectamente porque:
+ * - Al desplazar 4 bits a la derecha, los bits sobrantes se descartan automáticamente
+ * - Al desplazar 4 bits a la izquierda, los bits sobrantes también se descartan
+ * - Al hacer OR, cada mitad acaba en la posición correcta sin interferir con la otra
+ *
+ * VENTAJAS DE ESTA SOLUCIÓN:
+ * - Es extremadamente concisa (una sola línea)
+ * - Es muy eficiente (solo dos operaciones bit a bit)
+ * - Es fácil de entender conceptualmente
+ * - No necesita máscaras adicionales para un unsigned char de 8 bits
+ */
