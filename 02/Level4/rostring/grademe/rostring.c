@@ -1,124 +1,67 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-/*
-** KEY POINTS PARA ESTUDIAR:
-**
-** 1. Gestión de memoria dinámica:
-**    - Usamos malloc para almacenar temporalmente palabras
-**    - Importante liberar memoria con free
-**
-** 2. Técnica de procesamiento de strings:
-**    - Identificar inicio y fin de cada palabra
-**    - Manejar espacios múltiples y tabs
-**    - Control de límites de la cadena
-**
-** 3. Rotación de elementos:
-**    - La primera palabra se guarda aparte
-**    - Se imprimen el resto de palabras
-**    - Finalmente se imprime la primera palabra
-**
-** 4. Control de espacios:
-**    - Un solo espacio entre palabras
-**    - Sin espacios al inicio o final
-*/
-
-int is_space(char c)
-{
-    return (c == ' ' || c == '\t');
-}
-
-// Función para contar palabras en la cadena
-int count_words(char *str)
-{
-    int count = 0;
-    int i = 0;
-    int in_word = 0;
-
-    while (str[i])
-    {
-        if (!is_space(str[i]) && !in_word)
-        {
-            in_word = 1;
-            count++;
-        }
-        else if (is_space(str[i]))
-            in_word = 0;
-        i++;
-    }
-    return (count);
-}
-
-// Función para obtener la longitud de una palabra
-int word_len(char *str)
-{
-    int len = 0;
-    while (str[len] && !is_space(str[len]))
-        len++;
-    return (len);
-}
-
-void rostring(char *str)
+int ft_strlen(char *s)
 {
     int i = 0;
-    int first_word_len;
-    char *first_word;
-    int is_first_printed = 0;
-    int words = count_words(str);
-
-    if (words == 0)
-        return;
-
-    // Saltamos espacios iniciales
-    while (is_space(str[i]))
+    while (s[i])
         i++;
-
-    // Guardamos la primera palabra
-    first_word_len = word_len(str + i);
-    first_word = malloc(first_word_len + 1);
-    if (!first_word)
-        return;
-    for (int j = 0; j < first_word_len; j++)
-        first_word[j] = str[i + j];
-    first_word[first_word_len] = '\0';
-
-    // Avanzamos a la siguiente palabra
-    i += first_word_len;
-
-    // Imprimimos el resto de palabras
-    while (str[i])
-    {
-        if (!is_space(str[i]))
-        {
-            if (is_first_printed)
-                write(1, " ", 1);
-            while (str[i] && !is_space(str[i]))
-            {
-                write(1, &str[i], 1);
-                i++;
-            }
-            is_first_printed = 1;
-        }
-        else
-            i++;
-    }
-
-    // Imprimimos la primera palabra al final
-    if (is_first_printed)
-        write(1, " ", 1);
-    write(1, first_word, first_word_len);
-    free(first_word);
+    return i;
 }
 
 int main(int argc, char **argv)
 {
-    if (argc != 2)
+    if (argc < 2)
     {
         write(1, "\n", 1);
-        return (0);
+        return 0;
+    }
+    char *s = argv[1];
+    char *p = malloc(ft_strlen(s) + 1); // Buffer para la primera palabra
+    if (!p)
+        return 1;
+
+    int i = 0, j = 0;
+
+    // Saltar espacios iniciales
+    while (s[i] == ' ' || s[i] == '\t')
+        i++;
+
+    // Guardar la primera palabra
+    while (s[i] && s[i] != ' ' && s[i] != '\t')
+        p[j++] = s[i++];
+    p[j] = '\0';
+
+    // Saltar espacios después de la primera palabra
+    while (s[i] == ' ' || s[i] == '\t')
+        i++;
+
+    int first = 1;
+    // Imprimir el resto de las palabras
+    while (s[i])
+    {
+        // Saltar espacios antes de la palabra
+        while (s[i] == ' ' || s[i] == '\t')
+            i++;
+        if (!s[i])
+            break;
+        if (!first)
+            write(1, " ", 1);
+        first = 0;
+        int start = i;
+        while (s[i] && s[i] != ' ' && s[i] != '\t')
+            i++;
+        write(1, &s[start], i - start);
     }
 
-    rostring(argv[1]);
+    // Imprimir la primera palabra al final
+    if (j > 0)
+    {
+        if (first == 0) // Si ya imprimiste palabras antes
+            write(1, " ", 1);
+        write(1, p, j);
+    }
     write(1, "\n", 1);
-    return (0);
+    free(p);
+    return 0;
 }
