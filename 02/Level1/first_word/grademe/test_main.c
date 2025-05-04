@@ -13,26 +13,36 @@ int g_tests_failed = 0;
 void capture_program_output(char **args, char *output, size_t output_size) {
     int pipefd[2];
     pipe(pipefd);
-    
     pid_t pid = fork();
+    
     if (pid == 0) {
         // Proceso hijo
         close(pipefd[0]);
         dup2(pipefd[1], STDOUT_FILENO);
         close(pipefd[1]);
-        
         execv(args[0], args);
         exit(1);
     } else {
         // Proceso padre
         close(pipefd[1]);
-        ssize_t bytes = read(pipefd[0], output, output_size - 1);
-        if (bytes >= 0)
-            output[bytes] = '\0';
+        
+        // Leer en un bucle para capturar toda la salida
+        size_t total_bytes = 0;
+        ssize_t bytes;
+        
+        while ((bytes = read(pipefd[0], output + total_bytes, 
+                             output_size - total_bytes - 1)) > 0) {
+            total_bytes += bytes;
+            if (total_bytes >= output_size - 1)
+                break;
+        }
+        
+        output[total_bytes] = '\0';
         close(pipefd[0]);
         wait(NULL);
     }
 }
+
 
 // Función para ejecutar un test individual
 void run_test(const char *test_name, char **args, const char *expected) {

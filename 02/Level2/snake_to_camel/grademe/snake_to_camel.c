@@ -1,61 +1,40 @@
-/*
-** snake_to_camel.c
-**
-** CONCEPTOS CLAVE:
-**
-** 1. snake_case:
-**    - Palabras en minúscula
-**    - Separadas por guiones bajos (_)
-**    Ejemplo: "hello_world"
-**
-** 2. lowerCamelCase:
-**    - Primera palabra en minúscula
-**    - Siguientes palabras empiezan con mayúscula
-**    - Sin separadores
-**    Ejemplo: "helloWorld"
-**
-** 3. Manipulación de caracteres:
-**    - Convertir minúscula a mayúscula: c - 32
-**    - Encontrar y procesar guiones bajos
-*/
-
 #include <unistd.h>
+#include <stdlib.h>
 
-void    snake_to_camel(char *str)
+char to_upper(char c)
 {
-    int i;
-    int capitalize;
-
-    i = 0;
-    capitalize = 0;
-    while (str[i])
-    {
-        if (str[i] == '_')
-        {
-            capitalize = 1;
-        }
-        else
-        {
-            // Si debemos capitalizar, convertimos a mayúscula
-            if (capitalize)
-                str[i] = str[i] - 32;
-            write(1, &str[i], 1);
-            capitalize = 0;
-        }
-        i++;
-    }
+    if(c >= 'a' && c<= 'z')
+        return( c - 32);
+    return c;
 }
 
 int main(int argc, char **argv)
 {
-    // Si no hay argumentos, solo mostrar newline
-    if (argc != 2)
+    if(argc != 2)
     {
-        write(1, "\n", 1);
-        return (0);
+        write(1,"\n", 1);
+        return 0;
     }
+    int i = 0;
+    while (argv[1][i])
+    {
+        
+        if(argv[1][i] != '_')
+        {
+            write(1, &argv[1][i], 1);
+        }
+        else if (argv[1][i] == '_')
+        {
+            i++;
+            char c = argv[1][i];
+            c = to_upper(c);
+            write(1, &c, 1);
 
-    snake_to_camel(argv[1]);
-    write(1, "\n", 1);
-    return (0);
+        }
+        i++;   
+        
+    }
+    
+    write(1,"\n", 1);
+    return 0;
 }
