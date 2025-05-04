@@ -1,0 +1,4 @@
+ft_list_remove_if.c:12:14: warning: passing arguments to a function without a prototype is deprecated in all versions of C and is not supported in C2x [-Wdeprecated-non-prototype]
+    if((*cmp)(current->data, data_ref) == 0)
+             ^
+1 warning generated.

@@ -1,66 +1,60 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   camel_to_snake.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvigara- <mvigara-@student.42school.com    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/12 18:15:32 by mvigara-          #+#    #+#             */
-/*   Updated: 2024/11/12 18:15:33 by mvigara-         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <unistd.h>
+#include <stdlib.h>
 
-/*
-** Principales conceptos del ejercicio:
-** 
-** 1. Iteración de strings:
-**    - Recorremos el string caracter a caracter
-**    - No necesitamos malloc porque podemos escribir directamente
-**
-** 2. Detección de mayúsculas:
-**    - Usamos el rango ASCII: 'A'(65) a 'Z'(90)
-**    - Para convertir a minúscula sumamos 32 ('a'-'A')
-**    - TODAS las letras deben estar en minúsculas en snake_case
-**
-** 3. Write syscall:
-**    - Escribimos caracter a caracter
-**    - Añadimos '_' antes de cada mayúscula (excepto al inicio)
-*/
-
-int main(int argc, char **argv)
+char to_lower(char c)
 {
-    int i;
-    char c;
+    if(c >= 'A' && c <= 'Z')
+    {
+        return (c + 32);
+    }
+    return c;
+}
 
-    // Si no hay argumentos, solo imprime un salto de línea
+int is_upper(char c)
+{
+    return(c >= 'A' && c <= 'Z');
+}
+
+
+int main (int argc, char **argv)
+{
     if (argc != 2)
     {
         write(1, "\n", 1);
-        return (0);
+        return 1;
     }
+    char *s = argv[1];
+    int printed = 0;
 
-    i = 0;
-    // Mientras no lleguemos al final de la cadena
-    while (argv[1][i])
+    while(*s)
     {
-        if (argv[1][i] >= 'A' && argv[1][i] <= 'Z')
+        if(*s && is_upper(*s))
         {
-            // Si no es el primer carácter, añadimos el guión bajo
-            if (i > 0)
-                write(1, "_", 1);
-            // Convertimos la mayúscula a minúscula
-            c = argv[1][i] + ('a' - 'A');
-            write(1, &c, 1);
+            if(printed)
+            {
+                write(1, "_",1);
+                char c = to_lower(*s);
+                write(1, &c, 1);
+            }
+            else
+            {
+                char c = to_lower(*s);
+                write(1, &c, 1);
+            }
+            
+            s++;
         }
         else
         {
-            // Si no es mayúscula, escribimos el caracter tal cual
-            write(1, &argv[1][i], 1);
+            while(*s && !is_upper(*s))
+            {
+                write(1, s, 1);
+                printed = 1;
+                s++;
+            }
         }
-        i++;
+        
     }
-    write(1, "\n", 1);
-    return (0);
+    write(1,"\n", 1);
+    return 0;
 }

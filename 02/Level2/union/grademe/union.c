@@ -1,70 +1,44 @@
-/*
-** union.c
-**
-** CONCEPTOS CLAVE:
-**
-** 1. Orden de aparición:
-**    - Los caracteres deben mostrarse en el orden que aparecen
-**    - Primero los del primer string, luego los del segundo
-**
-** 2. Sin duplicados:
-**    - Un carácter solo debe mostrarse una vez
-**    - Usar array para trackear caracteres ya vistos
-**
-** 3. ASCII:
-**    - Los caracteres son valores ASCII (0-127/255)
-**    - Podemos usar array de booleanos para marcar vistos
-*/
-
 #include <unistd.h>
 
-// Función para comprobar si un carácter ya ha sido visto
-int has_been_seen(char c, char *seen)
-{
-    return (seen[(unsigned char)c]);
-}
-
-// Función para marcar un carácter como visto
-void mark_as_seen(char c, char *seen)
+//mark as seen
+void mark_seen(char *seen, char c)
 {
     seen[(unsigned char)c] = 1;
 }
-
-// Función para procesar un string
-void process_string(char *str, char *seen)
+//has it been seen?
+int has_been_seen(char *seen, char c)
 {
-    int i;
-
-    i = 0;
+    return(seen[(unsigned char)c] == 1);
+}
+//process string
+void process_string(char *seen, char *str)
+{
+    int i = 0;
+    
     while (str[i])
     {
-        if (!has_been_seen(str[i], seen))
+        if (!has_been_seen(seen, str[i]))
         {
             write(1, &str[i], 1);
-            mark_as_seen(str[i], seen);
+            mark_seen(seen, str[i]);
         }
         i++;
     }
 }
 
-int main(int argc, char **argv)
+int main (int argc, char **argv)
 {
-    char seen[256] = {0};  // Array para trackear caracteres vistos
-
-    // Si no hay exactamente 2 argumentos, mostrar newline y salir
-    if (argc != 3)
+    if(argc == 3)
     {
-        write(1, "\n", 1);
-        return (0);
+        //array para llevar el cómputo de chars vistos
+        char seen[256] = {0};
+
+        //process_string 1
+        process_string(seen, argv[1]);
+        //process_string 2
+        process_string(seen, argv[2]);
+
     }
-
-    // Procesar primer string
-    process_string(argv[1], seen);
-    
-    // Procesar segundo string
-    process_string(argv[2], seen);
-
-    // Escribir newline final
     write(1, "\n", 1);
-    return (0);
+    return 0;
 }
