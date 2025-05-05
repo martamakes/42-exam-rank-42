@@ -16,7 +16,21 @@ A diferencia de simplemente ver una solución completa, los modos guiados te ayu
 - Compilador GCC
 - Make
 
-### Comandos básicos
+### 1. Estructura de archivos
+
+Crearás tus soluciones en el directorio `rendu/` siguiendo esta estructura:
+
+```
+03/
+├── rendu/
+│   ├── ft_printf/
+│   │   └── ft_printf.c         # Tu solución para ft_printf
+│   └── get_next_line/
+│       ├── get_next_line.c     # Tu solución para get_next_line
+│       └── get_next_line.h     # Header para get_next_line
+```
+
+### 2. Comandos básicos
 
 Para compilar ambos modos guiados:
 ```bash
@@ -42,6 +56,13 @@ Para limpiar completamente y recompilar:
 ```bash
 make re
 ```
+
+### 3. Flujo de trabajo
+
+1. Compila los modos guiados con `make`
+2. Inicia el modo guiado que quieras seguir (`make printf_guide` o `make gnl_guide`)
+3. Sigue las instrucciones paso a paso y crea/modifica los archivos en el directorio `rendu/`
+4. El sistema comprobará automáticamente tu código en cada paso
 
 ## Estructura de ft_printf
 
