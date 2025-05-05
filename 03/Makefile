@@ -13,7 +13,12 @@ PRINTF_DIR = ft_printf
 GNL_DIR = get_next_line
 
 # Archivos ft_printf
-PRINTF_GUIDE = $(PRINTF_DIR)/ft_printf_guide.c
+PRINTF_GUIDE_MAIN = $(PRINTF_DIR)/printf_guide.c
+PRINTF_UTILS = $(PRINTF_DIR)/printf_guide_utils.c
+PRINTF_STEPS_1_2 = $(PRINTF_DIR)/printf_steps_1_2.c
+PRINTF_STEPS_3_4 = $(PRINTF_DIR)/printf_steps_3_4.c
+PRINTF_STEPS_5_6 = $(PRINTF_DIR)/printf_steps_5_6.c
+PRINTF_GUIDE_SRC = $(PRINTF_UTILS) $(PRINTF_STEPS_1_2) $(PRINTF_STEPS_3_4) $(PRINTF_STEPS_5_6) $(PRINTF_GUIDE_MAIN)
 
 # Archivos get_next_line
 GNL_GUIDE_MAIN = $(GNL_DIR)/gnl_guide.c
@@ -37,9 +42,9 @@ all: $(PRINTF_GUIDE_EXE) $(GNL_GUIDE_EXE)
 	@echo "$(BLUE)- Modo guiado ft_printf: $(PRINTF_GUIDE_EXE)$(RESET)"
 	@echo "$(BLUE)- Modo guiado get_next_line: $(GNL_GUIDE_EXE)$(RESET)"
 
-$(PRINTF_GUIDE_EXE): $(PRINTF_GUIDE)
+$(PRINTF_GUIDE_EXE): $(PRINTF_GUIDE_SRC)
 	@echo "$(PURPLE)Compilando modo guiado ft_printf...$(RESET)"
-	@$(CC) $(CFLAGS) -o $@ $<
+	@$(CC) $(CFLAGS) -o $@ $^
 	@echo "$(GREEN)¡Compilación de ft_printf_guide exitosa!$(RESET)"
 
 $(GNL_GUIDE_EXE): $(GNL_GUIDE_SRC)

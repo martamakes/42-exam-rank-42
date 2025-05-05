@@ -84,7 +84,7 @@ void gnl_step5_optimizing() {
     show_instruction("Tu tarea ahora es actualizar tu implementación para usar BUFFER_SIZE de manera eficiente.");
     
     // Verificar si el usuario ha actualizado el archivo
-    const char *filename = "get_next_line.c";
+    const char *filename = "rendu/get_next_line/get_next_line.c";
     if (file_exists(filename)) {
         show_instruction("Vamos a ver tu implementación actual:");
         show_student_code(filename);
@@ -170,7 +170,7 @@ void gnl_step6_final_test() {
         fprintf(file, "}\n");
         fclose(file);
         
-        const char *gnl_filename = "get_next_line.c";
+        const char *gnl_filename = "rendu/get_next_line/get_next_line.c";
         if (file_exists(gnl_filename)) {
             show_instruction("Vamos a probar tu implementación con diferentes valores de BUFFER_SIZE:");
             
