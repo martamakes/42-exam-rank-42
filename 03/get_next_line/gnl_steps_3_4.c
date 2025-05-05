@@ -69,7 +69,7 @@ void gnl_step3_basic_implementation() {
     show_instruction("Tu tarea ahora es crear un archivo get_next_line.c con esta implementación básica o una similar.");
     
     // Verificar si el usuario ha creado el archivo
-    const char *filename = "get_next_line.c";
+    const char *filename = "rendu/get_next_line/get_next_line.c";
     if (file_exists(filename)) {
         show_instruction("¡Bien! Parece que ya has creado el archivo get_next_line.c. "
                         "Vamos a ver su contenido:");
@@ -132,7 +132,7 @@ void gnl_step4_testing() {
         show_instruction("He creado un programa de prueba que abre el archivo, lee todas las líneas "
                         "usando get_next_line y las muestra junto con un contador de líneas.");
         
-        const char *gnl_filename = "get_next_line.c";
+        const char *gnl_filename = "rendu/get_next_line/get_next_line.c";
         if (file_exists(gnl_filename)) {
             show_instruction("Vamos a compilar y ejecutar el programa de prueba:");
             

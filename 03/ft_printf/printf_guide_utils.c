@@ -1,8 +1,8 @@
 /*
- * guide_utils.c - Implementación de funciones de utilidad para las guías interactivas
+ * printf_guide_utils.c - Implementación de funciones de utilidad para la guía de ft_printf
  */
 
-#include "guide_utils.h"
+#include "printf_guide_utils.h"
 
 // Función para mostrar un banner
 void show_banner(const char *title) {
@@ -52,15 +52,11 @@ int dir_exists(const char *dirname) {
 }
 
 // Función para compilar y probar el código del estudiante
-int compile_and_test(const char *filename, const char *test_program, const char *compile_flags) {
-    char cmd[512];
+int compile_and_test(const char *filename, const char *test_program) {
+    char cmd[256];
     
     // Compilar el código
-    if (compile_flags)
-        sprintf(cmd, "gcc -Wall -Wextra -Werror %s -o test %s %s", compile_flags, filename, test_program);
-    else
-        sprintf(cmd, "gcc -Wall -Wextra -Werror -o test %s %s", filename, test_program);
-    
+    sprintf(cmd, "gcc -Wall -Wextra -Werror -o test %s %s", filename, test_program);
     if (system(cmd) != 0) {
         printf("%sError al compilar. Revisa tu código.%s\n", RED, RESET);
         return 0;
@@ -92,17 +88,5 @@ void show_student_code(const char *filename) {
     }
     printf("```\n\n");
     
-    fclose(file);
-}
-
-// Función para crear un archivo de test simple
-void create_test_file(const char *filename, const char *content) {
-    FILE *file = fopen(filename, "w");
-    if (!file) {
-        printf("%sError al crear el archivo de test %s%s\n", RED, filename, RESET);
-        return;
-    }
-    
-    fprintf(file, "%s", content);
     fclose(file);
 }

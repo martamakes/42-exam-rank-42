@@ -86,7 +86,7 @@ void gnl_step2_header() {
              "evitan que el archivo se incluya más de una vez, lo que podría causar errores de compilación.");
     
     // Verificar si el usuario ha creado el archivo
-    const char *filename = "get_next_line.h";
+    const char *filename = "rendu/get_next_line/get_next_line.h";
     if (file_exists(filename)) {
         show_instruction("¡Bien! Parece que ya has creado el archivo get_next_line.h. "
                         "Vamos a ver su contenido:");
