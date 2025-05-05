@@ -38,9 +38,21 @@ CFLAGS = -Wall -Wextra -Werror
 
 # Reglas
 all: $(PRINTF_GUIDE_EXE) $(GNL_GUIDE_EXE)
-	@echo "$(GREEN)Modos guiados listos para usar:$(RESET)"
-	@echo "$(BLUE)- Modo guiado ft_printf: $(PRINTF_GUIDE_EXE)$(RESET)"
-	@echo "$(BLUE)- Modo guiado get_next_line: $(GNL_GUIDE_EXE)$(RESET)"
+	@echo "$(GREEN)¡Modos guiados compilados con éxito!$(RESET)"
+	@echo ""
+	@echo "$(PURPLE)INSTRUCCIONES DE USO:$(RESET)"
+	@echo "$(BLUE)1. Los archivos de solución deben crearse en:$(RESET)"
+	@echo "   - Para ft_printf: rendu/ft_printf/ft_printf.c"
+	@echo "   - Para get_next_line: rendu/get_next_line/get_next_line.c y get_next_line.h"
+	@echo ""
+	@echo "$(BLUE)2. Para iniciar los modos guiados:$(RESET)"
+	@echo "   - Guía de ft_printf:     $(GREEN)make printf_guide$(RESET)"
+	@echo "   - Guía de get_next_line: $(GREEN)make gnl_guide$(RESET)"
+	@echo ""
+	@echo "$(BLUE)3. Cada guía te llevará paso a paso por la implementación del ejercicio$(RESET)"
+	@echo "   y probará tu código automáticamente."
+	@echo ""
+	@echo "$(PURPLE)¡BUENA SUERTE EN TU EXAMEN!$(RESET)"
 
 $(PRINTF_GUIDE_EXE): $(PRINTF_GUIDE_SRC)
 	@echo "$(PURPLE)Compilando modo guiado ft_printf...$(RESET)"
@@ -54,10 +66,12 @@ $(GNL_GUIDE_EXE): $(GNL_GUIDE_SRC)
 
 printf_guide: $(PRINTF_GUIDE_EXE)
 	@echo "$(BLUE)Iniciando modo guiado para ft_printf...$(RESET)"
+	@echo "$(YELLOW)RECUERDA:$(RESET) Debes crear tu solución en $(GREEN)rendu/ft_printf/ft_printf.c$(RESET)"
 	@cd $(PRINTF_DIR) && ./$(notdir $(PRINTF_GUIDE_EXE))
 
 gnl_guide: $(GNL_GUIDE_EXE)
 	@echo "$(BLUE)Iniciando modo guiado para get_next_line...$(RESET)"
+	@echo "$(YELLOW)RECUERDA:$(RESET) Debes crear tu solución en: $(GREEN)rendu/get_next_line/get_next_line.c$(RESET) y $(GREEN)get_next_line.h$(RESET)"
 	@cd $(GNL_DIR) && ./$(notdir $(GNL_GUIDE_EXE))
 
 clean:
