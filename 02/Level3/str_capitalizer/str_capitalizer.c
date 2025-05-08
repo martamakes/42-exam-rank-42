@@ -1,37 +1,34 @@
 #include <unistd.h>
 
-void	str_capitalizer(char *str)
-{
-	int i = 0;
 
-	if (str[i] >= 'a' && 'z' >= str[i])
-		str[i] -= 32;
-	write(1, &str[i], 1);
-	while (str[++i])
-	{
-		if (str[i] >= 'A' && 'Z' >= str[i])
-			str[i] += 32;
-		if ((str[i] >= 'a' && 'z' >= str[i]) && (str[i - 1] == ' ' || str[i - 1] == '\t'))
-			str[i] -= 32;
-		write(1, &str[i], 1);
-	}
+void rstr_capitalizer(char *s)
+{
+    int i = 0;
+    
+    while (s[i])
+    {
+        // Make all letters lowercase
+        if (s[i] >= 'A' && s[i] <= 'Z')
+            s[i] += 32;
+            
+        // If current char is a letter and next is space/tab/end, capitalize it
+        if ((s[i] >= 'a' && s[i] <= 'z') &&
+            (s[i + 1] == ' ' || s[i + 1] == '\t' || s[i + 1] == '\0'))
+            s[i] -= 32;
+            
+        write(1, &s[i], 1);
+        i++;
+    }
 }
 
-int main(int argc, char *argv[])
-{
-	int i;
 
-	if (argc < 2)
-		write(1, "\n", 1);
-	else
-	{
-		i = 1;
-		while (i < argc)
-		{
-			str_capitalizer(argv[i]);
-			write(1, "\n", 1);
-			i += 1;
-		}
-	}
-	return (0);
+int main(int argc, char **argv)
+{
+    if(argc >= 2)
+    {
+        for(int i = 1; argv[i]; i++)
+            rstr_capitalizer(argv[i]);
+    }
+    write(1, "\n", 1);
+    return 0;
 }
