@@ -106,7 +106,33 @@ int main(void)
     {
         const char *args[] = {"./rstr_capitalizer", 
                             "hello,   worlD...  IT", NULL};
-        run_test("Complex test", args, "hellO,   worlD...  iT\n");
+        run_test("Complex test", args, "hello,   world...  iT\n");
+    }
+
+     // Test 4: Caso con un único char
+    {
+        const char *args[] = {"./rstr_capitalizer", 
+                            "a", NULL};
+        run_test("Single Letter", args, "A\n");
+    }
+
+    // Test 4: Ejemplo 1 del subject
+    {
+        const char *args[] = {"./rstr_capitalizer", "a FiRSt LiTTlE TESt", NULL};
+        run_test("Subject example 1", args, "A firsT littlE tesT\n");
+    }
+
+    // Test 5: Ejemplo 2 del subject (múltiples argumentos)
+    {
+        const char *args[] = {"./rstr_capitalizer", 
+                            "SecONd teST A LITtle BiT   Moar comPLEX",
+                            "   But... This iS not THAT COMPLEX",
+                            "     Okay, this is the last 1239809147801 but not    the least    t", 
+                            NULL};
+        run_test("Subject example 2", args, 
+                "seconD tesT A littlE biT   moaR compleX\n"
+                "   but... thiS iS noT thaT compleX\n"
+                "     okay, thiS iS thE lasT 1239809147801 buT noT    thE leasT    T\n");
     }
 
     // Resumen

@@ -1,69 +1,35 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   last_word.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvigara- <mvigara-@student.42school.com    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/12 18:18:58 by mvigara-          #+#    #+#             */
-/*   Updated: 2024/11/12 18:19:01 by mvigara-         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <unistd.h>
 
-/*
-** Conceptos clave del ejercicio:
-** 1. Manejo de strings:
-**    - Recorrer la cadena desde el final hacia el principio
-**    - Identificar delimitadores (espacios y tabs)
-**
-** 2. Identificación de la última palabra:
-**    - Saltar espacios finales
-**    - Encontrar el final de la última palabra
-**    - Encontrar el inicio de la última palabra
-**
-** 3. Manejo de casos especiales:
-**    - Cadenas solo con espacios
-**    - Múltiples espacios entre palabras
-**    - Cadena sin espacios (una sola palabra)
-*/
+int is_space(char c)
+{
+    return(c == ' ' || c == '\t');
+}
+
+int is_printable(char c)
+{
+    return(c >= 33 && c <= 126);
+}
+
+void last_word(char *s)
+{
+    int j = 0;
+    for(int i = 0; s[i]; i++)
+    {
+        if(is_space(s[i]) && is_printable(s[i + 1]))
+            j = i + 1;
+    }
+    while(is_printable(s[j]))
+    {
+        write(1, &s[j], 1);
+        j++;
+    }
+}
+
 
 int main(int argc, char **argv)
 {
-    int start;
-    int end;
-    
-    if (argc != 2)
-    {
-        write(1, "\n", 1);
-        return (0);
-    }
-    
-    // Encontrar el último carácter no espacio
-    end = 0;
-    while (argv[1][end])
-        end++;
-    end--;
-    while (end >= 0 && (argv[1][end] == ' ' || argv[1][end] == '\t'))
-        end--;
-        
-    if (end < 0)
-    {
-        write(1, "\n", 1);
-        return (0);
-    }
-    
-    // Encontrar el inicio de la última palabra
-    start = end;
-    while (start >= 0 && argv[1][start] != ' ' && argv[1][start] != '\t')
-        start--;
-    start++;
-    
-    // Escribir la última palabra
-    while (start <= end)
-        write(1, &argv[1][start++], 1);
+    if(argc == 2)
+        last_word(argv[1]);
     write(1, "\n", 1);
-    
-    return (0);
+    return 0;
 }

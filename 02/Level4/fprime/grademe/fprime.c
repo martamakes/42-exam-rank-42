@@ -1,62 +1,79 @@
-// fprime.c
 #include <stdio.h>
 #include <stdlib.h>
 
-void print_factors(int nb)
+
+void fprime(int n)
 {
-    int first = 1;  // Flag para saber si es el primer factor
     int factor = 2;
+    int first = 1;
+
+    while(n > 1)
+    {
+        if(n % factor == 0)
+        {
+            if(first)
+            {
+                printf("%d", factor);
+                first = 0;
+            }
+            else
+            {
+                printf("*%d", factor);
+            }
+            n /= factor;
+        }
+        else
+            factor++;
+    }
+
+}
+
+
+
+/*
+void fprime(int n)
+{
     
-    // Caso especial: número 1
-    if (nb == 1)
+    if(n == 1)
     {
         printf("1");
-        return;
+        return ;
     }
-    
-    // Mientras el número sea mayor que 1
-    while (nb > 1)
+    int factor = 2; // primer factor por el que dividir
+    int first = 1; // si es la última no imprimimos asterisco
+    while(n > 1)
     {
-        // Si encontramos un factor
-        if (nb % factor == 0)
+        //printf("n is over 1, it's %d\n", n);
+        if(n % factor == 0) //si no hay resto es que es divisible
         {
-            // Imprimir el factor con el formato correcto
-            if (first)
-                printf("%d", factor);
+            //printf("factor is %d, and the modulus %d from the factor if %d", factor, n, (n % factor));
+            if(first)
+            {
+                printf("%d", factor); //imprimimos el factor
+                first = 0;
+            }
             else
-                printf("*%d", factor);
-            first = 0;
+               printf(" * %d", factor); 
             
-            // Dividir el número por el factor
-            nb /= factor;
+            n /= factor; //dividimos el número por el factor para continuar
+            //factor++;  //no actualizamos factor porque si no imprimiría los primos, si no los número consecutivos por los que se dividiría
         }
-        // Si no es factor, probar con el siguiente número
         else
-        {
-            // Optimización: después del 2, solo probar impares
-            if (factor == 2)
-                factor = 3;
-            else
-                factor += 2;
-        }
+         factor++;//si no es divisible, probamos conel siguiente factor)
+
     }
-}
+
+}*/
 
 int main(int argc, char **argv)
 {
-    // Verificar número de argumentos
-    if (argc != 2)
+    if(argc == 2 && (atoi(argv[1]) > 0))
     {
-        printf("\n");
-        return (0);
+        int n = atoi(argv[1]);
+        if(n == 1) printf("1");
+        else
+            fprime(n);
     }
-    
-    // Convertir argumento a número
-    int num = atoi(argv[1]);
-    
-    // Imprimir factores
-    print_factors(num);
     printf("\n");
-    
-    return (0);
+    return 0;
 }
