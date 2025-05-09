@@ -440,11 +440,18 @@ while true; do
             echo -e "${RED}¿Estás seguro de que quieres resetear todo el progreso? (s/n)${NC}"
             read -r response
             if [[ "$response" =~ ^[Ss]$ ]]; then
+                # Vaciar archivos de progreso (manteniendo los archivos)
                 > "$LEVEL1_DONE"
                 > "$LEVEL2_DONE"
                 > "$LEVEL3_DONE"
                 > "$LEVEL4_DONE"
-                echo "Progreso reseteado"
+                
+                # Eliminar todos los archivos y carpetas dentro de rendu
+                # pero recrear el directorio para asegurar que existe
+                rm -rf "$RENDU_DIR"/*
+                mkdir -p "$RENDU_DIR"
+                
+                echo -e "${GREEN}Progreso reseteado y directorio rendu limpiado${NC}"
             fi
             ;;
         4)
