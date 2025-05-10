@@ -70,29 +70,20 @@ int     ft_atoi(char *str)
     return (num * sign);
 }
 
-// Función optimizada para verificar si un número es primo
-int     is_prime(int n)
+// Función para verificar si un número es primo
+int is_prime(int n)
 {
-    int i;
+    int i = 2;
 
-    // Casos base
     if (n <= 1)
-        return (0);
-    if (n <= 3)
-        return (1);
-    if (n % 2 == 0 || n % 3 == 0)
-        return (0);
-        
-    // Verificar divisibilidad hasta raíz cuadrada
-    // Saltando números que no pueden ser primos
-    i = 5;
-    while (i * i <= n)
+        return 0; // Los números menores o iguales a 1 no son primos
+    while (i * i <= n) // Solo verificamos hasta la raíz cuadrada de n
     {
-        if (n % i == 0 || n % (i + 2) == 0)
-            return (0);
-        i += 6;  // Optimización: saltar números no primos
+        if (n % i == 0) // Si n es divisible por i, no es primo
+            return 0;
+        i++;
     }
-    return (1);
+    return 1; // Si no se encontró ningún divisor, n es primo
 }
 
 int     main(int argc, char **argv)
