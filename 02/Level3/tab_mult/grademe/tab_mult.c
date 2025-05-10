@@ -1,74 +1,55 @@
 #include <unistd.h>
-#include <stdio.h>
 
-void put_number(int n)
+// Function to print a number using write
+void	print_num(int num)
 {
-    char c;
-    if (n < 0)
-    {
-        write(1,"-", 1);
-        n = -n;
-    }
-    if (n > 9)
-    {
-        put_number(n/10);
-        c = n % 10 + '0';
-        write(1, &c, 1);
-        
-    }
-    else
-    {
-        c = n + '0';
-        write(1, &c, 1);
-    }
+	char	c;
 
+	if (num > 9)
+		print_num(num / 10);
+	c = num % 10 + '0';
+	write(1, &c, 1);
 }
 
-int ft_atoi(char *s)
+// Function to print a string using write
+void	print_str(char *str)
 {
-   int r = 0;
-   int sign = 1;
-
-   
-        if(*s == ' ' || *s == '\t'  || *s == '\n' || *s == '\v' || *s == '\f' || *s == '\r')
-            s++;
-        while(*s == '+' || *s == '-')
-        {
-            if(*s == '-')
-                sign *= -1;
-            s++;
-        }
-        while(*s >= '0' && *s <= '9')
-        {
-            r = r * 10 + (*s - '0');
-            s++;
-        }
-        return (r * sign);
+	while (*str)
+		write(1, str++, 1);
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-    
-    if(argc == 2)
-    {
-    
-        int num = ft_atoi(argv[1]);
-        //put_number(num);
-        int i = 1;
-        while( i < 10)
-        {
-            int a = num * i;
-            put_number(i);
-            write(1," x ", 3);
-            put_number(num);
-            write(1," = ", 3);
-            put_number(a);
-            write(1, "\n", 1);
-            i++;
-        }  
-    }
-    else
-        write(1, "\n",1);
-    return 0;
+	int	num;
+	int	i;
 
+	// If no arguments, just print newline
+	if (argc != 2)
+	{
+		write(1, "\n", 1);
+		return (0);
+	}
+
+	// Convert argument to integer
+	num = 0;
+	i = 0;
+	while (argv[1][i])
+	{
+		num = num * 10 + (argv[1][i] - '0');
+		i++;
+	}
+
+	// Print multiplication table from 1 to 9
+	i = 1;
+	while (i <= 9)
+	{
+		print_num(i);
+		print_str(" x ");
+		print_num(num);
+		print_str(" = ");
+		print_num(i * num);
+		print_str("\n");
+		i++;
+	}
+	return (0);
 }

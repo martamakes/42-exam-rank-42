@@ -1,0 +1,164 @@
+#!/bin/bash
+
+# Colores para mejor visualización
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+
+# Directorios
+EXAM_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+GRADEME_DIR="$(cd "$(dirname "$0")" && pwd)"
+MICROSHELL_DIR="$(dirname "$GRADEME_DIR")"
+RENDU_DIR="$EXAM_DIR/rendu/microshell"
+TMP_DIR="$GRADEME_DIR/tmp"
+
+# Limpiar resultados anteriores
+rm -rf "$TMP_DIR"
+mkdir -p "$TMP_DIR"
+
+# Verificar existencia de archivos
+if [ ! -f "$RENDU_DIR/microshell.c" ]; then
+    echo -e "${RED}Error: No se encuentra el archivo microshell.c en $RENDU_DIR${NC}"
+    echo -e "${YELLOW}Crea tu archivo microshell.c en $RENDU_DIR${NC}"
+    exit 1
+fi
+
+# Compilar el microshell del estudiante
+echo -e "${BLUE}Compilando tu microshell...${NC}"
+gcc -Wall -Wextra -Werror "$RENDU_DIR/microshell.c" -o "$TMP_DIR/microshell"
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Error de compilación. Revisa tu código.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Compilación exitosa.${NC}"
+
+# Función para ejecutar tests
+run_test() {
+    local test_name=$1
+    local command=$2
+    local expected_output=$3
+    local expected_status=$4
+    
+    echo -e "${YELLOW}Test: $test_name${NC}"
+    echo -e "${CYAN}Comando: $command${NC}"
+    
+    # Ejecutar el comando
+    eval "$command" > "$TMP_DIR/actual_output" 2> "$TMP_DIR/actual_error"
+    local actual_status=$?
+    
+    # Verificar status de salida
+    if [ "$actual_status" = "$expected_status" ]; then
+        echo -e "${GREEN}✓ Status de salida correcto: $actual_status${NC}"
+    else
+        echo -e "${RED}✗ Status de salida incorrecto: $actual_status (esperado: $expected_status)${NC}"
+    fi
+    
+    # Verificar salida
+    if [ -n "$expected_output" ]; then
+        echo "$expected_output" > "$TMP_DIR/expected_output"
+        if diff -q "$TMP_DIR/expected_output" "$TMP_DIR/actual_output" > /dev/null; then
+            echo -e "${GREEN}✓ Salida correcta${NC}"
+        else
+            echo -e "${RED}✗ Salida incorrecta${NC}"
+            echo -e "${BLUE}Esperada:${NC}"
+            cat "$TMP_DIR/expected_output"
+            echo -e "${BLUE}Actual:${NC}"
+            cat "$TMP_DIR/actual_output"
+        fi
+    fi
+    
+    echo ""
+}
+
+# Pruebas básicas
+echo -e "${BLUE}=== PRUEBAS BÁSICAS ===${NC}\n"
+
+# Test 1: Comando simple
+run_test "Comando simple" \
+    "$TMP_DIR/microshell /bin/echo hola" \
+    "hola" \
+    0
+
+# Test 2: Comando con argumentos
+run_test "Comando con argumentos" \
+    "$TMP_DIR/microshell /bin/echo hola mundo" \
+    "hola mundo" \
+    0
+
+# Test 3: Comando inexistente
+run_test "Comando inexistente" \
+    "$TMP_DIR/microshell /comando_inexistente" \
+    "" \
+    1
+
+# Pruebas de cd
+echo -e "${BLUE}=== PRUEBAS DE CD ===${NC}\n"
+
+# Test 4: cd básico
+run_test "cd básico" \
+    "cd $TMP_DIR && $TMP_DIR/microshell cd .. ';' /bin/pwd" \
+    "$(cd $TMP_DIR/.. && pwd)" \
+    0
+
+# Test 5: cd con error
+run_test "cd con error" \
+    "$TMP_DIR/microshell cd /directorio_inexistente" \
+    "" \
+    1
+
+# Test 6: cd con número incorrecto de argumentos
+run_test "cd con número incorrecto de argumentos" \
+    "$TMP_DIR/microshell cd" \
+    "" \
+    1
+
+# Pruebas de pipes
+echo -e "${BLUE}=== PRUEBAS DE PIPES ===${NC}\n"
+
+# Test 7: Pipe simple
+# Primero creamos un archivo para grep
+echo "Este es un archivo de prueba" > "$TMP_DIR/test_file"
+echo "microshell es genial" >> "$TMP_DIR/test_file"
+run_test "Pipe simple" \
+    "cd $TMP_DIR && $TMP_DIR/microshell /bin/cat test_file '|' /bin/grep microshell" \
+    "microshell es genial" \
+    0
+
+# Test 8: Múltiples pipes
+run_test "Múltiples pipes" \
+    "cd $TMP_DIR && $TMP_DIR/microshell /bin/echo microshell es genial '|' /bin/grep microshell '|' /usr/bin/wc -w" \
+    "       1" \
+    0
+
+# Pruebas de punto y coma
+echo -e "${BLUE}=== PRUEBAS DE PUNTO Y COMA ===${NC}\n"
+
+# Test 9: Comandos separados por ;
+run_test "Comandos separados por ;" \
+    "$TMP_DIR/microshell /bin/echo hola ';' /bin/echo mundo" \
+    "hola\nmundo" \
+    0
+
+# Pruebas complejas
+echo -e "${BLUE}=== PRUEBAS COMPLEJAS ===${NC}\n"
+
+# Test 10: Combinación de pipes y punto y coma
+run_test "Combinación de pipes y punto y coma" \
+    "cd $TMP_DIR && $TMP_DIR/microshell /bin/cat test_file '|' /bin/grep microshell ';' /bin/echo prueba compleja" \
+    "microshell es genial\nprueba compleja" \
+    0
+
+# Test 11: Manejo de errores en pipe
+run_test "Manejo de errores en pipe" \
+    "$TMP_DIR/microshell /bin/echo hola '|' /comando_inexistente" \
+    "" \
+    1
+
+# Resumen de pruebas
+echo -e "${BLUE}=== RESUMEN DE PRUEBAS ===${NC}"
+echo -e "${GREEN}Pruebas completadas. Revisa los resultados para asegurarte de que tu microshell funciona correctamente.${NC}"
+
+exit 0

@@ -9,7 +9,7 @@ NC='\033[0m'
 # Directorios
 TESTDIR=$(dirname $0)
 EXERCISE="ft_printf"
-STUDENT_DIR="../../../../rendu/$EXERCISE"
+STUDENT_DIR="../../rendu/$EXERCISE"
 
 # Mostrar ayuda si se solicita
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then

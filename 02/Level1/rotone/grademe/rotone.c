@@ -1,48 +1,24 @@
 #include <unistd.h>
 
-void process_char(char c)
+void rotone(char *str)
 {
-    if(c == 'z')
-        write(1, "a", 1);
-    else if (c == 'Z')
-        write(1, "A", 1);
-    else if(c >= 'a' && c <= 'y')
+    while (*str)
     {
-        c += 1;
-        write(1, &c, 1);
+        if ((*str >= 'a' && *str < 'z') || (*str >= 'A' && *str < 'Z'))
+            *str += 1;
+        else if (*str == 'z')
+            *str = 'a';
+        else if (*str == 'Z')
+            *str = 'A';
+        write(1, str, 1);
+        str++;
     }
-    else if(c >= 'A' && c <= 'Y')
-    {
-        c += 1;
-        write(1, &c, 1);
-    }
-}
-
-int is_alpha(char c)
-{
-    return( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') );
-}
-
-void rotone(char *c)
-{
-    int i = 0;
-    while(c[i])
-    {
-        if(is_alpha(c[i]))
-            process_char(c[i]);
-        if(!is_alpha(c[i]))
-            write(1, &c[i], 1);
-        i++;
-    }
-
 }
 
 int main(int argc, char **argv)
 {
-    if(argc == 2)
-    {
+    if (argc == 2)
         rotone(argv[1]);
-    }
     write(1, "\n", 1);
-    return 0;
+    return (0);
 }

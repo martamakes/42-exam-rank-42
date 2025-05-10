@@ -1,108 +1,59 @@
-# Modos Guiados para Exam Rank 03
+# 42 Exam Rank 03 - Guía de Práctica
 
-Este directorio contiene modos guiados interactivos para ayudarte a implementar las funciones requeridas en el Exam Rank 03 de 42:
-- `ft_printf`
-- `get_next_line`
+Este directorio contiene los ejercicios y materiales para practicar el Exam Rank 03 de 42.
 
-## ¿Qué son los modos guiados?
+## Estructura del Examen
 
-Estos modos guiados son programas interactivos que te guían paso a paso en la implementación de las funciones requeridas. Te explican los conceptos clave, te muestran ejemplos de código y te permiten probar tu implementación en tiempo real.
+El Exam Rank 03 consta de dos posibles ejercicios, de los cuales se te asignará uno durante el examen:
 
-A diferencia de simplemente ver una solución completa, los modos guiados te ayudan a entender el proceso de desarrollo y a crear tu propia implementación. Esto es especialmente útil para prepararte para el examen, donde tendrás que escribir el código desde cero.
+1. **ft_printf**: Implementar una versión simplificada de la función printf.
+2. **get_next_line**: Implementar una función que lea una línea de un archivo descriptor.
 
-## Cómo usar los modos guiados
+## Cómo usar este sistema de práctica
 
-### Requisitos
-- Compilador GCC
-- Make
+1. Navega a los directorios `ft_printf` o `get_next_line` para ver el subject y los recursos disponibles.
+2. Crea tu solución siguiendo las instrucciones del subject.
+3. Usa el script `exam.sh` para seleccionar un ejercicio, practicarlo y validarlo.
 
-### 1. Estructura de archivos
+## Directorios importantes
 
-Crearás tus soluciones en el directorio `rendu/` siguiendo esta estructura:
+- `03/ft_printf/`: Ejercicio de ft_printf con subject, guías y tests.
+- `03/get_next_line/`: Ejercicio de get_next_line con subject, guías y tests.
+- `03/rendu/`: **Este es el directorio donde debes crear tus soluciones**.
 
-```
-03/
-├── rendu/
-│   ├── ft_printf/
-│   │   └── ft_printf.c         # Tu solución para ft_printf
-│   └── get_next_line/
-│       ├── get_next_line.c     # Tu solución para get_next_line
-│       └── get_next_line.h     # Header para get_next_line
-```
+## Estructura de tus soluciones
 
-### 2. Comandos básicos
-
-Para compilar ambos modos guiados:
-```bash
-make
-```
-
-Para iniciar el modo guiado de ft_printf:
-```bash
-make printf_guide
-```
-
-Para iniciar el modo guiado de get_next_line:
-```bash
-make gnl_guide
-```
-
-Para limpiar los archivos temporales:
-```bash
-make clean
-```
-
-Para limpiar completamente y recompilar:
-```bash
-make re
-```
-
-### 3. Flujo de trabajo
-
-1. Compila los modos guiados con `make`
-2. Inicia el modo guiado que quieras seguir (`make printf_guide` o `make gnl_guide`)
-3. Sigue las instrucciones paso a paso y crea/modifica los archivos en el directorio `rendu/`
-4. El sistema comprobará automáticamente tu código en cada paso
-
-## Estructura de ft_printf
-
-El modo guiado de ft_printf te ayuda a implementar una versión simplificada de la función printf que maneje solo las conversiones %s, %d y %x. El proceso se divide en 6 pasos:
-
-1. **Entendiendo ft_printf**: Introducción al enunciado y los conceptos clave.
-2. **Estructura Básica**: Creación de una estructura básica para ft_printf.
-3. **Manejo de Especificadores de Formato**: Implementación de la detección de especificadores.
-4. **Manejo de Strings (%s)**: Implementación de la impresión de strings.
-5. **Manejo de Enteros (%d y %x)**: Implementación de la impresión de enteros en decimal y hexadecimal.
-6. **Prueba Final**: Pruebas completas de tu implementación.
-
-## Estructura de get_next_line
-
-El modo guiado de get_next_line te ayuda a implementar una función que lea una línea de un descriptor de archivo. El proceso se divide en 6 pasos:
-
-1. **Entendiendo get_next_line**: Introducción al enunciado y los conceptos clave.
-2. **Creando el Header**: Creación del archivo de cabecera con las definiciones necesarias.
-3. **Implementación Básica**: Implementación simple que lee carácter por carácter.
-4. **Probando get_next_line**: Pruebas básicas de la implementación.
-5. **Optimizando get_next_line**: Optimización para usar BUFFER_SIZE de manera eficiente.
-6. **Prueba Final**: Pruebas completas con diferentes BUFFER_SIZE y casos especiales.
-
-## Consejos para el examen
+Para que los test automáticos funcionen correctamente, debes colocar tus archivos de la siguiente manera:
 
 ### Para ft_printf:
-- Asegúrate de entender bien cómo funcionan las funciones variádicas (va_list, va_start, va_arg, va_end).
-- Presta atención al valor de retorno, que debe ser el número de caracteres impresos.
-- Maneja correctamente los casos especiales como NULL para %s.
+```
+03/rendu/ft_printf/ft_printf.c
+```
 
 ### Para get_next_line:
-- Asegúrate de que tu implementación funcione con cualquier BUFFER_SIZE positivo.
-- No olvides manejar EOF, errores y líneas sin salto de línea al final.
-- Cuida las fugas de memoria: asegúrate de hacer free() cuando sea necesario.
-- Para el examen, incluso una implementación más simple (carácter por carácter) puede ser suficiente si es correcta.
+```
+03/rendu/get_next_line/get_next_line.c
+03/rendu/get_next_line/get_next_line.h
+```
 
-## Notas importantes
+## Guías y recursos adicionales
 
-- Los modos guiados están diseñados para ayudarte a entender y a implementar las funciones por ti mismo, no para darte una solución lista para copiar.
-- En el examen, tendrás que escribir el código desde cero, así que asegúrate de entender cada paso y concepto.
-- Practica varias veces implementando las funciones por tu cuenta, sin mirar los ejemplos de código.
+Cada ejercicio incluye:
+- Archivos de guía paso a paso (nombrados como `*guide*` o `*steps*`)
+- Ejemplos de implementaciones
+- Tests automáticos para validar tu solución
 
-¡Buena suerte en tu examen!
+Puedes acceder a estos recursos a través del menú principal del `exam.sh`.
+
+## Nota importante sobre los test
+
+Los tests verifican que tu implementación:
+1. Compila correctamente sin errores ni warnings
+2. Funciona correctamente con casos de prueba básicos y avanzados
+3. No tiene fugas de memoria (si se usa la opción `--valgrind`)
+
+Para get_next_line, los tests se ejecutan con diferentes valores de BUFFER_SIZE para verificar que tu solución funciona en todas las condiciones.
+
+---
+
+¡Buena suerte con tu práctica!

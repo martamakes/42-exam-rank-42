@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Script para dar permisos de ejecución a todos los scripts relevantes
+
+# Directorios
+EXAM_DIR="/Users/marta/Documents/PROJECTS/42-exam-practice/42-Exam-Rank-02/04"
+
+# Dar permisos al script principal
+chmod +x $EXAM_DIR/exam.sh
+
+# Dar permisos a los scripts de microshell
+chmod +x $EXAM_DIR/microshell/microshell_guide
+chmod +x $EXAM_DIR/microshell/grademe/test.sh
+chmod +x $EXAM_DIR/microshell/grademe/grademe.sh
+
+echo "Permisos actualizados correctamente."

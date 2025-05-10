@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# Colores para mejor visualización
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+
+clear
+
+echo -e "${BLUE}==============================================${NC}"
+echo -e "${BLUE}   GUÍA INTERACTIVA PARA MICROSHELL   ${NC}"
+echo -e "${BLUE}==============================================${NC}"
+echo ""
+echo -e "${YELLOW}Esta guía te ayudará a implementar el ejercicio microshell${NC}"
+echo -e "${YELLOW}paso a paso, explicando cada parte del código.${NC}"
+echo ""
+echo -e "${CYAN}Autor:${NC} mvigara- <mvigara-@student.42madrid.com>"
+echo ""
+
+# Menú principal
+while true; do
+    echo -e "${GREEN}=== MENÚ DE LA GUÍA ===${NC}"
+    echo "1. Ver el subject completo"
+    echo "2. Pasos 1-2: Funciones auxiliares y comando cd"
+    echo "3. Pasos 3-4: Ejecución de comandos y manejo de pipes"
+    echo "4. Pasos 5-6: Manejo de múltiples pipes y separadores"
+    echo "5. Guía completa"
+    echo "6. Consejos y buenas prácticas"
+    echo "0. Salir"
+    
+    read -p "Selecciona una opción: " option
+    
+    case $option in
+        1)
+            clear
+            echo -e "${BLUE}=== SUBJECT COMPLETO ===${NC}\n"
+            cat "$(dirname "$0")/README.md"
+            echo -e "\n${YELLOW}Presiona Enter para volver al menú...${NC}"
+            read
+            clear
+            ;;
+        2)
+            clear
+            echo -e "${BLUE}=== PASOS 1-2: FUNCIONES AUXILIARES Y COMANDO CD ===${NC}\n"
+            cat "$(dirname "$0")/microshell_steps_1_2.c"
+            echo -e "\n${YELLOW}Presiona Enter para volver al menú...${NC}"
+            read
+            clear
+            ;;
+        3)
+            clear
+            echo -e "${BLUE}=== PASOS 3-4: EJECUCIÓN DE COMANDOS Y MANEJO DE PIPES ===${NC}\n"
+            cat "$(dirname "$0")/microshell_steps_3_4.c"
+            echo -e "\n${YELLOW}Presiona Enter para volver al menú...${NC}"
+            read
+            clear
+            ;;
+        4)
+            clear
+            echo -e "${BLUE}=== PASOS 5-6: MANEJO DE MÚLTIPLES PIPES Y SEPARADORES ===${NC}\n"
+            cat "$(dirname "$0")/microshell_steps_5_6.c"
+            echo -e "\n${YELLOW}Presiona Enter para volver al menú...${NC}"
+            read
+            clear
+            ;;
+        5)
+            clear
+            echo -e "${BLUE}=== GUÍA COMPLETA ===${NC}\n"
+            cat "$(dirname "$0")/microshell_guide.c"
+            echo -e "\n${YELLOW}Presiona Enter para volver al menú...${NC}"
+            read
+            clear
+            ;;
+        6)
+            clear
+            echo -e "${BLUE}=== CONSEJOS Y BUENAS PRÁCTICAS ===${NC}\n"
+            
+            echo -e "${YELLOW}1. Gestión de descriptores de archivo${NC}"
+            echo "   - Cierra SIEMPRE todos los descriptores de archivo que abras"
+            echo "   - Especialmente importante cuando usas pipe(), para evitar leaks"
+            echo "   - Cerrar los descriptores innecesarios lo antes posible"
+            echo ""
+            
+            echo -e "${YELLOW}2. Manejo de errores${NC}"
+            echo "   - Verifica TODOS los valores de retorno de las funciones del sistema"
+            echo "   - Imprime mensajes de error exactamente como se especifica en el subject"
+            echo "   - Usa exit() en procesos hijo, no return"
+            echo ""
+            
+            echo -e "${YELLOW}3. Procesamiento de argumentos${NC}"
+            echo "   - Asegúrate de terminar cada lista de argumentos con NULL para execve"
+            echo "   - Maneja correctamente los separadores | y ;"
+            echo "   - Cuidado con manipular argv directamente, podría causar problemas"
+            echo ""
+            
+            echo -e "${YELLOW}4. Optimización${NC}"
+            echo "   - Evita usar malloc() si puedes, pero si lo usas, libera siempre la memoria"
+            echo "   - Minimiza el número de procesos fork() cuando sea posible"
+            echo "   - Cierra descriptores de archivo innecesarios para manejar muchos pipes"
+            echo ""
+            
+            echo -e "${YELLOW}5. Testing${NC}"
+            echo "   - Prueba con diferentes combinaciones de pipes y separadores"
+            echo "   - Asegúrate de que cd funciona correctamente con errores"
+            echo "   - Verifica que no haya leaks de descriptores de archivo"
+            
+            echo -e "\n${YELLOW}Presiona Enter para volver al menú...${NC}"
+            read
+            clear
+            ;;
+        0)
+            echo -e "${GREEN}¡Buena suerte con tu implementación!${NC}"
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Opción inválida. Intenta de nuevo.${NC}"
+            sleep 1
+            clear
+            ;;
+    esac
+done
