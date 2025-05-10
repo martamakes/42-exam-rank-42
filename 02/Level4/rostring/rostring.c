@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 
 // Función para escribir una cadena
 void ft_putstr(char *str)
@@ -13,9 +14,10 @@ int is_space(char c)
     return (c == ' ' || c == '\t');
 }
 
+
 int main(int argc, char **argv)
 {
-    int i, start, end, first_word_end;
+    int i= 0, start=0, end=0, fstart=0, fend=0;
 
     // Si no hay argumentos, imprimir un salto de línea y salir
     if (argc < 2)
@@ -28,12 +30,15 @@ int main(int argc, char **argv)
     // Saltar espacios iniciales
     while (argv[1][i] && is_space(argv[1][i]))
         i++;
+     fstart = i;
+     
 
     // Encontrar el final de la primera palabra
-    start = i;
     while (argv[1][i] && !is_space(argv[1][i]))
         i++;
-    first_word_end = i;
+    fend = i;
+    print_var(fstart, fend);
+    
 
     // Imprimir el resto de las palabras
     while (argv[1][i])
@@ -54,10 +59,13 @@ int main(int argc, char **argv)
             write(1, " ", 1);
         }
     }
-
-    // Imprimir la primera palabra
-    write(1, argv[1], first_word_end);
-    write(1, "\n", 1);
+    
+    // Imprimir la primera palabra si no está vacía
+    if (fstart < fend)
+    {
+        write(1, argv[fstart], fend - fstart);
+        write(1, "\n", 1);
+    }
 
     return 0;
 }

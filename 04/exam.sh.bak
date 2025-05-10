@@ -1,0 +1,409 @@
+#!/bin/bash
+
+clear
+
+# Colores
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+RESET='\033[0m'
+BOLD='\033[1m'
+
+# Verificar argumentos
+if [ "$1" = "clean" ]; then
+    echo -e "${RED}Limpiando...${RESET}"
+    rm -f microshell/microshell
+    rm -f microshell/test.sh
+    echo -e "${GREEN}Limpieza completada.${RESET}"
+    exit 0
+fi
+
+# Título
+echo -e "${BLUE}${BOLD}==========================${RESET}"
+echo -e "${BLUE}${BOLD}   EXAM RANK 04 - TESTER${RESET}"
+echo -e "${BLUE}${BOLD}==========================${RESET}"
+echo ""
+
+# Comprobar si el archivo microshell.c existe
+if [ ! -f "microshell/microshell.c" ]; then
+    echo -e "${RED}Error: No se encuentra el archivo microshell.c${RESET}"
+    echo -e "${YELLOW}Por favor, crea tu implementación en: ${CYAN}microshell/microshell.c${RESET}"
+    echo -e "${YELLOW}Ejemplo básico:${RESET}"
+    cat > microshell/microshell.c << 'EOL'
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   microshell.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tu_usuario <tu_email>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/01 00:00:00 by tu_usuario        #+#    #+#             */
+/*   Updated: 2023/01/01 00:00:00 by tu_usuario       ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+
+// Tu implementación aquí
+
+int main(int argc, char **argv, char **env) {
+    // Implementación del microshell
+    write(1, "Microshell no implementado aún\n", 31);
+    return (1);
+}
+EOL
+    exit 1
+fi
+
+# Compilar el código
+echo -e "${YELLOW}Compilando microshell...${RESET}"
+gcc -Wall -Wextra -Werror microshell/microshell.c -o microshell/microshell
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Error de compilación.${RESET}"
+    exit 1
+fi
+echo -e "${GREEN}Compilación exitosa.${RESET}"
+
+# Crear script de prueba
+echo -e "${YELLOW}Creando script de prueba...${RESET}"
+cat > microshell/test.sh << 'EOL'
+#!/bin/bash
+
+MICROSHELL="./microshell"
+COLOR_RED="\033[0;31m"
+COLOR_GREEN="\033[0;32m"
+COLOR_YELLOW="\033[0;33m"
+COLOR_RESET="\033[0m"
+
+echo -e "${COLOR_YELLOW}=== Pruebas básicas ===${COLOR_RESET}"
+
+# Prueba 1: Comando simple
+echo -e "\n${COLOR_YELLOW}Prueba 1: Comando simple${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls"
+$MICROSHELL /bin/ls
+if [ $? -eq 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 1 pasada${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 1 fallida${COLOR_RESET}"
+fi
+
+# Prueba 2: Comando con argumentos
+echo -e "\n${COLOR_YELLOW}Prueba 2: Comando con argumentos${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls -la"
+$MICROSHELL /bin/ls -la
+if [ $? -eq 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 2 pasada${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 2 fallida${COLOR_RESET}"
+fi
+
+# Prueba 3: Comando inexistente
+echo -e "\n${COLOR_YELLOW}Prueba 3: Comando inexistente${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /comando_inexistente"
+$MICROSHELL /comando_inexistente
+if [ $? -ne 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 3 pasada (el comando fallido devuelve código diferente a 0)${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 3 fallida (el comando fallido debería devolver código diferente a 0)${COLOR_RESET}"
+fi
+
+echo -e "\n${COLOR_YELLOW}=== Pruebas de cd ===${COLOR_RESET}"
+
+# Prueba 4: cd básico
+echo -e "\n${COLOR_YELLOW}Prueba 4: cd básico${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL cd .. ';' /bin/pwd"
+CURRENT_DIR=$(pwd)
+$MICROSHELL cd .. ";" /bin/pwd
+if [ "$(pwd)" = "$CURRENT_DIR" ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 4 pasada (cd no afecta al proceso padre)${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 4 fallida (cd afectó al proceso padre)${COLOR_RESET}"
+    cd "$CURRENT_DIR"
+fi
+
+# Prueba 5: cd con error
+echo -e "\n${COLOR_YELLOW}Prueba 5: cd con error${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL cd /directorio_inexistente"
+$MICROSHELL cd /directorio_inexistente
+if [ $? -ne 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 5 pasada (cd a directorio inexistente devuelve error)${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 5 fallida (cd a directorio inexistente debería devolver error)${COLOR_RESET}"
+fi
+
+echo -e "\n${COLOR_YELLOW}=== Pruebas de pipes ===${COLOR_RESET}"
+
+# Prueba 6: Pipe simple
+echo -e "\n${COLOR_YELLOW}Prueba 6: Pipe simple${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls '|' /bin/grep microshell"
+$MICROSHELL /bin/ls "|" /bin/grep microshell
+if [ $? -eq 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 6 pasada${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 6 fallida${COLOR_RESET}"
+fi
+
+# Prueba 7: Múltiples pipes
+echo -e "\n${COLOR_YELLOW}Prueba 7: Múltiples pipes${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls '|' /bin/grep microshell '|' /usr/bin/wc -l"
+$MICROSHELL /bin/ls "|" /bin/grep microshell "|" /usr/bin/wc -l
+if [ $? -eq 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 7 pasada${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 7 fallida${COLOR_RESET}"
+fi
+
+echo -e "\n${COLOR_YELLOW}=== Pruebas de punto y coma ===${COLOR_RESET}"
+
+# Prueba 8: Comandos separados por ;
+echo -e "\n${COLOR_YELLOW}Prueba 8: Comandos separados por ;${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls ';' /bin/echo 'Prueba de punto y coma'"
+$MICROSHELL /bin/ls ";" /bin/echo "Prueba de punto y coma"
+if [ $? -eq 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 8 pasada${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 8 fallida${COLOR_RESET}"
+fi
+
+echo -e "\n${COLOR_YELLOW}=== Pruebas complejas ===${COLOR_RESET}"
+
+# Prueba 9: Combinación de pipes y punto y coma
+echo -e "\n${COLOR_YELLOW}Prueba 9: Combinación de pipes y punto y coma${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls '|' /bin/grep microshell ';' /bin/echo 'Prueba compleja'"
+$MICROSHELL /bin/ls "|" /bin/grep microshell ";" /bin/echo "Prueba compleja"
+if [ $? -eq 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 9 pasada${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 9 fallida${COLOR_RESET}"
+fi
+
+# Prueba 10: Caso de error en pipe
+echo -e "\n${COLOR_YELLOW}Prueba 10: Caso de error en pipe${COLOR_RESET}"
+echo -e "Ejecutando: $MICROSHELL /bin/ls '|' /comando_inexistente"
+$MICROSHELL /bin/ls "|" /comando_inexistente
+if [ $? -ne 0 ]; then
+    echo -e "${COLOR_GREEN}✓ Prueba 10 pasada (error en comando de pipe devuelve error)${COLOR_RESET}"
+else
+    echo -e "${COLOR_RED}✗ Prueba 10 fallida (error en comando de pipe debería devolver error)${COLOR_RESET}"
+fi
+
+echo -e "\n${COLOR_YELLOW}Todas las pruebas completadas.${COLOR_RESET}"
+EOL
+chmod +x microshell/test.sh
+
+echo -e "${GREEN}Script de prueba creado.${RESET}"
+
+# Crear grademe.sh para evaluación automática
+echo -e "${YELLOW}Creando script de evaluación...${RESET}"
+cat > microshell/grademe.sh << 'EOL'
+#!/bin/bash
+
+# Colores
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+RESET='\033[0m'
+BOLD='\033[1m'
+
+# Funciones 
+parse_test_output() {
+    local output="$1"
+    local passed=$(echo "$output" | grep -c "✓")
+    local failed=$(echo "$output" | grep -c "✗")
+    local total=$(($passed + $failed))
+    
+    echo "$passed $failed $total"
+}
+
+# Verificamos que tengamos microshell
+if [ ! -f "microshell" ]; then
+    echo -e "${RED}Error: No se encuentra el ejecutable microshell${RESET}"
+    echo -e "${YELLOW}Compilando...${RESET}"
+    gcc -Wall -Wextra -Werror microshell.c -o microshell
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Error de compilación.${RESET}"
+        exit 1
+    fi
+fi
+
+# Ejecutar las pruebas y capturar salida
+echo -e "${BLUE}${BOLD}Ejecutando pruebas...${RESET}"
+OUTPUT=$(./test.sh 2>&1)
+
+# Análisis de resultados
+RESULTS=$(parse_test_output "$OUTPUT")
+PASSED=$(echo $RESULTS | cut -d' ' -f1)
+FAILED=$(echo $RESULTS | cut -d' ' -f2)
+TOTAL=$(echo $RESULTS | cut -d' ' -f3)
+
+# Mostrar resultados
+echo -e "${BLUE}${BOLD}===============================${RESET}"
+echo -e "${BLUE}${BOLD}       RESULTADOS FINALES      ${RESET}"
+echo -e "${BLUE}${BOLD}===============================${RESET}"
+echo -e "${GREEN}Pruebas pasadas: ${PASSED}/${TOTAL}${RESET}"
+echo -e "${RED}Pruebas fallidas: ${FAILED}/${TOTAL}${RESET}"
+
+# Calcular nota aproximada (cada prueba vale 10 puntos)
+SCORE=$((PASSED * 100 / TOTAL))
+echo -e "${YELLOW}${BOLD}Nota aproximada: ${SCORE}/100${RESET}"
+
+if [ $SCORE -eq 100 ]; then
+    echo -e "${GREEN}${BOLD}¡PERFECTO! Tu implementación pasa todas las pruebas.${RESET}"
+elif [ $SCORE -ge 80 ]; then
+    echo -e "${GREEN}¡Bien hecho! Tu implementación funciona correctamente en la mayoría de los casos.${RESET}"
+elif [ $SCORE -ge 50 ]; then
+    echo -e "${YELLOW}Tu implementación funciona parcialmente. Revisa los casos que fallan.${RESET}"
+else
+    echo -e "${RED}Tu implementación necesita más trabajo. Revisa los requisitos del ejercicio.${RESET}"
+fi
+
+exit 0
+EOL
+chmod +x microshell/grademe.sh
+
+echo -e "${GREEN}Script de evaluación creado.${RESET}"
+
+# Crear un template para la implementación de microshell
+echo -e "${YELLOW}Creando template para microshell.c...${RESET}"
+if [ -f "microshell/microshell.c" ] && [ $(wc -l < microshell/microshell.c) -gt 30 ]; then
+    echo -e "${GREEN}Ya existe un archivo microshell.c con contenido.${RESET}"
+else
+    cat > microshell/microshell.c << 'EOL'
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   microshell.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tu_usuario <tu_email>                      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/01 00:00:00 by tu_usuario        #+#    #+#             */
+/*   Updated: 2023/01/01 00:00:00 by tu_usuario       ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+
+// Funciones auxiliares
+int ft_strlen(char *str) {
+    int i = 0;
+    while (str[i])
+        i++;
+    return i;
+}
+
+int ft_strcmp(char *s1, char *s2) {
+    int i = 0;
+    while (s1[i] && s2[i] && s1[i] == s2[i])
+        i++;
+    return s1[i] - s2[i];
+}
+
+void ft_putstr_fd(char *str, int fd) {
+    write(fd, str, ft_strlen(str));
+}
+
+// Función para el comando cd
+int exec_cd(char **argv) {
+    if (!argv[1] || argv[2]) {
+        ft_putstr_fd("error: cd: bad arguments\n", 2);
+        return 1;
+    }
+    if (chdir(argv[1]) != 0) {
+        ft_putstr_fd("error: cd: cannot change directory to ", 2);
+        ft_putstr_fd(argv[1], 2);
+        ft_putstr_fd("\n", 2);
+        return 1;
+    }
+    return 0;
+}
+
+// Función para ejecutar comandos
+int exec_cmd(char **argv, char **env) {
+    pid_t pid;
+    int status;
+
+    if (!argv[0])
+        return 0;
+    
+    if (ft_strcmp(argv[0], "cd") == 0)
+        return exec_cd(argv);
+    
+    pid = fork();
+    if (pid < 0) {
+        ft_putstr_fd("error: fatal\n", 2);
+        exit(1);
+    }
+    
+    if (pid == 0) {
+        if (execve(argv[0], argv, env) < 0) {
+            ft_putstr_fd("error: cannot execute ", 2);
+            ft_putstr_fd(argv[0], 2);
+            ft_putstr_fd("\n", 2);
+            exit(1);
+        }
+    } else {
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status))
+            return WEXITSTATUS(status);
+        return 1;
+    }
+    return 0;
+}
+
+// TODO: Implementar manejo de pipes
+// TODO: Implementar manejo de comandos separados por punto y coma
+
+int main(int argc, char **argv, char **env) {
+    int i = 1;
+    int ret = 0;
+    
+    if (argc == 1)
+        return 0;
+    
+    // Ejemplo básico solo para pruebas iniciales
+    // Debes implementar el manejo completo de pipes (|) y punto y coma (;)
+    ret = exec_cmd(&argv[1], env);
+    
+    return ret;
+}
+EOL
+    echo -e "${GREEN}Template para microshell.c creado.${RESET}"
+fi
+
+# Actualizar exam_master.sh para incluir el Exam Rank 04
+echo -e "${YELLOW}Actualizando el script principal...${RESET}"
+
+# Verificar si ya está incluido en exam_master.sh
+if grep -q "04.*microshell" "/Users/marta/Documents/PROJECTS/42-exam-practice/exam_master.sh"; then
+    echo -e "${GREEN}El Exam Rank 04 ya está incluido en el script principal.${RESET}"
+else
+    # Agregar Exam Rank 04 al master script
+    sed -i '' '/# Exam Rank 03/a\\
+# Exam Rank 04\
+elif [ "$1" = "04" ]; then\
+    cd 42-Exam-Rank-02/04\
+    ./exam.sh "$2"\
+    cd ../..\
+' "/Users/marta/Documents/PROJECTS/42-exam-practice/exam_master.sh"
+    echo -e "${GREEN}Script principal actualizado.${RESET}"
+fi
+
+# Instrucciones finales
+echo -e "\n${YELLOW}${BOLD}Instrucciones de uso:${RESET}"
+echo -e "${CYAN}1. Completa tu implementación en:${RESET} microshell/microshell.c"
+echo -e "${CYAN}2. Ejecuta las pruebas con:${RESET} ./test.sh"
+echo -e "${CYAN}3. Evalúa tu código con:${RESET} ./grademe.sh"
+echo -e "${CYAN}4. Limpia los archivos generados con:${RESET} ./exam.sh clean"
+echo -e "\n${GREEN}${BOLD}¡Buena suerte con el examen!${RESET}"
+
+exit 0

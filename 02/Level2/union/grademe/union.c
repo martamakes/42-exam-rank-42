@@ -1,44 +1,44 @@
 #include <unistd.h>
 
-//mark as seen
-void mark_seen(char *seen, char c)
+/* Function to print union of two strings without duplicates */
+void	ft_union(char *s1, char *s2)
 {
-    seen[(unsigned char)c] = 1;
-}
-//has it been seen?
-int has_been_seen(char *seen, char c)
-{
-    return(seen[(unsigned char)c] == 1);
-}
-//process string
-void process_string(char *seen, char *str)
-{
-    int i = 0;
-    
-    while (str[i])
-    {
-        if (!has_been_seen(seen, str[i]))
-        {
-            write(1, &str[i], 1);
-            mark_seen(seen, str[i]);
-        }
-        i++;
-    }
+	int		i;
+	char	seen[256] = {0}; // Array to track seen characters (ASCII)
+
+	/* Process first string */
+	i = 0;
+	while (s1[i])
+	{
+		/* If character hasn't been seen before */
+		if (!seen[(unsigned char)s1[i]])
+		{
+			write(1, &s1[i], 1); // Print the character
+			seen[(unsigned char)s1[i]] = 1; // Mark as seen
+		}
+		i++;
+	}
+
+	/* Process second string */
+	i = 0;
+	while (s2[i])
+	{
+		/* If character hasn't been seen before */
+		if (!seen[(unsigned char)s2[i]])
+		{
+			write(1, &s2[i], 1); // Print the character
+			seen[(unsigned char)s2[i]] = 1; // Mark as seen
+		}
+		i++;
+	}
 }
 
-int main (int argc, char **argv)
+/* Main function to handle program execution */
+int	main(int argc, char **argv)
 {
-    if(argc == 3)
-    {
-        //array para llevar el cómputo de chars vistos
-        char seen[256] = {0};
-
-        //process_string 1
-        process_string(seen, argv[1]);
-        //process_string 2
-        process_string(seen, argv[2]);
-
-    }
-    write(1, "\n", 1);
-    return 0;
+	/* Check if exactly 2 arguments are provided */
+	if (argc == 3)
+		ft_union(argv[1], argv[2]); // Call union function
+	write(1, "\n", 1); // Print newline
+	return (0);
 }

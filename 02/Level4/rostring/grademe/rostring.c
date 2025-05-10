@@ -1,45 +1,71 @@
 #include <unistd.h>
-#include <stdlib.h>
 
-int is_space(char c)
+// Función para escribir una cadena
+void ft_putstr(char *str)
 {
-    return(c == ' '|| c == '\t');
+    while (*str)
+        write(1, str++, 1);
 }
 
-void rostring(char *s)
+// Función para verificar si un carácter es un espacio o tabulación
+int is_space(char c)
 {
-    int i = 0, end = 0, start = 0, fend = 0, fstart = 0;
-
-    while(s[i] && is_space(s[i]))
-        i++;
-    fstart = i;
-    while(s[i] &&  !is_space(s[i]))
-        i++;
-    fend = i;
-
-    while(s[i])
-    {
-        while(s[i] && is_space(s[i]))
-            i++;
-        start = i;
-        while(s[i] && !is_space(s[i]))
-            i++;
-        end = i;
-        if(start < end)
-        {
-            write(1, s + start, end - start);
-            write(1, " ", 1);
-        }
-    }
-   
-    write(1, s + fstart, fend - fstart);
-
+    return (c == ' ' || c == '\t');
 }
 
 int main(int argc, char **argv)
 {
-    if(argc >= 2)
-        rostring(argv[1]);
+    int i, start, end, first_word_end;
+
+    // Si no hay argumentos, imprimir un salto de línea y salir
+    if (argc < 2)
+    {
+        write(1, "\n", 1);
+        return 0;
+    }
+
+    i = 0;
+    // Saltar espacios iniciales
+    while (argv[1][i] && is_space(argv[1][i]))
+        i++;
+
+    // Encontrar el final de la primera palabra
+    start = i;
+    while (argv[1][i] && !is_space(argv[1][i]))
+        i++;
+    first_word_end = i;
+
+    // Imprimir el resto de las palabras
+    int printed = 0;
+    while (argv[1][i])
+    {
+        // Saltar espacios entre palabras
+        while (argv[1][i] && is_space(argv[1][i]))
+            i++;
+        start = i;
+        // Encontrar el final de la palabra actual
+        while (argv[1][i] && !is_space(argv[1][i]))
+            i++;
+        end = i;
+
+        // Imprimir la palabra si no está vacía
+        if (start < end)
+        {
+            if (printed)
+                write(1, " ", 1);
+            write(1, argv[1] + start, end - start);
+            printed = 1;
+        }
+    }
+
+    // Imprimir la primera palabra si existe
+    if (first_word_end > 0)
+    {
+        if (printed)
+            write(1, " ", 1);
+        write(1, argv[1], first_word_end);
+    }
     write(1, "\n", 1);
+
     return 0;
 }

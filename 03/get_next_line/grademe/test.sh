@@ -9,7 +9,7 @@ NC='\033[0m'
 # Directorios
 TESTDIR=$(dirname $0)
 EXERCISE="get_next_line"
-STUDENT_DIR="../../../../rendu/$EXERCISE"
+STUDENT_DIR="../../rendu/$EXERCISE"
 
 # Valores de BUFFER_SIZE a probar
 BUFFER_SIZES=("1" "5" "42" "9999")

@@ -1,49 +1,59 @@
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-
-void operate(int n1, int n2, char *op)
-{
-    if(*op == '+')
-    {
-        printf("%d\n",n1+n2);
-        return ;
-    }
-    if(*op == '-')
-    {
-        printf("%d\n",n1-n2);
-        return ;
-    }
-    if(*op == '/')
-    {
-        printf("%d\n",n1/n2);
-        return ;
-    }
-    if(*op == '*')
-    {
-        printf("%d\n",n1*n2);
-        return ;
-    }
-    if(*op == '%')
-    {
-        printf("%d\n",n1%n2);
-        return ;
-    }
-    else
-        return ;        
-
-}
-
 int main(int argc, char **argv)
 {
+    // Check if we have exactly 3 arguments (program name + 3 parameters)
     if (argc != 4)
     {
-        write(1, "\n", 1);
-        return 1;
+        printf("\n");  // Print newline if incorrect number of arguments
+        return (0);
     }
-    int n1 = atoi(argv[1]);
-    int n2 = atoi(argv[3]);
-    operate(n1, n2, argv[2]);
-    return 0;
+
+    // Convert first and third arguments to integers using atoi
+    int num1 = atoi(argv[1]);
+    int num2 = atoi(argv[3]);
+    
+    // Get the operator from the second argument
+    char operator = argv[2][0];  // We only need the first character
+
+    // Perform the operation based on the operator
+    int result = 0;
+    if (operator == '+')
+        result = num1 + num2;
+    else if (operator == '-')
+        result = num1 - num2;
+    else if (operator == '*')
+        result = num1 * num2;
+    else if (operator == '/')
+    {
+        // Handle division by zero
+        if (num2 == 0)
+        {
+            printf("\n");
+            return (0);
+        }
+        result = num1 / num2;
+    }
+    else if (operator == '%')
+    {
+        // Handle modulo by zero
+        if (num2 == 0)
+        {
+            printf("\n");
+            return (0);
+        }
+        result = num1 % num2;
+    }
+    else
+    {
+        // If operator is invalid, just print newline
+        printf("\n");
+        return (0);
+    }
+
+    // Print the result followed by newline
+    printf("%d\n", result);
+    
+    return (0);
 }
