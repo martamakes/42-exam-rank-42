@@ -1,24 +1,22 @@
 #include <unistd.h>
 
-void rotone(char *str)
-{
-    while (*str)
-    {
-        if ((*str >= 'a' && *str < 'z') || (*str >= 'A' && *str < 'Z'))
-            *str += 1;
-        else if (*str == 'z')
-            *str = 'a';
-        else if (*str == 'Z')
-            *str = 'A';
-        write(1, str, 1);
-        str++;
-    }
-}
-
 int main(int argc, char **argv)
 {
-    if (argc == 2)
-        rotone(argv[1]);
+    if(argc == 2)
+    {
+        for(int i = 0; argv[1][i]; i++)
+        {
+            if((argv[1][i] >= 'a' &&argv[1][i] <= 'z') || (argv[1][i] >= 'A' &&argv[1][i] <= 'Z')  )
+            {
+                if(argv[1][i] == 'z' || argv[1][i] == 'Z')
+                {
+                    argv[1][i] -= 25;
+                }
+                else if((argv[1][i] >= 'a' &&argv[1][i] < 'z') || (argv[1][i] >= 'A' &&argv[1][i] < 'Z'))
+                    argv[1][i] += 1;
+            }
+            write(1, &argv[1][i], 1);
+        }
+    }
     write(1, "\n", 1);
-    return (0);
 }
