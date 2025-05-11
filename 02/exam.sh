@@ -388,6 +388,156 @@ practice_exercises() {
     done
 }
 
+# Función para practicar todos los ejercicios de un nivel aleatoriamente
+practice_level_randomly() {
+    local level=$1
+    local exercises=()
+    local done_file="$PROGRESS_DIR/level${level}_done.txt"
+    local total=$(count_total_exercises $level)
+    local completed=$(sort "$done_file" | uniq | wc -l)
+    
+    # Obtener lista de todos los ejercicios del nivel
+    for dir in Level${level}/*/; do
+        if [ -d "$dir" ]; then
+            dirname=$(basename "$dir")
+            # Verificar si el ejercicio ya está completado
+            if ! grep -q "^$dirname$" "$done_file"; then
+                exercises+=("$dirname")
+            fi
+        fi
+    done
+    
+    # Verificar si hay ejercicios disponibles
+    local available=${#exercises[@]}
+    if [ $available -eq 0 ]; then
+        echo -e "${YELLOW}No hay ejercicios disponibles en el nivel $level. ¡Todos están completados!${NC}"
+        read -p "Presiona Enter para continuar..."
+        return
+    fi
+    
+    clear
+    echo -e "${BLUE}=== PRACTICANDO NIVEL $level ALEATORIAMENTE ===${NC}"
+    echo -e "${GREEN}Progreso: $completed/$total ejercicios completados${NC}"
+    echo -e "${YELLOW}Ejercicios disponibles: $available${NC}"
+    echo -e "\n${YELLOW}Presiona Enter para comenzar o 'q' para salir${NC}"
+    read -r response
+    [ "$response" = "q" ] && return
+    
+    # Aleatorizar el orden de los ejercicios
+    # Usamos el algoritmo Fisher-Yates para mezclar el array
+    local shuffled_exercises=()
+    local size=${#exercises[@]}
+    local indices=()
+
+    # Generar un array de índices
+    for i in $(seq 0 $((size-1))); do
+        indices[$i]=$i
+    done
+
+    # Mezclar índices usando el algoritmo Fisher-Yates
+    for ((i = size - 1; i > 0; i--)); do
+        j=$((RANDOM % (i + 1)))
+        # Intercambiar índices
+        temp=${indices[$i]}
+        indices[$i]=${indices[$j]}
+        indices[$j]=$temp
+    done
+
+    # Usar los índices mezclados para crear el array de ejercicios
+    for i in "${indices[@]}"; do
+        shuffled_exercises+=("${exercises[$i]}")
+    done
+    
+    # Practicar cada ejercicio en orden aleatorio
+    for exercise in "${shuffled_exercises[@]}"; do
+        clear
+        echo -e "${BLUE}=== PRACTICANDO NIVEL $level ALEATORIAMENTE ===${NC}"
+        echo -e "${GREEN}Progreso: $completed/$total ejercicios completados${NC}"
+        echo -e "${YELLOW}Ejercicio actual: $exercise${NC}"
+        
+        show_subject $level "$exercise"
+        while true; do
+            echo -e "\n${YELLOW}Opciones:${NC}"
+            echo "1. Validar ejercicio"
+            echo "2. Marcar como completado sin validar"
+            echo "3. Dejar pendiente (pasar al siguiente)"
+            echo "4. Salir al menú principal"
+            read -r option
+            
+            case $option in
+                1)
+                    if validate_exercise $level "$exercise"; then
+                        echo -e "${GREEN}¡Tests pasados correctamente!${NC}"
+                        mark_as_completed $level "$exercise"
+                        break
+                    else
+                        echo -e "${RED}Los tests han fallado. Sigue intentándolo.${NC}"
+                        echo -e "\n${YELLOW}Presiona Enter para continuar...${NC}"
+                        read
+                    fi
+                    ;;
+                2)
+                    mark_as_completed $level "$exercise"
+                    echo -e "${GREEN}¡Ejercicio marcado como completado!${NC}"
+                    break
+                    ;;
+                3)
+                    echo -e "${YELLOW}Pasando al siguiente ejercicio...${NC}"
+                    break
+                    ;;
+                4)
+                    return
+                    ;;
+                *)
+                    echo "Opción inválida"
+                    ;;
+            esac
+        done
+        
+        # Actualizar contador de completados
+        completed=$(sort "$done_file" | uniq | wc -l)
+        
+        # Si no quedan más ejercicios, salir
+        if [ $completed -eq $total ]; then
+            echo -e "${GREEN}¡Felicidades! Has completado todos los ejercicios del nivel $level${NC}"
+            read -p "Presiona Enter para continuar..."
+            return
+        fi
+        
+        echo -e "\n${YELLOW}Presiona Enter para continuar con el siguiente ejercicio o 'q' para salir${NC}"
+        read -r response
+        [ "$response" = "q" ] && break
+    done
+}
+
+# Función para seleccionar un nivel y practicar todos sus ejercicios aleatoriamente
+select_level_for_random_practice() {
+    while true; do
+        clear
+        echo -e "${BLUE}=== SELECCIONAR NIVEL PARA PRÁCTICA ALEATORIA ===${NC}"
+        echo "1. Level 1"
+        echo "2. Level 2"
+        echo "3. Level 3"
+        echo "4. Level 4"
+        echo "0. Volver"
+        
+        read -r level_choice
+        
+        case $level_choice in
+            [1-4])
+                practice_level_randomly "$level_choice"
+                ;;
+            0)
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                read -p "Presiona Enter para continuar..."
+                ;;
+        esac
+    done
+}
+
 # Función para inicializar el entorno
 init_environment() {
     # Verificar que existe init.sh
@@ -415,17 +565,17 @@ init_environment() {
 init_environment
 
 # Menú principal
-# Menú principal
 while true; do
     clear
     echo -e "${BLUE}=== 42 EXAM PRACTICE ===${NC}"
     show_progress
     
     echo -e "\n${YELLOW}Opciones:${NC}"
-    echo "1. Comenzar práctica aleatoria"
-    echo "2. Seleccionar ejercicio específico"
-    echo "3. Resetear todo el progreso"
-    echo "4. Salir"
+    echo "1. Comenzar práctica aleatoria (todos los niveles)"
+    echo "2. Practicar todos los ejercicios de un nivel aleatoriamente"
+    echo "3. Seleccionar ejercicio específico"
+    echo "4. Resetear todo el progreso"
+    echo "5. Salir"
     
     read -p "Selecciona una opción: " option
 
@@ -434,9 +584,12 @@ while true; do
             practice_exercises
             ;;
         2)
-            select_level
+            select_level_for_random_practice
             ;;
         3)
+            select_level
+            ;;
+        4)
             echo -e "${RED}¿Estás seguro de que quieres resetear todo el progreso? (s/n)${NC}"
             read -r response
             if [[ "$response" =~ ^[Ss]$ ]]; then
@@ -454,7 +607,7 @@ while true; do
                 echo -e "${GREEN}Progreso reseteado y directorio rendu limpiado${NC}"
             fi
             ;;
-        4)
+        5)
             echo "¡Hasta luego!"
             exit 0
             ;;
@@ -463,5 +616,5 @@ while true; do
             ;;
     esac
 
-    [ "$option" != "1" ] && [ "$option" != "2" ] && read -p "Presiona Enter para continuar..."
+    [ "$option" != "1" ] && [ "$option" != "2" ] && [ "$option" != "3" ] && read -p "Presiona Enter para continuar..."
 done
