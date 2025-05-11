@@ -1,36 +1,49 @@
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-void	print_hex(unsigned int num)
+void print_hex(int n)
 {
-	char	hex_digits[] = "0123456789abcdef";
-	char	hex_char;
-	
-	if (num >= 16)
-		print_hex(num / 16);
-	hex_char = hex_digits[num % 16];
-	write(1, &hex_char, 1);
+    char base[] = "0123456789abcdef";
+    if(n >= 16)
+        print_hex(n/16);
+    write(1, &base[n % 16], 1);  
+    
 }
 
-int	main(int argc, char **argv)
+int ft_atoi(char *s)
 {
-	if (argc != 2)
-	{
-		write(1, "\n", 1);
-		return (0);
-	}
-	
-	unsigned int num = 0;
-	int i = 0;
-	
-	// Convert string to number
-	while (argv[1][i])
-	{
-		num = num * 10 + (argv[1][i] - '0');
-		i++;
-	}
-	
-	// Print hexadecimal number
-	print_hex(num);
-	write(1, "\n", 1);
-	return (0);
+    int i = 0;
+    int sign = 1;
+    int result = 0;
+    if(s[i] == '-' || s[i]== '+')
+    {
+        if(s[i] == '-')
+            sign = -1;
+        i++;
+    }
+    while(s[i]>= '0' && s[i] <= '9' )
+    {
+        result = result * 10 + (s[i] - '0');
+        i++;
+    }
+   
+
+    return result * sign;
+}
+int main(int argc, char **argv)
+{
+    if(argc == 2)
+    {
+        int n = ft_atoi(argv[1]);
+        //printf("n is %d\n", n);
+        if(n == 0)
+            write(1, "0", 1);
+        else
+        {
+            print_hex(n);
+        } 
+    }
+    write(1, "\n", 1);
+    return 0;
 }
