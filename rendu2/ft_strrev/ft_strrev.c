@@ -33,6 +33,9 @@ char    *ft_strrev(char *str)
     len = 0;
     while (str[len])
         len++;
+    //si la longitud de str es 0, devolvemos el puntero str, para evitar len - 1
+    if(len == 0)
+        return str;
 
     // Invertimos la string usando dos índices
     i = 0;
