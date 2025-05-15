@@ -1,62 +1,63 @@
 #include <unistd.h>
-char to_lower(char c)
+
+int is_low(char c)
 {
-    if(c >= 'A' && c <= 'Z')
-        return(c += 32);
-    return c;
+    return(c >= 'a' && c <= 'z');
 }
-int is_upper(char c)
+int is_up(char c)
 {
     return(c >= 'A' && c <= 'Z');
 }
 
 char to_upper(char c)
 {
-    if(c >= 'a' && c <= 'z')
-        return(c -= 32);
-    return c;
+    if(is_low(c))
+        return c -= 32;
+    return c; 
+}
+
+char to_lower(char c)
+{
+    if(is_up(c))
+        return c += 32;
+    return c; 
 }
 
 int is_space(char c)
 {
-    return(c == ' ' || c == '\t');
+    return( c == ' ' || c == '\t');
 }
 
-void capi(char *s)
+void processs(char *s)
 {
-    int i;
-    for(i = 0; s[i]; i++)
+    char c;
+    for(int i = 0; s[i]; i++)
     {
-        if(is_upper(s[i]))
-            s[i] = to_lower(s[i]);
-    }
-    if(s[0] && !is_space(s[0]))
-    {
-        s[0] = to_upper(s[0]);
-    }
-    for(i = 0; s[i]; i++)
-    {
-        
-        if(!is_space(s[i]) && is_space(s[i - 1]))
+        if((s[i]) && (is_space(s[i - 1]) || i == 0))
         {
-            s[i] = to_upper(s[i]);
+            c = to_upper(s[i]);   
         }
-        write(1, &s[i], 1);
+        else
+        {
+            c = to_lower(s[i]);
+        }
+        write(1, &c, 1);
     }
-
 }
+
+
 int main(int argc, char **argv)
 {
     if(argc >= 2)
     {
         for(int i = 1; argv[i]; i++)
         {
-            capi(argv[i]);
+            processs(argv[i]);
             write(1, "\n", 1);
         }
         
     }
     else
-        write(1, "\n", 1);
+       write(1, "\n", 1);
     return 0;
 }
