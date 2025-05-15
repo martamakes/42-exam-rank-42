@@ -142,6 +142,7 @@ Este proyecto no está oficialmente afiliado con 42 School. Es una herramienta d
 ## 📜 Licencia
 
 Este proyecto está bajo la licencia MIT. Ver `LICENSE` para más información.
+Todos los enunciados pertenecen a 42 School.
 
 ## 🙏 Agradecimientos
 
