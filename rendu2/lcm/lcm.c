@@ -34,16 +34,9 @@
 // Función auxiliar para calcular el MCD usando el algoritmo de Euclides
 unsigned int    get_gcd(unsigned int a, unsigned int b)
 {
-    unsigned int    temp;
-
-    // Aplicamos el algoritmo de Euclides
-    while (b != 0)
-    {
-        temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return (a);
+    if (b == 0)
+        return a;
+    get_gcd(b, a % b);
 }
 
 unsigned int    lcm(unsigned int a, unsigned int b)

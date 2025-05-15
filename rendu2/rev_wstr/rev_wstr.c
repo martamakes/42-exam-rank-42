@@ -17,87 +17,51 @@
 **    - Liberar memoria correctamente
 */
 
-typedef struct s_word
-{
-    int start;  // Posición inicial de la palabra
-    int len;    // Longitud de la palabra
-} t_word;
-
-// Cuenta el número de palabras en el string
-int count_words(char *str)
-{
-    int i = 0;
-    int count = 0;
-
-    while (str[i])
-    {
-        // Si encontramos un carácter no espacio
-        if (str[i] != ' ' && (i == 0 || str[i - 1] == ' '))
-            count++;
-        i++;
-    }
-    return count;
-}
-
-void print_word(char *str, int start, int len)
-{
-    write(1, str + start, len);
-}
-
-void rev_wstr(char *str)
-{
-    int i = 0;
-    int word_count = count_words(str);
-    t_word *words;
-
-    // Si no hay palabras, retornamos
-    if (word_count == 0)
-        return;
-
-    // Reservar memoria para almacenar información de palabras
-    words = malloc(sizeof(t_word) * word_count);
-    if (!words)
-        return;
-
-    // Almacenar información de cada palabra
-    int current_word = 0;
-    while (str[i])
-    {
-        // Si encontramos el inicio de una palabra
-        if (str[i] != ' ' && (i == 0 || str[i - 1] == ' '))
-        {
-            words[current_word].start = i;
-            words[current_word].len = 0;
-            // Contar longitud de la palabra
-            while (str[i] && str[i] != ' ')
-            {
-                words[current_word].len++;
-                i++;
-            }
-            current_word++;
-        }
-        else
-            i++;
-    }
-
-    // Inicializamos i al último índice
-    i = word_count - 1;
-    
-    while (i >= 0)
-    {
-        print_word(str, words[i].start, words[i].len);
-        if (i > 0)  // Si no es la última palabra a imprimir
-            write(1, " ", 1);
-        i--;
-    }
-
-    free(words);
-}
+#include <unistd.h>
+#include <stdlib.h>
 
 int main(int argc, char **argv)
 {
-    if (argc == 2)
-        rev_wstr(argv[1]);
-    write(1, "\n", 1);
-    return (0);
+    int i = 0;
+    int start;
+    int end;
+
+    // Verificar si el número de argumentos es correcto
+    if (argc != 2)
+    {
+        write(1, "\n", 1);
+        return 0;
+    }
+
+    // Obtener la longitud de la cadena
+    while (argv[1][i] != '\0')
+        i++;
+    i--; // Ajustar para apuntar al último carácter válido (no el nulo)
+
+    // Procesar la cadena de derecha a izquierda
+    while (i >= 0)
+    {
+        // Saltar espacios desde el final
+        while (i >= 0 && (argv[1][i] == ' ' || argv[1][i] == '\t'))
+            i--;
+
+        end = i + 1; // El final de la palabra (posición después del último carácter)
+
+        // Encontrar el inicio de la palabra
+        while (i >= 0 && argv[1][i] != ' ' && argv[1][i] != '\t')
+            i--;
+
+        start = i + 1; // El inicio de la palabra
+
+        // Imprimir la palabra
+        if (end > start) // Asegurarse de que hay una palabra para imprimir
+            write(1, argv[1] + start, end - start);
+
+        // Imprimir espacio si no es la primera palabra (quedan más palabras por procesar)
+        if (i >= 0)
+            write(1, " ", 1);
+    }
+
+    write(1, "\n", 1); // Salto de línea al final
+    return 0;
 }
