@@ -67,7 +67,7 @@ create_template() {
     
     # Verificar si el directorio existe
     if [ ! -d "$RENDU_DIR/cpp_module_$module" ]; then
-        echo -e "${RED}Error: No se encuentra el directorio $RENDU_DIR/cpp_module_$module${NC}"
+        echo -e "${RED}Error: No se encuentra el directorio cpp_module_$module${NC}"
         return
     fi
     

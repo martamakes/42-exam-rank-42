@@ -64,8 +64,8 @@ case $option in
     3)
         # Verificar si existe una implementación
         if [ ! -f "$RENDU_DIR/microshell.c" ]; then
-            echo -e "${RED}Error: No se encuentra el archivo microshell.c en $RENDU_DIR${RESET}"
-            echo -e "${YELLOW}Por favor, crea tu implementación en: ${CYAN}$RENDU_DIR/microshell.c${RESET}"
+            echo -e "${RED}Error: No se encuentra el archivo microshell.c${RESET}"
+            echo -e "${YELLOW}Por favor, crea tu implementación en: ${CYAN}rendu/microshell/microshell.c${RESET}"
             
             # Preguntar si quiere crear un template
             read -p "¿Quieres crear un template básico para comenzar? (s/n): " create_template
@@ -211,8 +211,8 @@ EOL
     4)
         # Verificar si existe una implementación
         if [ ! -f "$RENDU_DIR/microshell.c" ]; then
-            echo -e "${RED}Error: No se encuentra el archivo microshell.c en $RENDU_DIR${RESET}"
-            echo -e "${YELLOW}Por favor, crea tu implementación en: ${CYAN}$RENDU_DIR/microshell.c${RESET}"
+            echo -e "${RED}Error: No se encuentra el archivo microshell.c${RESET}"
+            echo -e "${YELLOW}Por favor, crea tu implementación en: ${CYAN}rendu/microshell/microshell.c${RESET}"
             echo -e "\n${YELLOW}Presiona Enter para volver...${RESET}"
             read
             $EXAM_DIR/exam.sh
@@ -226,7 +226,7 @@ EOL
             echo -e "${RED}Error de compilación.${RESET}"
         else
             echo -e "${GREEN}Compilación exitosa.${RESET}"
-            echo -e "${YELLOW}Puedes encontrar el ejecutable en: ${CYAN}$RENDU_DIR/microshell${RESET}"
+            echo -e "${YELLOW}Puedes encontrar el ejecutable en: ${CYAN}rendu/microshell/microshell${RESET}"
         fi
         
         echo -e "\n${YELLOW}Presiona Enter para volver...${RESET}"
