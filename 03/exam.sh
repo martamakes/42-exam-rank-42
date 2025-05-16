@@ -31,15 +31,15 @@ show_subject() {
     if [ -f "$subject_path" ]; then
         cat "$subject_path"
         echo -e "\n${YELLOW}Para resolver este ejercicio:${NC}"
-        echo -e "1. ${CYAN}Directorio:${NC} $RENDU_DIR/$exercise"
-        echo -e "2. ${CYAN}Crea tu solución en:${NC} $RENDU_DIR/$exercise/"
-        echo -e "\n${GREEN}${BOLD}IMPORTANTE:${NC} Tu solución debe estar dentro del directorio $RENDU_DIR/$exercise/"
+        echo -e "1. ${CYAN}Directorio:${NC} rendu/$exercise"
+        echo -e "2. ${CYAN}Crea tu solución en:${NC} rendu/$exercise/"
+        echo -e "\n${GREEN}${BOLD}IMPORTANTE:${NC} Tu solución debe estar dentro del directorio rendu/$exercise/"
         echo -e "Los archivos que debes crear son:"
         if [ "$exercise" = "ft_printf" ]; then
-            echo -e "- ${CYAN}$RENDU_DIR/$exercise/ft_printf.c${NC}"
+            echo -e "- ${CYAN}ft_printf.c${NC}"
         elif [ "$exercise" = "get_next_line" ]; then
-            echo -e "- ${CYAN}$RENDU_DIR/$exercise/get_next_line.c${NC}"
-            echo -e "- ${CYAN}$RENDU_DIR/$exercise/get_next_line.h${NC}"
+            echo -e "- ${CYAN}get_next_line.c${NC}"
+            echo -e "- ${CYAN}get_next_line.h${NC}"
         fi
     else
         echo -e "${RED}Error: No se encuentra el subject en $subject_path${NC}"
