@@ -1,23 +1,64 @@
-Assignment name : get_next_line
-Expected files : get_next_line.c
-Allowed functions: read, free, malloc
---------------------------------------------------------------------------------
+# get_next_line
 
-Write a function named get_next_line which prototype should be:
+## Enunciado
 
+Escribe una función llamada `get_next_line` que devuelva una línea leída de un file descriptor.
+
+## Prototipo
+
+```c
 char *get_next_line(int fd);
+```
 
+## Parámetros
 
-Your function must return a line that has been read from the file descriptor passed as parameter. What we call a "line that has been read" is a succesion of 0 to n characters that end with '\n' (ascii code 0x0a) or with End Of File (EOF).
+- `fd`: El file descriptor desde donde leer
 
-The line should be returned including the '\n' in case there is one at the end of the line that has been read. When you've reached the EOF, you must store the current buffer in a char * and return it. If the buffer is empty you must return NULL.
+## Retorno
 
-In case of error return NULL. In case of not returning NULL, the pointer should be free-able. Your program will be compiled with the flag -D BUFFER_SIZE=xx, which has to be used as the buffer size for the read calls in your functions.
+- Si todo va bien, la función devuelve la línea leída.
+- Si no hay nada más que leer o si ocurre un error, devuelve NULL.
 
-Your function must be memory leak free. When you've reached the EOF, your function should keep 0 memory allocated with malloc, except the line that has been returned.
+## Descripción
 
-Calling your function get_next_line in a loop will therefore allow you to read the text available on a file descriptor one line at a time until the end of the text, no matter the size od either the text or one of its lines.
+- La línea devuelta debe incluir el carácter de nueva línea final '\n', excepto si se alcanza el final del archivo (EOF) y éste no termina con un carácter de nueva línea.
+- El buffer size para la lectura está definido como BUFFER_SIZE.
+- La función debe ser capaz de manejar cualquier BUFFER_SIZE.
 
-Make sure that your function behaves well when it reads from a file, from the standard output, from a redirection, etc...
+## Restricciones
 
-No call to another function will be done on the file descriptor between 2 calls of get_next_line. Finally we consider that get_next_line has an undefined behaviour when reading from a binary file.
+- Tu función debe gestionar correctamente memoria: no debe tener fugas de memoria.
+- No puedes usar funciones de la librería estándar excepto las que ya permiten en el subject original: read, malloc y free.
+
+## Ejemplos
+
+```c
+int fd = open("archivo.txt", O_RDONLY);
+char *line;
+
+// Leer primera línea
+line = get_next_line(fd);
+printf("%s", line);
+free(line);
+
+// Leer segunda línea
+line = get_next_line(fd);
+printf("%s", line);
+free(line);
+
+// Continuar leyendo hasta el final
+while ((line = get_next_line(fd)) != NULL)
+{
+    printf("%s", line);
+    free(line);
+}
+
+close(fd);
+```
+
+## Consejos
+
+- Piensa en cómo gestionar un buffer de lectura
+- Necesitarás guardar lo que queda del buffer entre llamadas a la función
+- Ten en cuenta que puedes necesitar realizar múltiples lecturas para obtener una línea completa
+- Siempre verifica el valor de retorno de read y gestiona correctamente los errores

@@ -1,25 +1,40 @@
-Assignment name  : ft_printf
-Expected files   : ft_printf.c
-Allowed functions: malloc, free, write, va_start, va_arg, va_copy, va_end
---------------------------------------------------------------------------------
+# ft_printf
 
-Write a function named `ft_printf` that will mimic the real printf but 
-it will manage only the following conversions: s,d and x.
+## Enunciado
 
-Your function must be declared as follows:
+Escribe una función llamada `ft_printf` que imite el comportamiento real de printf pero solo gestione las siguientes conversiones:
 
-int ft_printf(const char *, ... );
+- `%s` (string)
+- `%d` (decimal)
+- `%x` (hexadecimal en minúsculas)
 
-Before you start we advise you to read the `man 3 printf` and the `man va_arg`.
-To test your program compare your results with the true printf.
+## Prototipo
 
-Exemples of the function output:
+```c
+int ft_printf(const char *format, ...);
+```
 
-call: ft_printf("%s\n", "toto");
-out: toto$
+## Restricciones
 
-call: ft_printf("Magic %s is %d", "number", 42);
-out: Magic number is 42%
+- Tu función debe manejar el formato de la misma manera que printf
+- No es necesario reproducir el buffer de printf
+- Debes usar la librería `<stdarg.h>`
 
-call: ft_printf("Hexadecimal for %d is %x\n", 42, 42);
-out: Hexadecimal for 42 is 2a$
+## Retorno
+
+La función debe devolver el número de caracteres impresos (excluyendo el '\0' final).
+
+## Ejemplos
+
+```c
+ft_printf("Hello %s\n", "world"); // Imprime: Hello world
+ft_printf("%d\n", 42);          // Imprime: 42
+ft_printf("%x\n", 42);          // Imprime: 2a
+```
+
+## Consejos
+
+- Familiarízate con la biblioteca `<stdarg.h>` y sus funciones (va_list, va_start, va_arg, va_end)
+- Separa la lógica para cada tipo de conversión
+- Utiliza la función write para imprimir caracteres
+- Recuerda contar correctamente los caracteres impresos para el valor de retorno
