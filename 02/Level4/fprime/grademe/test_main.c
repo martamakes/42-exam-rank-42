@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 
 #define BUFFER_SIZE 4096
 int g_tests_failed = 0;
