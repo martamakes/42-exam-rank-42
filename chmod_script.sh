@@ -7,11 +7,11 @@ script_dirs=(
     "."
     "./02"
     "./03"
+    "./03/ft_printf"
+    "./03/get_next_line"
     "./04"
     "./05"
     "./06"
-    "./03/ft_printf"
-    "./03/get_next_line"
 )
 
 # Tipo de archivos para dar permisos

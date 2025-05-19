@@ -1,59 +1,64 @@
-# 42 Exam Rank 03 - Guía de Práctica
+# Guía para usar el entorno de práctica para el Exam Rank 02/03
 
-Este directorio contiene los ejercicios y materiales para practicar el Exam Rank 03 de 42.
+## Introducción
 
-## Estructura del Examen
+Este entorno te ayudará a practicar los ejercicios del examen Rank 02/03 de 42, que incluye:
+- ft_printf
+- get_next_line
 
-El Exam Rank 03 consta de dos posibles ejercicios, de los cuales se te asignará uno durante el examen:
+El entorno ofrece diferentes modos de práctica, incluyendo:
+- Modo guiado clásico: Instrucciones paso a paso básicas
+- Modo guiado mejorado: Sigue el proceso de pensamiento natural de un programador
+- Modo de práctica: Verifica tu solución y comprueba si pasa los tests
+- Modo simulación: Simula un examen real con selección aleatoria de ejercicios
 
-1. **ft_printf**: Implementar una versión simplificada de la función printf.
-2. **get_next_line**: Implementar una función que lea una línea de un archivo descriptor.
+## Configuración inicial
 
-## Cómo usar este sistema de práctica
+Para configurar el entorno, ejecuta:
 
-1. Navega a los directorios `ft_printf` o `get_next_line` para ver el subject y los recursos disponibles.
-2. Crea tu solución siguiendo las instrucciones del subject.
-3. Usa el script `exam.sh` para seleccionar un ejercicio, practicarlo y validarlo.
-
-## Directorios importantes
-
-- `03/ft_printf/`: Ejercicio de ft_printf con subject, guías y tests.
-- `03/get_next_line/`: Ejercicio de get_next_line con subject, guías y tests.
-- `03/rendu/`: **Este es el directorio donde debes crear tus soluciones**.
-
-## Estructura de tus soluciones
-
-Para que los test automáticos funcionen correctamente, debes colocar tus archivos de la siguiente manera:
-
-### Para ft_printf:
 ```
-03/rendu/ft_printf/ft_printf.c
+bash chmod_setup.sh
+bash setup_permissions.sh
 ```
 
-### Para get_next_line:
+## Cómo usar el entorno
+
+Ejecuta el script principal:
+
 ```
-03/rendu/get_next_line/get_next_line.c
-03/rendu/get_next_line/get_next_line.h
+./exam.sh
 ```
 
-## Guías y recursos adicionales
+En el menú principal puedes elegir entre varias opciones:
 
-Cada ejercicio incluye:
-- Archivos de guía paso a paso (nombrados como `*guide*` o `*steps*`)
-- Ejemplos de implementaciones
-- Tests automáticos para validar tu solución
+1. **Modo guiado**: Recomendado para principiantes. Te mostrará una guía paso a paso para implementar las funciones, siguiendo un flujo natural de pensamiento.
 
-Puedes acceder a estos recursos a través del menú principal del `exam.sh`.
+2. **Practicar ft_printf**: Te permite validar tu implementación de ft_printf y ver ejemplos.
 
-## Nota importante sobre los test
+3. **Practicar get_next_line**: Te permite validar tu implementación de get_next_line y ver ejemplos.
 
-Los tests verifican que tu implementación:
-1. Compila correctamente sin errores ni warnings
-2. Funciona correctamente con casos de prueba básicos y avanzados
-3. No tiene fugas de memoria (si se usa la opción `--valgrind`)
+4. **Simular examen**: Te asigna un ejercicio aleatorio y mide el tiempo que tardas en completarlo.
 
-Para get_next_line, los tests se ejecutan con diferentes valores de BUFFER_SIZE para verificar que tu solución funciona en todas las condiciones.
+5. **Ver estructura de directorios**: Muestra la estructura de carpetas del entorno.
 
----
+6. **Limpiar directorio rendu**: Elimina tus implementaciones actuales para empezar de nuevo.
 
-¡Buena suerte con tu práctica!
+## Funcionalidades adicionales
+
+En el modo guiado puedes elegir entre:
+- Modo mejorado: Sigue un proceso de pensamiento natural, explicando el razonamiento detrás de cada paso
+- Modo clásico: Instrucciones directas y concisas
+
+## Tips para el examen
+
+1. **ft_printf**:
+   - Maneja los 3 especificadores requeridos (%s, %d, %x)
+   - Asegúrate de que tu función devuelva el número correcto de caracteres impresos
+   - Maneja correctamente strings NULL y números negativos
+
+2. **get_next_line**:
+   - Recuerda incluir el \n en la línea devuelta, excepto al final del archivo
+   - Usa la variable estática para mantener el contenido restante entre llamadas
+   - El BUFFER_SIZE puede variar, tu función debe funcionar con cualquier valor
+
+## Buena suerte en tu examen!
