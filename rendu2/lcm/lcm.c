@@ -36,7 +36,7 @@ unsigned int    get_gcd(unsigned int a, unsigned int b)
 {
     if (b == 0)
         return a;
-    get_gcd(b, a % b);
+    return get_gcd(b, a % b);
 }
 
 unsigned int    lcm(unsigned int a, unsigned int b)
