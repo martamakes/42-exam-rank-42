@@ -26,7 +26,7 @@ show_overall_stats() {
     local patterns_completed=0
     
     # Contabilizar estadísticas generales
-    for pattern in {01..10}; do
+    for pattern in {01..12}; do
         pattern_file="progress/pattern_${pattern}.txt"
         if [[ -f "$pattern_file" ]]; then
             ((patterns_started++))
@@ -50,8 +50,8 @@ show_overall_stats() {
     
     echo -e "${BLUE}📊 Estadísticas Generales:${NC}"
     echo -e "  🎯 Ejercicios completados: ${GREEN}$completed_exercises${NC}/${total_exercises} (${percentage}%)"
-    echo -e "  📚 Patrones iniciados: ${CYAN}$patterns_started${NC}/10"
-    echo -e "  ✅ Patrones completados: ${GREEN}$patterns_completed${NC}/10"
+    echo -e "  📚 Patrones iniciados: ${CYAN}$patterns_started${NC}/12"
+    echo -e "  ✅ Patrones completados: ${GREEN}$patterns_completed${NC}/12"
     echo ""
     
     # Barra de progreso general
@@ -79,6 +79,8 @@ show_pattern_progress() {
         "08:Manipulación de listas enlazadas:🔗"
         "09:Algoritmos de ordenación:📈"
         "10:Recursividad y algoritmos de inundación:🌊"
+        "11:Operaciones Bitwise (Manipulación de bits):🔢"
+        "12:Uso de Flags (Banderas de estado):🚩"
     )
     
     for pattern in "${patterns[@]}"; do
@@ -150,7 +152,7 @@ show_recommendations() {
     local next_pattern=""
     local next_exercise=""
     
-    for pattern in {01..10}; do
+    for pattern in {01..12}; do
         pattern_file="progress/pattern_${pattern}.txt"
         if [[ -f "$pattern_file" ]]; then
             while IFS=':' read -r exercise status; do

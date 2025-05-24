@@ -1,0 +1,13 @@
+first_word:pending
+repeat_alpha:pending
+rev_print:pending
+search_and_replace:pending
+last_word:pending
+camel_to_snake:pending
+snake_to_camel:pending
+epur_str:pending
+expand_str:pending
+str_capitalizer:pending
+rstr_capitalizer:pending
+rostring:pending
+rev_wstr:pending

@@ -39,6 +39,8 @@ help:
 	@echo "  $(PURPLE)08.$(NC) Manipulación de listas enlazadas"
 	@echo "  $(PURPLE)09.$(NC) Algoritmos de ordenación"
 	@echo "  $(PURPLE)10.$(NC) Recursividad y algoritmos de inundación"
+	@echo "  $(PURPLE)11.$(NC) Operaciones Bitwise (Manipulación de bits)"
+	@echo "  $(PURPLE)12.$(NC) Uso de Flags (Banderas de estado)"
 	@echo ""
 
 start: setup
@@ -112,3 +114,9 @@ pattern-09:
 
 pattern-10:
 	@./scripts/pattern_practice.sh 10-recursividad-flood-fill
+
+pattern-11:
+	@./scripts/pattern_practice.sh 11-operaciones-bitwise
+
+pattern-12:
+	@./scripts/pattern_practice.sh 12-uso-de-flags

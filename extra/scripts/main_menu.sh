@@ -29,7 +29,7 @@ show_overall_progress() {
     completed_exercises=0
     
     # Contar ejercicios totales y completados
-    for pattern in {01..10}; do
+    for pattern in {01..12}; do
         pattern_file="progress/pattern_${pattern}.txt"
         if [[ -f "$pattern_file" ]]; then
             while IFS= read -r line; do
@@ -73,6 +73,8 @@ show_patterns() {
         "08:Manipulación de listas enlazadas:🔗"
         "09:Algoritmos de ordenación:📈"
         "10:Recursividad y algoritmos de inundación:🌊"
+        "11:Operaciones Bitwise (Manipulación de bits):🔢"
+        "12:Uso de Flags (Banderas de estado):🚩"
     )
     
     for pattern in "${patterns[@]}"; do
@@ -115,7 +117,7 @@ main_menu() {
         
         echo -e "${GREEN}¿Qué quieres hacer?${NC}"
         echo ""
-        echo -e "  ${YELLOW}1-10${NC}) Practicar un patrón específico"
+        echo -e "  ${YELLOW}1-12${NC}) Practicar un patrón específico"
         echo -e "  ${YELLOW}p${NC})    Ver progreso detallado"
         echo -e "  ${YELLOW}s${NC})    Estado del sistema"
         echo -e "  ${YELLOW}r${NC})    Reiniciar progreso (¡CUIDADO!)"
@@ -127,7 +129,7 @@ main_menu() {
         read -r choice
         
         case $choice in
-            [1-9]|10)
+            [1-9]|1[0-2])
                 pattern_num=$(printf "%02d" $choice)
                 ./scripts/pattern_practice.sh "${pattern_num}"
                 ;;

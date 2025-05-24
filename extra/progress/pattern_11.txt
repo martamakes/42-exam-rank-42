@@ -1,0 +1,4 @@
+print_bits:pending
+reverse_bits:pending
+swap_bits:pending
+is_power_of_2:pending
