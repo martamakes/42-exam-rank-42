@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <unistd.h>
 
 int is_space(char c)
@@ -5,32 +6,35 @@ int is_space(char c)
     return (c == ' ' || c == '\t');
 }
 
-void rev_wstr(char *s)
+void rev(char *s)
 {
-    int i = 0;
-    while(s[i])
-        i++;
-    int end, start;
+    int i  = 0;
+    while(s[i]) i++;
     i--;
-    while(i >= 0)
+    int end = 0, start = 0;
+    int first_word = 1;
+    while(i >= 0 && is_space(s[i])) i--;
+    while( i >= 0)
     {
-        while(i >= 0 && is_space(s[i]))
-            i--;
+        while(i >= 0 && is_space(s[i])) i--;
+        if(i < 0) break;
         end = i + 1;
-        while(i >= 0 && !is_space(s[i]))
-            i--;
+        while(i >= 0 && !is_space(s[i])) i--;
         start = i + 1;
-        if(end > start)
+        if(start < end)
+        {
+            if(!first_word)
+                write(1, " ", 1);
             write(1, &s[start], end - start);
-        if ( i > 0)
-            write(1, " ", 1);
+            first_word = 0;
+        }
     }
 }
 
 int main(int argc, char **argv)
 {
-    if(argc == 2)
-        rev_wstr(argv[1]);
+    if (argc == 2)
+        rev(argv[1]);
     write(1, "\n", 1);
     return 0;
 }

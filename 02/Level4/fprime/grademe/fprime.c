@@ -1,18 +1,13 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-void fprime(char *s)
+void fprime(int n)
 {
-    int n = atoi(s);
-
-    int first = 1;
     int factor = 2;
+    int first = 1;
 
-    if(n == 1)
-    {
-        printf("1");
-        return;
-    }
+    if(n == 1){ printf("1"); return;}
+
     while(n > 1)
     {
         if(n % factor == 0)
@@ -30,12 +25,15 @@ void fprime(char *s)
 }
 
 
-
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-    if(argc == 2)
+     if (argc != 2)
     {
-        fprime(argv[1]);
+        printf("\n");
+        return 0;
     }
+
+    fprime(atoi(argv[1]));
     printf("\n");
+    return 0;
 }
