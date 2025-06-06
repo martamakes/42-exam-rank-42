@@ -23,16 +23,16 @@ int main() {
     // Pruebas con valores extremos
     printf("=== Pruebas con valores extremos ===\n");
     
-    len1 = printf("Original - String NULL: %s\n", NULL);
-    len2 = ft_printf("Tu ft_printf - String NULL: %s\n", NULL);
+    len1 = printf("Original - String NULL: %s\n", (char*)NULL);
+    len2 = ft_printf("Tu ft_printf - String NULL: %s\n", (char*)NULL);
     printf("Longitud original: %d, tu función: %d\n\n", len1, len2);
     
     len1 = printf("Original - Decimal extremo: %d\n", 2147483647);
     len2 = ft_printf("Tu ft_printf - Decimal extremo: %d\n", 2147483647);
     printf("Longitud original: %d, tu función: %d\n\n", len1, len2);
     
-    len1 = printf("Original - Decimal negativo: %d\n", -2147483648);
-    len2 = ft_printf("Tu ft_printf - Decimal negativo: %d\n", -2147483648);
+    len1 = printf("Original - Decimal negativo: %d\n", (int)-2147483648);
+    len2 = ft_printf("Tu ft_printf - Decimal negativo: %d\n", (int)-2147483648);
     printf("Longitud original: %d, tu función: %d\n\n", len1, len2);
     
     len1 = printf("Original - Hexadecimal grande: %x\n", 0xABCDEF);

@@ -124,7 +124,7 @@ show_exercise_subject() {
             local in_examples=false
             local empty_line_count=0
             
-            while IFS= read -r line; do
+            while IFS= read -r line || [[ -n "$line" ]]; do
                 # Detectar inicio de descripción (línea con guiones)
                 if [[ "$line" =~ ^-+$ ]]; then
                     description_start=true
@@ -167,6 +167,11 @@ show_exercise_subject() {
         # Verificar estado del directorio rendu
         echo -e "${BLUE}📁 ESTADO DEL EJERCICIO:${NC}"
         local exercise_dir="../rendu/$exercise"
+        
+        # Debug: mostrar donde estamos
+        echo -e "${YELLOW}Debug - Directorio actual: $(pwd)${NC}"
+        echo -e "${YELLOW}Debug - Buscando: $exercise_dir${NC}"
+        echo -e "${YELLOW}Debug - Existe? $(ls -la ../rendu/ | grep $exercise || echo 'NO')${NC}"
         
         if [[ -d "$exercise_dir" ]]; then
             echo -e "${GREEN}✓ Directorio creado: $exercise_dir/${NC}"
@@ -425,8 +430,8 @@ test_exercise() {
             cp test.sh test_exam.sh
             
             # Cambiar las rutas para usar nuestro directorio rendu
-            local full_rendu_path=$(cd "$(dirname "$0")" && pwd)
-            full_rendu_path="$full_rendu_path/../rendu/$exercise"
+            local full_rendu_path=$(cd "../../../.." && pwd)
+            full_rendu_path="$full_rendu_path/rendu/$exercise"
             
             sed -i.bak "s|STUDENT_DIR=\"../../../../rendu/\$EXERCISE\"|STUDENT_DIR=\"$full_rendu_path\"|g" test_exam.sh
             
