@@ -108,3 +108,74 @@ char *get_next_line(int fd)
  * 
  * ¡EXCELENTE INSIGHT! 🚀
  */
+
+/*
+FUNCIÓN expand_line(línea_actual, tamaño_actual, capacidad_referencia):
+    INCREMENTAR capacidad_referencia EN BUFFER_SIZE
+    
+    nueva_línea = RESERVAR_MEMORIA(nueva_capacidad)
+    SI nueva_línea ES NULL:
+        LIBERAR(línea_actual)
+        RETORNAR NULL
+    
+    PARA i = 0 HASTA tamaño_actual - 1:
+        nueva_línea[i] = línea_actual[i]
+    
+    LIBERAR(línea_actual)
+    RETORNAR nueva_línea
+FIN FUNCIÓN
+
+FUNCIÓN get_next_line(descriptor_archivo):
+    // VARIABLES ESTÁTICAS (persisten entre llamadas)
+    ESTÁTICO buffer[BUFFER_SIZE]
+    ESTÁTICO bytes_leídos = 0
+    ESTÁTICO posición_buffer = 0
+    
+    // VARIABLES LOCALES
+    línea = NULL
+    índice_línea = 0
+    capacidad_línea = BUFFER_SIZE
+    
+    // VALIDACIONES INICIALES
+    SI descriptor_archivo < 0 O BUFFER_SIZE <= 0:
+        RETORNAR NULL
+    
+    // RESERVAR MEMORIA INICIAL PARA LA LÍNEA
+    línea = RESERVAR_MEMORIA(capacidad_línea)
+    SI línea ES NULL:
+        RETORNAR NULL
+    
+    // BUCLE PRINCIPAL: PROCESAR HASTA ENCONTRAR \n
+    HACER:
+        // ¿NECESITAMOS LEER MÁS DATOS DEL ARCHIVO?
+        SI posición_buffer >= bytes_leídos:
+            bytes_leídos = LEER(descriptor_archivo, buffer, BUFFER_SIZE)
+            posición_buffer = 0
+            
+            // MANEJAR EOF O ERROR
+            SI bytes_leídos <= 0:
+                SI índice_línea == 0:  // No hay contenido
+                    LIBERAR(línea)
+                    RETORNAR NULL
+                SINO:  // Hay contenido, terminar línea
+                    línea[índice_línea] = '\0'
+                    RETORNAR línea
+        
+        // ¿NECESITAMOS EXPANDIR LA LÍNEA?
+        SI índice_línea >= capacidad_línea - 1:
+            línea = expand_line(línea, índice_línea, &capacidad_línea)
+            SI línea ES NULL:
+                RETORNAR NULL
+        
+        // PROCESAR CARÁCTER ACTUAL
+        línea[índice_línea] = buffer[posición_buffer]
+        INCREMENTAR posición_buffer
+        INCREMENTAR índice_línea
+        
+    MIENTRAS línea[índice_línea - 1] != '\n'
+    
+    // TERMINAR LÍNEA Y RETORNAR
+    línea[índice_línea] = '\0'
+    RETORNAR línea
+FIN FUNCIÓN
+*/
