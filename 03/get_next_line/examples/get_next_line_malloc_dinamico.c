@@ -2,7 +2,7 @@
 /*              GET_NEXT_LINE - VERSIÓN OPTIMAL CON TU IDEA                  */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_example.h"
 
 /*
  * VERSIÓN FINAL: Implementando tu excelente idea
@@ -16,7 +16,6 @@ static char	*expand_line(char *line, int size, int *capacity)
 	char	*new_line;
 	int		i;
 	
-	// 🔥 TU IDEA: Crecer por BUFFER_SIZE en lugar de duplicar
 	*capacity += BUFFER_SIZE;
 	
 	new_line = malloc(*capacity);
