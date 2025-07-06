@@ -1,0 +1,52 @@
+Assignment name  : string_bigint
+Expected files   : *.cpp *.hpp
+Allowed functions: All C++ standard functions
+--------------------------------------------------------------------------------
+
+Write a class called 'bigint' that can handle arbitrarily large integers using strings.
+
+Your bigint class must:
+
+1. Have a private member: std::string _string to store the number
+
+2. Implement the following constructors:
+   - bigint();                           // default constructor (value = "0")
+   - bigint(unsigned int n);             // constructor from unsigned int
+   - bigint(const std::string& str);     // constructor from string
+   - bigint(const bigint& original);     // copy constructor
+
+3. Implement a destructor:
+   - ~bigint();
+
+4. Implement getter function:
+   - std::string getArbiter_value() const;  // returns the string representation
+
+5. Implement the following operators:
+   - operator+ for addition
+   - operator- for subtraction  
+   - operator* for multiplication
+   - operator= for assignment
+   - operator<< for output stream
+
+6. Your class should handle:
+   - Leading zeros removal
+   - Basic arithmetic operations on large numbers
+   - Proper string to number conversion
+
+Requirements:
+- Handle numbers that exceed standard integer types
+- All operations should return a new bigint object
+- Implement proper error handling for invalid strings
+- The string should store digits only (no sign handling required)
+
+Example usage:
+bigint a("123456789012345678901234567890");
+bigint b(987654321);
+bigint c = a + b;
+std::cout << c << std::endl;
+
+Your implementation should be efficient and handle edge cases like:
+- Empty strings
+- Strings with leading zeros
+- Addition/subtraction resulting in larger numbers
+- Zero operands
