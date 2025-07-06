@@ -1,0 +1,46 @@
+Assignment name  : practice_bigint
+Expected files   : *.cpp *.hpp
+Allowed functions: All C++ standard functions
+--------------------------------------------------------------------------------
+
+Write a simplified version of the bigint class for practice purposes.
+
+Your bigint class must:
+
+1. Have a private member to store the large integer (choose appropriate container)
+
+2. Implement basic constructors:
+   - Default constructor
+   - Constructor from int
+   - Constructor from string
+   - Copy constructor
+
+3. Implement basic operators:
+   - operator+ for addition of two bigints
+   - operator<< for output to stream
+
+4. Core functionality:
+   - Store and manipulate integers larger than standard int/long
+   - Perform addition on arbitrarily large numbers
+   - Handle string input parsing
+   - Remove leading zeros from results
+
+Requirements:
+- Focus on addition algorithm implementation
+- Handle carries properly in digit-by-digit addition
+- Parse input strings correctly (digits only)
+- Output results without leading zeros
+
+This is a simplified version focusing on:
+- Understanding the basic concept of big integer arithmetic
+- Implementing digit-by-digit addition
+- Proper class design with constructors and operators
+- String manipulation for number representation
+
+Example:
+bigint a("999999999999999999");
+bigint b("1");
+bigint c = a + b;
+std::cout << c << std::endl;  // Should output: 1000000000000000000
+
+Focus on correctness over efficiency for this practice version.
