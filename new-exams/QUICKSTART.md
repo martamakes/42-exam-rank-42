@@ -1,103 +1,156 @@
-# 🚀 EXAMSHELL - Quick Start Guide
+# 🚀 QUICK START GUIDE
 
-## 1. Instalación Rápida
+> **Get up and running with examshell in 2 minutes**
 
-```bash
-# Hacer ejecutables los scripts
-chmod +x install.sh test.sh
-
-# Ejecutar instalación automática
-./install.sh
-
-# O compilar manualmente
-make
-```
-
-## 2. Uso Inmediato
+## ⚡ Super Quick Setup
 
 ```bash
-# Empezar con rank 03 (más fácil)
-./examshell 03
+# 1. Get the code
+git clone <repository-url>
+cd examshell
 
-# O elegir interactivamente
-./examshell
+# 2. Run setup (does everything automatically)
+chmod +x setup.sh && ./setup.sh
+
+# 3. Start practicing!
+./examshell 03
 ```
 
-## 3. Navegación Básica
+## 🎯 First Session Walkthrough
 
-Una vez en el examen:
-- **Subject mostrado automáticamente** (como en el examen real)
-- **`g`** → Marcar como aprobado (grademe)
-- **`n`** → Siguiente ejercicio (mismo nivel)
-- **`q`** → Salir
-
-## 4. Ejemplo de Sesión
-
-```
+### Step 1: Launch examshell
+```bash
 ./examshell 03
+```
 
-EXAM MODE: 1 exercise per level (like real exam)
-Status: Working on level 1 exercise
+You'll see:
+```
+=====================================
+        42 SCHOOL - EXAMSHELL        
+         Practice Environment        
+=====================================
 
 📚 Current Exercise:
    Name: filter
    Level: 1
 
-=== SUBJECT ===
-
-Assignment name: filter
-Expected files: filter.c
-...
-[Aquí se muestra automáticamente todo el subject]
-...
-
-=== END SUBJECT ===
-
-Press Enter to continue to menu...
-
-[t] Run tester
-[g] Grademe → Marca nivel 1 como aprobado, pasa a nivel 2
-[n] Next → Cambia a otro ejercicio del nivel 1
-[q] Quit → Salir del examen
+✅ Subject: subject/filter/subject.txt
+✅ Submit to: rendu/filter/
+    (Create this directory and put your .c and .h files here)
 ```
 
-## 5. Solución de Problemas
-
-**Error "No exam ranks found":**
+### Step 2: Read the exercise (new terminal)
 ```bash
-ls -la  # Verifica que tienes exam-rank-03, etc.
+cat subject/filter/subject.txt
 ```
 
-**Error de compilación:**
+### Step 3: Code your solution (new terminal)
 ```bash
-make clean && make  # Recompila desde cero
+# Create your submission directory
+mkdir rendu/filter
+
+# Write your solution
+vim rendu/filter/filter.c
+
+# Test it
+gcc rendu/filter/filter.c -o filter
+echo "test input" | ./filter "pattern"
 ```
 
-**Permisos:**
+### Step 4: Check your files (back to examshell)
+```
+Enter your choice: r
+
+📁 Files in rendu/filter/:
+  - filter.c ✓
+  Total: 1 files
+```
+
+### Step 5: Submit when ready
+```
+Enter your choice: g
+
+✅ Level 1 completed! Well done!
+Moving to level 2...
+```
+
+## 🎮 Menu Quick Reference
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `r` | **Show files** | List your current solution files |
+| `g` | **Submit** | Mark exercise as complete, advance level |
+| `n` | **Next exercise** | Get different exercise (same level) |
+| `s` | **Stats** | Show progress and time |
+| `q` | **Quit** | Save and exit (resume later) |
+
+## 📁 Directory Structure
+
+```
+examshell/
+├── subject/filter/subject.txt    ← Read this for instructions
+└── rendu/filter/                 ← CREATE THIS and put your files here
+    ├── filter.c                  ← Your solution
+    └── filter.h                  ← Your headers (if needed)
+```
+
+## 🔄 Between Sessions
+
 ```bash
-chmod +x examshell install.sh test.sh
+# Continue where you left off
+./examshell 03
+
+# Start fresh (cleans rendu/ directory)
+./examshell 03
+# Choose 'n' for new session when prompted
+
+# Switch ranks (auto-cleans rendu/)
+./examshell 04  # Will ask to clean previous rank's files
 ```
 
-## 6. Ejercicios Disponibles
+## 🧪 Verify Everything Works
 
-### Rank 03 (Nivel Intermedio)
-- **Level 1:** filter, scanf, broken_gnl
-- **Level 2:** n_queens, permutations, powerset, rip, tsp
+```bash
+# Run the test suite
+chmod +x test_system.sh && ./test_system.sh
 
-### Rank 04 (Nivel Avanzado)
-- **Level 1:** ft_popen, picoshell, sandbox
-- **Level 2:** argo, vbc
+# Should show: "🎉 ALL TESTS PASSED!"
+```
 
-### Rank 05 (Nivel Experto)
-- **Level 1:** string_bigint, vect2
-- **Level 2:** bsq, game_of_life
+## 🆘 Troubleshooting
 
-## 7. Tips de Estudio
+**Program won't start:**
+```bash
+make fclean && make
+./examshell 03
+```
 
-1. **Lee bien el subject** (`s` command)
-2. **No uses libft** - implementa desde cero
-3. **Maneja errores** - usa perror() cuando sea necesario
-4. **Prueba edge cases** - entrada vacía, malloc fails, etc.
-5. **Simula el tiempo real** - practica bajo presión
+**No exercises found:**
+```bash
+ls exam-rank-*  # Should show exam-rank-03, exam-rank-04, exam-rank-05
+```
 
-¡Happy coding! 🎯
+**Permission denied:**
+```bash
+chmod +x examshell setup.sh test_system.sh
+```
+
+## 🎓 Study Tips
+
+1. **🕐 Practice time management** - Track your session time
+2. **🔄 Use all 3 terminals** - Like in real exam
+3. **📖 Read subjects carefully** - Details matter
+4. **🧪 Test edge cases** - Empty input, errors, etc.
+5. **💾 No libft allowed** - Implement everything from scratch
+
+## 📊 Available Content
+
+- **Rank 03:** filter, scanf, broken_gnl, n_queens, permutations, powerset, rip, tsp
+- **Rank 04:** ft_popen, picoshell, sandbox, argo, vbc  
+- **Rank 05:** string_bigint, vect2, bsq, game_of_life
+
+---
+
+**That's it! You're ready to practice like it's the real exam! 🎯**
+
+Need more details? Check `README.md` for full documentation.
