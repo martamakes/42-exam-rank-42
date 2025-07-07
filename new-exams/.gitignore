@@ -1,0 +1,70 @@
+# EXAMSHELL - 42 School Exam Practice System
+# .gitignore file
+
+# Compiled files
+*.o
+*.a
+*.so
+*.dylib
+examshell
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Progress and session files
+.examshell_progress
+
+# Subject directories (auto-generated)
+subject/
+
+# User solutions (keep these!)
+# rendu/ directories should be tracked so users can see examples
+# But exclude common temporary files in rendu/
+rendu/**/*.o
+rendu/**/*.a
+rendu/**/a.out
+rendu/**/*.dSYM/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build directories
+build/
+dist/
+
+# Logs
+*.log
+
+# Test files
+test_*
+*_test
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+
+# Core dumps
+core
+core.*
+
+# Vim temporary files
+.*.swp
+.*.swo
+.*.un~
