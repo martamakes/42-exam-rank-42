@@ -1,17 +1,34 @@
-# 42 Exam Rank - Training System 🚀
+# 🎓 42 Exam Practice - UNIFIED SYSTEM 🚀
 
-Este repositorio contiene un sistema completo para practicar los Exámenes Rank de la escuela 42. El sistema simula el entorno de examen y proporciona ejercicios de práctica organizados por niveles y rangos de examen.
+¡Sistema completo e integrado para practicar **TODOS** los Exámenes Rank de 42! Combina el mejor de ambos mundos: sistema legacy para principiantes y EXAMSHELL auténtico para experiencia real.
 
-## 🎯 Características
+## ⚡ **NUEVO: Sistema Unificado**
 
-- Sistema unificado para todos los exámenes Rank (02, 03, 04, 05, 06)
-- Organización por niveles progresivos (para Rank 02)
-- Ejercicios aleatorios 
-- Test automáticos
-- Tracking de progreso
-- Interfaz amigable en terminal
-- Modo práctica realista
-- Guías y ejemplos para exámenes más avanzados
+```bash
+# 🚀 ACCESO ÚNICO A TODO
+./unified_exam.sh
+```
+
+## 🎯 **Características Principales**
+
+**🔧 Sistema Legacy (02, 06):**
+- Ideal para principiantes
+- Menús guiados paso a paso
+- 4 niveles progresivos (Rank 02)
+- Tests automáticos con validación
+
+**🚀 Sistema EXAMSHELL (03, 04, 05):**
+- **Réplica exacta del examshell real de 42**
+- Workflow idéntico al examen oficial
+- Ejercicios aleatorios por sesión
+- Tracking de tiempo real
+- Estructura auténtica subject/ y rendu/
+
+**🎯 Integración Total:**
+- Acceso unificado a TODOS los exam ranks
+- Detección automática de sistemas disponibles
+- Acceso directo por exam rank
+- Compilación automática de EXAMSHELL
 
 ## 📋 Requisitos
 
@@ -19,72 +36,101 @@ Este repositorio contiene un sistema completo para practicar los Exámenes Rank 
 - Compilador GCC
 - Make
 
-## 🛠 Instalación
+## 🛠 **Instalación Rápida**
 
 ```bash
 # Clonar el repositorio
 git clone https://github.com/martamakes/42-exam-rank-42.git
 
 # Entrar al directorio
-cd 42-Exam-Rank-02
+cd 42-exam-rank-42
 
-# Dar permisos de ejecución (si es necesario)
-chmod +x exam_master.sh
-chmod +x 02/exam.sh
-chmod +x 02/init.sh
-chmod +x 03/exam.sh  # Si está disponible
-
-# Iniciar el sistema
-make
+# 🚀 INICIAR SISTEMA UNIFICADO
+./unified_exam.sh
 ```
 
-## 🎮 Uso
+## 🎮 **Uso del Sistema Unificado**
 
-### Comandos básicos:
+### **Método Recomendado (Nuevo):**
 ```bash
-make            # Inicia el sistema de exámenes completo
-make run_exam_02 # Inicia solo el examen Rank 02
-make clean      # Limpia archivos temporales
-make fclean     # Resetea todo el progreso
-make re         # Reinstala todo el sistema
+./unified_exam.sh      # Acceso a TODOS los exam ranks
 ```
 
-## 📦 Estructura del proyecto
+### **Métodos Alternativos:**
+```bash
+# Sistema Legacy específico
+./exam_master.sh       # Solo ranks 02, 03, 04, 05, 06 (legacy)
 
-El proyecto ahora tiene una estructura modular que permite practicar diferentes exámenes Rank:
+# Sistema EXAMSHELL específico  
+cd new-exams && ./init.sh    # Solo ranks 03, 04, 05 (EXAMSHELL)
+
+# Métodos clásicos
+make                   # Sistema legacy
+make run_exam_02      # Solo Rank 02
+```
+
+## 📦 **Estructura Unificada del Proyecto**
 
 ```
-.
-├── exam_master.sh        # Script principal que permite elegir el examen
-├── 02/                   # Exam Rank 02
-│   ├── Level1/           # Ejercicios de nivel 1
-│   ├── Level2/           # Ejercicios de nivel 2
-│   ├── Level3/           # Ejercicios de nivel 3
-│   ├── Level4/           # Ejercicios de nivel 4
-│   ├── exam.sh           # Script específico del examen 02
+42-exam-rank-42/
+├── unified_exam.sh       # 🚀 NUEVO: Acceso unificado a todo
+├── exam_master.sh        # Sistema legacy original
+│
+├── 02/                   # 🔧 SISTEMA LEGACY
+│   ├── Level1/ Level2/ Level3/ Level4/
+│   ├── exam.sh
+│   └── rendu/
+├── 06/                   # 🔧 SISTEMA LEGACY  
+│   ├── exam.sh
 │   └── ...
-├── 03/                   # Exam Rank 03
-│   ├── ft_printf/        # Ejercicio ft_printf
-│   ├── get_next_line/    # Ejercicio get_next_line
-│   ├── exam.sh           # Script específico del examen 03
-│   └── ...
-├── 04/                   # Exam Rank 04 (cuando esté disponible)
-├── 05/                   # Exam Rank 05 (cuando esté disponible)
-├── 06/                   # Exam Rank 06 (cuando esté disponible)
-└── rendu/                # Directorio para tus soluciones del Rank 02
+│
+├── new-exams/            # 🚀 SISTEMA EXAMSHELL
+│   ├── examshell         # Binario EXAMSHELL (compilado)
+│   ├── init.sh           # Menu EXAMSHELL
+│   ├── exam-rank-03/
+│   │   ├── level-1/ level-2/
+│   │   └── [exercises]
+│   ├── exam-rank-04/
+│   │   ├── level-1/ level-2/
+│   │   └── [exercises]
+│   ├── exam-rank-05/
+│   │   ├── level-1/ level-2/
+│   │   └── [exercises]
+│   ├── rendu/            # Soluciones EXAMSHELL
+│   └── subject/          # Subjects temporales
+│
+├── 03/ 04/ 05/           # Legacy duplicados (compatibilidad)
+└── rendu/                # Soluciones legacy
 ```
 
-## 💻 Estructura de soluciones por examen
+## 🎯 **Guía de Uso por Sistema**
 
-### Exam Rank 02
-Tus soluciones deben estar en `/rendu/[nombre_ejercicio]/` siguiendo la guía del sistema.
+### **🚀 Sistema EXAMSHELL (Ranks 03, 04, 05) - RECOMENDADO**
 
-### Exam Rank 03
-Tus soluciones deben estar en `/03/rendu/` con la siguiente estructura:
-- ft_printf: `/03/rendu/ft_printf/ft_printf.c`
-- get_next_line: `/03/rendu/get_next_line/get_next_line.c` y `/03/rendu/get_next_line/get_next_line.h`
+**Workflow auténtico de 42:**
+1. Lanza: `./unified_exam.sh` → Opción 2 o 3
+2. El sistema te asigna un ejercicio aleatorio
+3. Lee: `cat subject/[ejercicio]/subject.txt`
+4. Programa: `mkdir rendu/[ejercicio]` y crea tu solución
+5. Valida: `grademe` en el sistema
 
-> **Nota importante**: El sistema te guiará sobre dónde colocar tus archivos para cada examen. Sigue siempre las instrucciones que se muestran en pantalla.
+**Ventajas:**
+- ✅ Experiencia **exacta** al examen real
+- ✅ Tracking de tiempo real
+- ✅ Workflow idéntico a 42
+
+### **🔧 Sistema Legacy (Ranks 02, 06) - Para Principiantes**
+
+**Workflow guiado:**
+1. Lanza: `./unified_exam.sh` → Opción 1 o 3
+2. Menú te guía paso a paso
+3. Ejercicios organizados por niveles
+4. Tests automáticos incluidos
+
+**Ventajas:**
+- ✅ Ideal para empezar
+- ✅ Progresión por niveles
+- ✅ Tests automáticos
 
 ## 📚 Contenido de los exámenes
 
