@@ -50,3 +50,24 @@ perror includes:
 
 read includes:
                 #include <fcntl.h>
+
+Usage of filter.sh:
+
+  1. Make it executable first:
+  chmod +x filter.sh
+  2. Use it to test your C program:
+  # Test your program against the reference
+  echo 'abcdefaaaabcdeabcabcdabc' | ./filter abc
+  echo 'abcdefaaaabcdeabcabcdabc' | ./filter.sh abc
+
+  # Compare outputs - they should be identical
+  echo 'ababcabababc' | ./filter ababc | cat -e
+  echo 'ababcabababc' | ./filter.sh ababc | cat -e
+  3. What the script does:
+    - Takes one argument (the pattern to replace)
+    - Reads from stdin
+    - Replaces all occurrences of the pattern with asterisks (*) of the same length
+    - Example: bonjour → ******* (7 asterisks)
+
+  The script is provided so you can verify your C implementation produces the same output as this shell version. Your task is to write
+  filter.c that behaves identically to this script.
