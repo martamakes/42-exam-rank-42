@@ -1,52 +1,67 @@
-Assignment name  : string_bigint
-Expected files   : *.cpp *.hpp
-Allowed functions: All C++ standard functions
+[EN]
+Assignment name : bigint
+Expected files : bigint.hpp, bigint.cpp
 --------------------------------------------------------------------------------
+In computer science a bignum is an object representing an arbitrary precision
+number, this is useful when you want to store a number bigger than SIZE_MAX
+without any loss of precision. This is often achieved by storing an array or a
+string containing the different "parts" of the number.
+Create a class called bigint that will store an arbitrary precision unsigned
+integer.
+Your class must support addition, comparison and "digitshift" (like bitshift but
+instead of shifting the bits you will shift the digits in base 10, e.g.:
+(42 << 3 == 42000) and (1337 >> 2 == 13)).
+Your bigint must be printable with the << operator (in base 10) and the output
+should not contain any leading zeros.
+You will find a main in this directory that must work with your class
 
-Write a class called 'bigint' that can handle arbitrarily large integers using strings.
+[TR]
+Bilgisayar bilimlerinde bignum, keyfi bir hassasiyetteki sayıyı temsil eden bir nesnedir.
+Bu, herhangi bir hassasiyet kaybı olmadan SIZE_MAX değerinden büyük bir sayıyı depolamak istediğinizde kullanışlıdır.
+Bu genellikle sayının farklı "kısımlarını" içeren bir dizi veya dize depolayarak elde edilir.
 
-Your bigint class must:
+keyfi bir hassasiyetteki işaretsiz tamsayıyı depolayacak bigint adlı bir sınıf oluşturun.
+Sınıfınız toplama, karşılaştırma ve "rakam kaydırma" işlemlerini desteklemelidir
+(bit kaydırma gibi, ancak bitleri kaydırmak yerine 10 tabanındaki rakamları kaydırırsınız
+örneğin: (42 << 3 == 42000) ve (1337 >> 2 == 13)).
 
-1. Have a private member: std::string _string to store the number
+bigint değeriniz << operatörüyle (10 tabanında) yazdırılabilir olmalı ve çıktıda başta sıfır bulunmamalıdır.
 
-2. Implement the following constructors:
-   - bigint();                           // default constructor (value = "0")
-   - bigint(unsigned int n);             // constructor from unsigned int
-   - bigint(const std::string& str);     // constructor from string
-   - bigint(const bigint& original);     // copy constructor
+Bu dizinde, sınıfınızla uyumlu olması gereken bir main bulacaksınız.
 
-3. Implement a destructor:
-   - ~bigint();
+[SUBJECT MAIN]
+#include "bigint.hpp"
+#include <iostream>
 
-4. Implement getter function:
-   - std::string getArbiter_value() const;  // returns the string representation
+int main()
+{
+    const bigint a(42);
+    bigint b(21), c, d(1337), e(d);
 
-5. Implement the following operators:
-   - operator+ for addition
-   - operator- for subtraction  
-   - operator* for multiplication
-   - operator= for assignment
-   - operator<< for output stream
+    std::cout << "a = " << a << std::endl;
+    std::cout << "b = " << b << std::endl;
+    std::cout << "c = " << c << std::endl;
+    std::cout << "d = " << d << std::endl;
+    std::cout << "e = " << e << std::endl;
 
-6. Your class should handle:
-   - Leading zeros removal
-   - Basic arithmetic operations on large numbers
-   - Proper string to number conversion
+    std::cout << "a + b = " << a + b << std::endl;
+    std::cout << "(c += a) = " << (c += a) << std::endl;
 
-Requirements:
-- Handle numbers that exceed standard integer types
-- All operations should return a new bigint object
-- Implement proper error handling for invalid strings
-- The string should store digits only (no sign handling required)
+    std::cout << "b = " << b << std::endl;
+    std::cout << "++b = " << ++b << std::endl;
+    std::cout << "b++ = " << b++ << std::endl;
 
-Example usage:
-bigint a("123456789012345678901234567890");
-bigint b(987654321);
-bigint c = a + b;
-std::cout << c << std::endl;
+    std::cout << "(b << 10) + 42 = " << ((b << 10) + 42) << std::endl;
+    std::cout << "(d <<= 4) = " << (d <<= 4) << std::endl;
+    std::cout << "(d >>= 2) = " << (d >>= (const bigint)2) << std::endl;
 
-Your implementation should be efficient and handle edge cases like:
-- Empty strings
-- Strings with leading zeros
-- Addition/subtraction resulting in larger numbers
-- Zero operands
+    std::cout << "a =" << a << std::endl;
+    std::cout << "d =" << d << std::endl;
+
+    std::cout << "(d < a) = " << (d < a) << std::endl;
+    std::cout << "(d <= a) = " << (d <= a) << std::endl;
+    std::cout << "(d > a) = " << (d > a) << std::endl;
+    std::cout << "(d >= a) = " << (d >= a) << std::endl;
+    std::cout << "(d == a) = " << (d == a) << std::endl;
+    std::cout << "(d != a) = " << (d != a) << std::endl;
+}
