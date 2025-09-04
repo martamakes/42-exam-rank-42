@@ -1,56 +1,61 @@
-#include <string>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vect2.hpp                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fatkeski <fatkeski@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/28 18:20:54 by fatkeski          #+#    #+#             */
+/*   Updated: 2025/08/01 21:14:17 by fatkeski         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef VECT2_HPP
+#define VECT2_HPP
+
 #include <iostream>
-#include <ostream>
-#include <vector>
 
 class vect2
 {
 	private:
-		std::vector<int>	_container;
-
+		int x;
+		int y;
 	public:
-		vect2();//default constructor, add ": _container()"
-		vect2(int v1, int v2);//initalise constructor
-		vect2(const vect2& original);//copy constructor
-		~vect2();//	Destructor
+		vect2();
+		vect2(int num1, int num2);
+		vect2(const vect2& source);
+		vect2& operator=(const vect2& source);
 
-	int	getContainer_elements(int array) const;
+		int operator[](int index) const;
+		int& operator[](int index); // NON-COST
 
-	
-	//handle operators for '+', '-' and '*';
-	//	addition ASSIGNMENT operators
-		// +
-		vect2	operator+(int add) const;
-		vect2	operator+(const vect2 addon) const;
-		vect2&	operator++(void);// ++(pre)Increment
-		vect2	operator++(int);// ++(post)Increment
+		vect2 operator-() const;
+		vect2 operator*(int num) const;
 
-	//	substraction ASSIGNMENT operators
-		// -
-		vect2	operator-(int add) const;
-		vect2	operator-(const vect2 addon) const;
-		vect2&	operator--(void);// --(pre)decrement operators
-		vect2	operator--(int);// --(post)decrement operators
+		vect2& operator*=(int num);
 
-	//	multiplication ASSIGNMENT operators
-		// *
-		vect2	operator*(int multi) const;
-		vect2	operator*(const vect2 &multion) const;
+		vect2& operator+=(const vect2& obj);
+		vect2& operator-=(const vect2& obj);
+		vect2& operator*=(const vect2& obj);
 
-	//	equal(==) ASSIGNMENT operators
-		vect2&	operator=(const vect2& other);//	Copy Assignment Operator
-		bool	operator==(const vect2& other) const;// ==
-		bool	operator!=(const vect2& other) const;// !=
-		// +=
-		vect2   operator+=(int add);
-		vect2   operator+=(const vect2 &addon);
-		// -=
-		vect2   operator-=(int add);
-		vect2   operator-=(const vect2 &addon);
-		// *=
-		vect2   operator*=(int multi);
-		vect2   operator*=(const vect2 &multion);
+		vect2 operator+(const vect2& obj) const;
+		vect2 operator-(const vect2& obj) const;
+		vect2 operator*(const vect2& obj) const;
+
+		vect2& operator++();
+		vect2 operator++(int);
+		vect2& operator--();
+		vect2 operator--(int);
+
+		bool operator==(const vect2& obj) const;
+		bool operator!=(const vect2& obj) const;
+
+		~vect2();
 };
 
-vect2	operator*(int number, const vect2& vector);
-std::ostream& operator<<(std::ostream& out, const vect2& v);
+vect2 operator*(int num, const vect2& obj);
+
+std::ostream& operator<<(std::ostream& os,const vect2& obj);
+
+#endif
+
