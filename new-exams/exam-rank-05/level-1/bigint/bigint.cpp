@@ -1,384 +1,252 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bigint.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fatkeski <fatkeski@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/23 14:27:29 by fatkeski          #+#    #+#             */
+/*   Updated: 2025/07/26 18:15:45 by fatkeski         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "bigint.hpp"
 
 bigint::bigint()
 {
-	//initalise
-	this->_string = "0";
+	this->str = "0";
 }
 
-bigint::bigint(unsigned int value)
+bigint::bigint(unsigned int num)
 {
-	std::ostringstream oss;
-	oss << value;
-
-	this->_string = oss.str();
+	std::stringstream ss;
+	ss << num;
+	this->str = ss.str();
+	// std::cout << "str: " << str << std::endl;
 }
 
-bigint::bigint(const std::string& str)
+bigint::bigint(const bigint& source)
 {
-    this->_string = str;
-	int i = 0;
+	(*this) = source;
+}
 
-	while (str[i] != std::string::npos && str[i] == '0')
-		i++;
-	if (i > 0)
+bigint& bigint::operator=(const bigint& source)
+{
+	if(this == &source)
+		return(*this);
+	this->str = source.str;
+	return(*this);
+}
+
+std::string bigint::getStr() const
+{
+	return(this->str);
+}
+
+std::string reverse(const std::string& str)
+{
+	std::string revStr;
+	for(size_t i = str.length(); i > 0; i--)
 	{
-		if (str[i] != std::string::npos)
+		revStr.push_back(str[i - 1]);
+	}
+	return(revStr);
+}
+
+std::string addition(const bigint& obj1, const bigint& obj2)
+{
+	std::string str1 = reverse(obj1.getStr());
+	std::string str2 = reverse(obj2.getStr());
+	std::string result;
+	size_t len1 = str1.length();
+	size_t len2 = str2.length();
+
+	if(len1 > len2)
+	{
+		int diff = len1 - len2;
+		while(diff > 0)
 		{
-			std::string str2;
-			if (str.size() != 0 && str.size() != 1)
-			{
-				str2 = str.substr (i, (str.size() - i)); // 0000506 -> 506
-				this->_string = str2;
-			}
+			str2.push_back('0');
+			diff--;
 		}
 	}
-	else if (str[0] == std::string::npos)
-    	this->_string = "0"; //if all are zeros
-}
-
-bigint::bigint(const bigint& original)
-{
-	*this = original;
-}
-
-bigint::~bigint() {}
-
-//getter
-std::string	bigint::getArbiter_value() const
-{
-	return (this->_string);
-}
-
-
-
-
-
-
-
-//----------------------------------------
-//               Additions               |
-//----------------------------------------
-bigint	bigint::operator+(const bigint& other) const
-{
-	bigint	copy(*this);
-	std::string ss1 = this->_string;
-	std::string ss2 = other._string;
-
-	// Make sure ss1 is longer for the while loop working
-	if (ss2.length() > ss1.length())
-		std::swap(ss1, ss2);
-
-	std::string	result = "";
-	int	i = ss1.length() - 1;// to prevent hitting the .end() part
-	int	j = ss2.length() - 1;// to prevent hitting the .end() part
-	int	carry = 0;
-
-	while (i >= 0 || j >= 0 || carry)
+	else if(len2 > len1)
 	{
-		int digit1 = i >= 0 ? ss1[i] - '0' : 0;
-		int digit2 = j >= 0 ? ss2[j] - '0' : 0;
-		int sum = digit1 + digit2 + carry;
-
-		i--;
-		j--;
-		result.insert(result.begin(), (sum % 10) + '0');// if sum == 4, "+ '0'" will make it a string
-		carry = (sum / 10);// leftovers will be transferred over like primary school maths
+		int diff = len2 - len1;
+		while(diff > 0)
+		{
+			str1.push_back('0');
+			diff--;
+		}
 	}
-	copy._string = result;
-	return (copy);
+
+	int carry = 0;
+	int digit1;
+	int digit2;
+	size_t len = str1.length();
+	for(size_t i = 0; i < len; i++)
+	{
+		digit1 = str1[i] - '0';
+		// std::cout <<  "digit1:" << digit1 << std::endl;
+		digit2 = str2[i] - '0';
+		// std::cout << "digit2:" << digit2 << std::endl;
+		int res = digit1 + digit2 + carry;
+		// std::cout << res << std::endl;
+		if(res > 9)
+		{
+			carry = res / 10;
+			result.push_back((res % 10) + '0');
+		}
+		else
+			result.push_back(res + '0');
+	}
+	if(carry != 0)
+		result.push_back(carry + '0');
+	return(reverse(result));
 }
 
-bigint	bigint::operator+(unsigned int value) const
+bigint bigint::operator+(const bigint& other)const
 {
-	// Convert the unsigned int to a bigint
-	bigint copy(value); // This uses the new constructor: bigint(unsigned int val)
+	bigint temp(other);
+	temp.str.clear();
+	std::string result = addition(*this, other);
+	temp.str = result;
+	//std::cout << "r: " << result << std::endl;
 
-	// Now, simply reuse the existing bigint::operator+(const bigint& other)
-	return (*this + copy);
+	return(temp);
 }
 
-bigint	bigint::operator+=(const bigint& other)
+bigint& bigint::operator+=(const bigint& other)
 {
-	*this = *this + other;
-	return (*this);
+	(*this) = (*this) + other;
+	return(*this);
 }
 
-bigint	bigint::operator+=(unsigned int value)
+bigint& bigint::operator++()
 {
-	*this = *this + value;
-	return (*this);
-}
-
-bigint	bigint::operator++(void)
-{
-	*this += 1;
-	return (*this);
+	*(this) = *(this) + bigint(1);
+	return(*this);
 }
 
 bigint bigint::operator++(int)
 {
-	bigint copy(*this);  // Store current state
-	*this += 1;          // Reuse your +=
-	return (copy);         // Return original
+	bigint temp = (*this);
+	*(this) = *(this) + bigint(1);
+	return(temp);
 }
 
 
-//----------------------------------------
-//               Comparsion              |
-//----------------------------------------
-
-bool	bigint::operator>(const bigint& other)
+bigint bigint::operator<<(unsigned int n)const
 {
-	if (this->_string.size() > other._string.size())
-		return (true);
-	if (this->_string.size() < other._string.size())
-		return (false);
+	bigint temp = *this;
 
-	std::string	x1 = this->_string;
-	std::string	x2 = other._string;
-
-	for (size_t i = 0; i < x1.size(); i++)
-	{
-		if (x1[i] != x2[i])
-		{
-			if (x1[i] > x2[i])
-				return (true);
-			else
-				return (false);
-		}
-	}
-	return (false);
+	temp.str.insert(temp.str.end(), n, '0');
+	//std::cout << temp.str << std::endl;
+	return(temp);
 }
 
-bool	bigint::operator>(unsigned int value)
+bigint bigint::operator>>(unsigned int n)const
 {
-	bigint	other(value);
-	if (this->_string.size() > other._string.size())
-		return (true);
-	if (this->_string.size() < other._string.size())
-		return (false);
-
-	std::string	x1 = this->_string;
-	std::string	x2 = other._string;
-
-	for (size_t i = 0; i < x1.size(); i++)
-	{
-		if (x1[i] != x2[i])
-		{
-			if (x1[i] > x2[i])
-				return (true);
-			else
-				return (false);
-		}
-	}
-	return (false);
-}
-
-bool	bigint::operator<(const bigint& other)
-{
-	if (this->_string.size() < other._string.size())
-		return (true);
-	if (this->_string.size() > other._string.size())
-		return (false);
-
-	std::string	x1 = this->_string;
-	std::string	x2 = other._string;
-
-	for (size_t i = 0; i < x1.size(); i++)
-	{
-		if (x1[i] != x2[i])
-		{
-			if (x1[i] < x2[i])
-				return (true);
-			else
-				return (false);
-		}
-	}
-	return (false);
-}
-
-bool	bigint::operator<(unsigned int value)
-{
-	bigint	other(value);
-	if (this->_string.size() < other._string.size())
-		return (true);
-	if (this->_string.size() > other._string.size())
-		return (false);
-
-	std::string	x1 = this->_string;
-	std::string	x2 = other._string;
-
-	for (size_t i = 0; i < x1.size(); i++)
-	{
-		if (x1[i] != x2[i])
-		{
-			if (x1[i] < x2[i])
-				return (true);
-			else
-				return (false);
-		}
-	}
-	return (false);
-}
-
-bool	bigint::operator<=(const bigint& other)
-{
-	if ((*this < other) == true || (*this == other) == true)
-		return (true);
-	return (false);
-}
-
-bool	bigint::operator<=(unsigned int value)
-{
-	bigint	other(value);
-	if ((*this < other) == true || (*this == other) == true)
-		return (true);
-	return (false);
-}
-
-bool	bigint::operator>=(const bigint& other)
-{
-	if ((*this > other) == true || (*this == other) == true)
-		return (true);
-	return (false);
-}
-
-bool	bigint::operator>=(unsigned int value)
-{
-	bigint	other(value);
-	if ((*this > other) == true || (*this == other) == true)
-		return (true);
-	return (false);
-}
-
-bigint bigint::operator<<(unsigned int shift) const
-{
-	bigint	copy(*this);
-
-	if (copy._string == "0")
-		return (copy);
-
-	copy._string.append(shift, '0');// append n zeros at the end
-	return (copy);
-}
-
-bigint	bigint::operator>>(unsigned int shift) const
-{
-	bigint	copy(*this);
-
-	if (copy._string == "0")
-		return (copy);
-
-	if (copy._string.size() > shift)
-		copy._string.erase(copy._string.begin() + (copy._string.size() - shift), copy._string.end());
+	bigint temp = *this;
+	size_t len = temp.str.length();
+	if(n >= len)
+		temp.str = "0";
 	else
 	{
-		copy._string.clear();
-		copy._string.push_back('0');//you have cleared everything, add back a zero;
+		temp.str.erase(temp.str.length() - n, n); // ilk parametre: silme yapacağın yerin başlangıç indexi, diğeri: kaç tane eleman silinecek
 	}
-	return (copy);
+	return(temp);
 }
 
-bigint bigint::operator<<=(const bigint& other)
+bigint& bigint::operator<<=(unsigned int n)
 {
-	if (this->_string == "0")
-		return (*this);
-
-	this->_string.append(shift, '0');// append n zeros at the end
-	return (*this);
+	(*this) = (*this) << n;
+	return(*this);
 }
 
-bigint bigint::operator<<=(unsigned int shift)
+bigint& bigint::operator>>=(unsigned int n)
 {
-	if (this->_string == "0")
-		return (*this);
-
-	this->_string.append(shift, '0');// append n zeros at the end
-	return (*this);
+	(*this) = (*this) >> n;
+	return(*this);
 }
 
-bigint	bigint::operator>>=(unsigned int shift)
+unsigned int stringToUINT(std::string str)
 {
-	if (this->_string == "0")
-		return (*this);
-
-	if (this->_string.size() > shift)
-		this->_string.erase(this->_string.begin() + (this->_string.size() - shift), this->_string.end());
-	else
-	{
-		this->_string.clear();
-		this->_string.push_back('0');//you have cleared everything, add back a zero;
-	}
-	return (*this);
+	std::stringstream ss(str);
+	unsigned int res;
+	ss >> res;
+	return (res);
 }
 
-
-
-
-
-
-
-//----------------------------------------
-//            Operators(=/==)()          |
-//----------------------------------------
-bigint&	bigint::operator=(const bigint& other)
+bigint bigint::operator<<(const bigint& other)const
 {
-	if (this == &other)
-		return (*this);
-
-	this->_string = other._string;
-	return (*this);
+	bigint temp;
+	temp = (*this) << stringToUINT(other.str);
+	return(temp);
 }
 
-bool	bigint::operator==(const bigint& other)
+bigint bigint::operator>>(const bigint& other)const
 {
-	if (this->_string == other._string)
-		return (true);
-	return (false);
+	bigint temp;
+	temp = (*this) >> stringToUINT(other.str);
+	return(temp);
 }
 
-bool	bigint::operator==(unsigned int shift)
+bigint& bigint::operator<<=(const bigint& other)
 {
-	bigint	other(shift);
-
-	if (this->_string == other._string)
-		return (true);
-	return (false);
+	(*this) = (*this) << stringToUINT(other.str);
+	return(*this);
 }
 
-bool	bigint::operator!=(const bigint& other)
+bigint& bigint::operator>>=(const bigint& other)
 {
-	if (this->_string != other._string)
-		return (true);
-	return (false);
-}
-
-bool	bigint::operator!=(unsigned int shift)
-{
-	bigint	other(shift);
-
-	if (this->_string != other._string)
-		return (true);
-	return (false);
+	(*this) = (*this) >> stringToUINT(other.str);
+	return(*this);
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-//outside of bigint class
-std::ostream&	operator<<(std::ostream& out, const bigint& v)
+bool bigint::operator==(const bigint& other) const
 {
-	out << "{" << v.getArbiter_value() << "}";
-	return (out);
+	if(this->getStr() == other.getStr())
+		return(true);
+	return(false);
+}
+
+bool bigint::operator!=(const bigint& other) const
+{
+	return(!((*this) == (other)));
+}
+
+bool bigint::operator<(const bigint& other) const
+{
+	std::string str1 = this->str;
+	std::string str2 = other.getStr();
+	size_t len1 = str1.length();
+	size_t len2 = str2.length();
+
+	if(len1 != len2)
+		return(len1 < len2);
+	return(str1 < str2);  // thanks for your feedback, mjuicha!! o7
+}
+
+bool bigint::operator>(const bigint& other) const
+{
+	return(!(((*this) < other)));
+}
+
+bool bigint::operator<=(const bigint& other) const
+{
+	return((((*this) < other) || ((*this) == other)));
+}
+
+bool bigint::operator>=(const bigint& other) const
+{
+	return((((*this) > other) || ((*this) == other)));
+}
+
+// non member func
+std::ostream& operator<<(std::ostream& output, const bigint& obj)
+{
+	output << obj.getStr();
+	return(output);
 }
