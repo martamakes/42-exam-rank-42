@@ -236,10 +236,11 @@ main_menu() {
         echo "1. 📚 Acceder a Exam Rank 03 (Intermediate)"
         echo "2. 📚 Acceder a Exam Rank 04 (Advanced)"
         echo "3. 📚 Acceder a Exam Rank 05 (Expert)"
-        echo "4. ℹ️  Información del proyecto"
-        echo "5. 🔧 Compilar EXAMSHELL"
-        echo "6. ❓ Ayuda y consejos"
-        echo "7. 🚪 Salir"
+        echo "4. ✨ Sistema Avanzado (Con tracking y selección aleatoria)"
+        echo "5. ℹ️  Información del proyecto"
+        echo "6. 🔧 Compilar EXAMSHELL"
+        echo "7. ❓ Ayuda y consejos"
+        echo "8. 🚪 Salir"
         echo ""
         
         read -p "Selecciona una opción: " choice
@@ -255,20 +256,27 @@ main_menu() {
                 access_exam_05
                 ;;
             4)
-                show_project_info
+                echo -e "${GREEN}✨ Iniciando Sistema Avanzado...${NC}"
+                echo -e "${CYAN}💡 Funcionalidades: Tracking de progreso, selección aleatoria, progresión automática${NC}"
+                echo -e "${YELLOW}Presiona Enter para continuar...${NC}"
+                read
+                ./advanced_init.sh
                 ;;
             5)
-                compile_examshell
+                show_project_info
                 ;;
             6)
-                show_help
+                compile_examshell
                 ;;
             7)
+                show_help
+                ;;
+            8)
                 echo -e "${GREEN}¡Hasta luego! 👋${NC}"
                 exit 0
                 ;;
             *)
-                echo -e "${RED}Opción inválida. Por favor selecciona un número del 1 al 7.${NC}"
+                echo -e "${RED}Opción inválida. Por favor selecciona un número del 1 al 8.${NC}"
                 read -p "Presiona Enter para continuar..."
                 ;;
         esac
