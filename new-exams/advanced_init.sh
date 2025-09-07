@@ -273,8 +273,10 @@ random_practice() {
         echo -e "${YELLOW}Opciones:${NC}"
         echo "1. ✅ Completar este ejercicio y continuar"
         echo "2. ⏭️  Saltar a otro ejercicio aleatorio"
-        echo "3. 📊 Ver estadísticas detalladas"
-        echo "4. 🚪 Volver al menú principal"
+        echo "3. 📚 Ver subject del ejercicio"
+        echo "4. 📁 Crear directorio de trabajo (rendu/$random_exercise)"
+        echo "5. 📊 Ver estadísticas detalladas"
+        echo "6. 🚪 Volver al menú principal"
         echo ""
         
         read -p "Selecciona una opción: " choice
@@ -298,12 +300,40 @@ random_practice() {
                 echo -e "${BLUE}=== PRÁCTICA ALEATORIA - EXAM RANK $rank ===${NC}\n"
                 ;;
             3)
-                show_detailed_stats $rank
+                echo -e "${CYAN}📚 Subject del ejercicio $random_exercise:${NC}"
+                echo ""
+                local subject_path="exam-rank-$rank/level-$current_level/$random_exercise/subject.txt"
+                if [ -f "$subject_path" ]; then
+                    cat "$subject_path"
+                else
+                    echo -e "${RED}Subject no encontrado en: $subject_path${NC}"
+                fi
+                echo ""
                 read -p "Presiona Enter para continuar..."
                 clear
                 echo -e "${BLUE}=== PRÁCTICA ALEATORIA - EXAM RANK $rank ===${NC}\n"
                 ;;
             4)
+                echo -e "${CYAN}📁 Creando directorio de trabajo...${NC}"
+                mkdir -p "rendu/$random_exercise"
+                if [ -d "rendu/$random_exercise" ]; then
+                    echo -e "${GREEN}✅ Directorio creado: rendu/$random_exercise/${NC}"
+                    echo -e "${CYAN}💡 Tip: Programa tus archivos .c y .h en este directorio${NC}"
+                else
+                    echo -e "${RED}❌ Error al crear el directorio${NC}"
+                fi
+                echo ""
+                read -p "Presiona Enter para continuar..."
+                clear
+                echo -e "${BLUE}=== PRÁCTICA ALEATORIA - EXAM RANK $rank ===${NC}\n"
+                ;;
+            5)
+                show_detailed_stats $rank
+                read -p "Presiona Enter para continuar..."
+                clear
+                echo -e "${BLUE}=== PRÁCTICA ALEATORIA - EXAM RANK $rank ===${NC}\n"
+                ;;
+            6)
                 return
                 ;;
             *)
@@ -412,10 +442,14 @@ manual_exercise_selection() {
             fi
             
             echo ""
+            echo -e "${CYAN}💡 Para programar:${NC} Crea tu solución en ${GREEN}rendu/$selected_exercise/${NC}"
+            echo ""
             echo -e "${YELLOW}Opciones:${NC}"
             echo "1. ✅ Marcar como completado"
             echo "2. ❌ Marcar como no completado"
-            echo "3. 🚪 Volver a la lista"
+            echo "3. 📚 Ver subject del ejercicio"
+            echo "4. 📁 Crear directorio de trabajo (rendu/$selected_exercise)"
+            echo "5. 🚪 Volver a la lista"
             echo ""
             
             read -p "Selecciona una opción: " action
@@ -436,6 +470,30 @@ manual_exercise_selection() {
                     read -p "Presiona Enter para continuar..."
                     ;;
                 3)
+                    echo -e "${CYAN}📚 Subject del ejercicio $selected_exercise:${NC}"
+                    echo ""
+                    local subject_path="exam-rank-$rank/level-$level_choice/$selected_exercise/subject.txt"
+                    if [ -f "$subject_path" ]; then
+                        cat "$subject_path"
+                    else
+                        echo -e "${RED}Subject no encontrado en: $subject_path${NC}"
+                    fi
+                    echo ""
+                    read -p "Presiona Enter para continuar..."
+                    ;;
+                4)
+                    echo -e "${CYAN}📁 Creando directorio de trabajo...${NC}"
+                    mkdir -p "rendu/$selected_exercise"
+                    if [ -d "rendu/$selected_exercise" ]; then
+                        echo -e "${GREEN}✅ Directorio creado: rendu/$selected_exercise/${NC}"
+                        echo -e "${CYAN}💡 Tip: Programa tus archivos .c y .h en este directorio${NC}"
+                    else
+                        echo -e "${RED}❌ Error al crear el directorio${NC}"
+                    fi
+                    echo ""
+                    read -p "Presiona Enter para continuar..."
+                    ;;
+                5)
                     continue
                     ;;
                 *)
