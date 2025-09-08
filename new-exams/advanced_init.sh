@@ -449,7 +449,8 @@ manual_exercise_selection() {
             echo "2. ❌ Marcar como no completado"
             echo "3. 📚 Ver subject del ejercicio"
             echo "4. 📁 Crear directorio de trabajo (rendu/$selected_exercise)"
-            echo "5. 🚪 Volver a la lista"
+            echo "5. 🧪 Ejecutar tests (grademe)"
+            echo "6. 🚪 Volver a la lista"
             echo ""
             
             read -p "Selecciona una opción: " action
@@ -494,6 +495,71 @@ manual_exercise_selection() {
                     read -p "Presiona Enter para continuar..."
                     ;;
                 5)
+                    # Ejecutar tests (grademe)
+                    echo -e "${CYAN}🧪 Ejecutando tests para $selected_exercise...${NC}"
+                    echo ""
+                    
+                    local exercise_dir="$NEW_EXAMS_DIR/exam-rank-$rank/level-$level_choice/$selected_exercise"
+                    local grademe_dir="$exercise_dir/grademe"
+                    local student_dir="$NEW_EXAMS_DIR/rendu/$selected_exercise"
+                    local student_file="$student_dir/$selected_exercise.c"
+                    local test_script="$grademe_dir/test.sh"
+                    
+                    # Verificar que existe el directorio de tests
+                    if [ ! -d "$grademe_dir" ]; then
+                        echo -e "${RED}❌ Error: No se encuentran los tests para $selected_exercise${NC}"
+                        echo -e "${YELLOW}📁 Ruta esperada: $grademe_dir${NC}"
+                        read -p "Presiona Enter para continuar..."
+                        continue
+                    fi
+                    
+                    if [ ! -f "$test_script" ]; then
+                        echo -e "${RED}❌ Error: No se encuentra el script de tests${NC}"
+                        echo -e "${YELLOW}📁 Archivo esperado: $test_script${NC}"
+                        read -p "Presiona Enter para continuar..."
+                        continue
+                    fi
+                    
+                    if [ ! -f "$student_file" ]; then
+                        echo -e "${RED}❌ Error: No se encuentra tu solución en $student_file${NC}"
+                        echo -e "${YELLOW}💡 Tip: Crea el archivo $selected_exercise.c en el directorio rendu/$selected_exercise/${NC}"
+                        mkdir -p "$student_dir"
+                        read -p "Presiona Enter para continuar..."
+                        continue
+                    fi
+                    
+                    # Dar permisos de ejecución al script de test
+                    chmod +x "$test_script"
+                    
+                    # Ejecutar tests
+                    echo -e "${BLUE}🚀 Ejecutando tests...${NC}"
+                    if ! cd "$grademe_dir"; then
+                        echo -e "${RED}❌ Error: No se puede acceder al directorio de tests${NC}"
+                        read -p "Presiona Enter para continuar..."
+                        continue
+                    fi
+                    
+                    ./test.sh
+                    local result=$?
+                    cd - > /dev/null
+                    
+                    echo ""
+                    if [ $result -eq 0 ]; then
+                        echo -e "${GREEN}✅ ¡Todos los tests han pasado correctamente!${NC}"
+                        echo -e "${CYAN}¿Quieres marcar este ejercicio como completado? (s/n):${NC}"
+                        read -r mark_complete
+                        if [[ "$mark_complete" =~ ^[Ss]$ ]]; then
+                            mark_exercise_completed $rank $level_choice $selected_exercise
+                            echo -e "${GREEN}🎉 Ejercicio marcado como completado${NC}"
+                        fi
+                    else
+                        echo -e "${RED}❌ Algunos tests han fallado. El ejercicio no está completamente correcto.${NC}"
+                        echo -e "${YELLOW}💡 Revisa tu código y vuelve a intentarlo${NC}"
+                    fi
+                    
+                    read -p "Presiona Enter para continuar..."
+                    ;;
+                6)
                     continue
                     ;;
                 *)
