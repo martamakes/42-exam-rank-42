@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# VERSION CORREGIDA - Diferencia entre ft_printf (sin .h) y get_next_line (con .h)
-
 # Colores para mejor visualización
 GREEN='\033[0;32m'
 RED='\033[0;31m'
@@ -9,223 +7,429 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
-BOLD='\033[1m'
 
 # Directorios de trabajo
 EXAM_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$EXAM_DIR")"
-RENDU_DIR="$EXAM_DIR/rendu"
+PROGRESS_DIR="$EXAM_DIR/exam_progress"
+RENDU_DIR="$PROJECT_ROOT/rendu"
 
-# Crear directorios si no existen
+# Crear directorios necesarios
+mkdir -p "$PROGRESS_DIR"
 mkdir -p "$RENDU_DIR"
-mkdir -p "$RENDU_DIR/ft_printf"
-mkdir -p "$RENDU_DIR/get_next_line"
 
-# Función para validar ejercicio - CORREGIDA
+# Archivos para almacenar ejercicios completados por nivel
+LEVEL1_DONE="$PROGRESS_DIR/level1_done.txt"
+LEVEL2_DONE="$PROGRESS_DIR/level2_done.txt"
+
+# Crear archivos si no existen
+touch "$LEVEL1_DONE" "$LEVEL2_DONE"
+
+# Función para validar ejercicio
 validate_exercise() {
-    local exercise=$1
-    local student_dir="$RENDU_DIR/$exercise"
-    local source_dir="$EXAM_DIR/$exercise"
+    local level=$1
+    local exercise=$2
+    local exercise_dir="$EXAM_DIR/level-${level}/${exercise}"
+    local grademe_dir="$exercise_dir/grademe"
+    local student_dir="$RENDU_DIR/${exercise}"
+    local student_file="${student_dir}/${exercise}.c"
+    local test_script="$grademe_dir/test.sh"
     
-    # Verificar que el usuario ha creado su solución
+    # Verificar que existe el directorio de tests
+    if [ ! -d "$grademe_dir" ]; then
+        echo -e "${RED}Error: No se encuentran los tests para $exercise${NC}"
+        echo -e "${YELLOW}Creando directorio: $grademe_dir${NC}"
+        mkdir -p "$grademe_dir"
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Error: No se pudo crear el directorio de tests${NC}"
+            return 1
+        fi
+        
+        # Crear archivos vacíos de test
+        touch "$grademe_dir/test.sh"
+        chmod +x "$grademe_dir/test.sh"
+        echo "echo 'Los tests aún no se han creado'" > "$grademe_dir/test.sh"
+        
+        touch "$grademe_dir/test.sh"
+        chmod +x "$grademe_dir/test.sh"
+        echo "echo 'Los tests aún no se han creado'" > "$grademe_dir/test.sh"
+    fi
+    
+    # Verificar que el estudiante ha creado su directorio
     if [ ! -d "$student_dir" ]; then
-        echo -e "${RED}Error: No se encuentra tu solución en $student_dir${NC}"
-        mkdir -p "$student_dir"
-        echo -e "${YELLOW}Se ha creado el directorio $student_dir${NC}"
+        echo -e "${RED}Error: No se encuentra el directorio $student_dir${NC}"
+        echo -e "${YELLOW}Crea el directorio: mkdir $student_dir${NC}"
         return 1
     fi
     
-    # Verificar existencia de archivos necesarios
-    if [ "$exercise" = "ft_printf" ]; then
-        if [ ! -f "$student_dir/ft_printf.c" ]; then
-            echo -e "${RED}Error: No se encuentra ft_printf.c en $student_dir${NC}"
-            return 1
-        fi
-        echo -e "${BLUE}${BOLD}Ejecutando tests para ft_printf...${NC}"
-        
-        # COMPILACIÓN ESPECÍFICA PARA FT_PRINTF (SIN .h)
-        if [ -f "$source_dir/test_main.c" ]; then
-            cd "$student_dir"
-            gcc -Wall -Wextra -Werror "$source_dir/test_main.c" "$student_dir/ft_printf.c" -o ft_printf_test
-            COMPILE_RESULT=$?
-            
-            if [ $COMPILE_RESULT -ne 0 ]; then
-                echo -e "${RED}Error de compilación. Por favor, corrige los errores.${NC}"
-                return 1
-            fi
-            
-            echo -e "${GREEN}✅ Compilación exitosa para ft_printf${NC}"
-            ./ft_printf_test
-            TEST_RESULT=$?
-            rm -f ft_printf_test
-        else
-            echo -e "${YELLOW}No se encontró test_main.c, compilando solo ft_printf.c${NC}"
-            cd "$student_dir"
-            gcc -Wall -Wextra -Werror -c ft_printf.c
-            TEST_RESULT=$?
-            rm -f ft_printf.o
-        fi
-        
-    elif [ "$exercise" = "get_next_line" ]; then
-        if [ ! -f "$student_dir/get_next_line.c" ] || [ ! -f "$student_dir/get_next_line.h" ]; then
-            echo -e "${RED}Error: Faltan archivos en $student_dir${NC}"
-            echo -e "${YELLOW}Asegúrate de tener get_next_line.c y get_next_line.h${NC}"
-            return 1
-        fi
-        echo -e "${BLUE}${BOLD}Ejecutando tests para get_next_line...${NC}"
-        
-        # COMPILACIÓN ESPECÍFICA PARA GET_NEXT_LINE (CON .h)
-        if [ -f "$source_dir/test_main.c" ]; then
-            cd "$student_dir"
-            gcc -Wall -Wextra -Werror -D BUFFER_SIZE=42 "$source_dir/test_main.c" get_next_line.c -o gnl_test
-            COMPILE_RESULT=$?
-            
-            if [ $COMPILE_RESULT -ne 0 ]; then
-                echo -e "${RED}Error de compilación. Por favor, corrige los errores.${NC}"
-                return 1
-            fi
-            
-            echo -e "${GREEN}✅ Compilación exitosa para get_next_line${NC}"
-            ./gnl_test
-            TEST_RESULT=$?
-            rm -f gnl_test
-        else
-            echo -e "${YELLOW}No se encontró test_main.c, compilando solo get_next_line.c${NC}"
-            cd "$student_dir"
-            gcc -Wall -Wextra -Werror -D BUFFER_SIZE=42 -c get_next_line.c
-            TEST_RESULT=$?
-            rm -f get_next_line.o
-        fi
+    # Verificar que el archivo existe
+    if [ ! -f "$student_file" ]; then
+        echo -e "${RED}Error: No se encuentra el archivo $student_file${NC}"
+        return 1
     fi
     
-    if [ $TEST_RESULT -eq 0 ]; then
-        echo -e "${GREEN}¡Los tests para $exercise han pasado correctamente!${NC}"
+    echo -e "${BLUE}Ejecutando tests para $exercise...${NC}"
+    cd "$grademe_dir"
+    
+    # Ejecutar el script de tests
+    ./test.sh
+    local test_result=$?
+    
+    cd "$EXAM_DIR"
+    
+    if [ $test_result -eq 0 ]; then
+        echo -e "${GREEN}✅ Tests pasados para $exercise${NC}"
         return 0
     else
-        echo -e "${RED}Algunos tests han fallado. Revisa tu implementación.${NC}"
+        echo -e "${RED}❌ Tests fallaron para $exercise${NC}"
         return 1
     fi
 }
 
-# Función para mostrar el subject de un ejercicio
-show_subject() {
-    local exercise=$1
-    local subject_path="$EXAM_DIR/$exercise/README.md"
-    
-    clear
-    echo -e "${BLUE}${BOLD}=== EJERCICIO: $exercise ===${NC}\n"
-    echo -e "${CYAN}${BOLD}=== SUBJECT ===${NC}\n"
-    
-    if [ -f "$subject_path" ]; then
-        cat "$subject_path"
-        echo -e "\n${YELLOW}Para resolver este ejercicio:${NC}"
-        echo -e "1. ${CYAN}Directorio:${NC} rendu/$exercise"
-        echo -e "2. ${CYAN}Crea tu solución en:${NC} rendu/$exercise/"
-        echo -e "\n${GREEN}${BOLD}IMPORTANTE:${NC} Tu solución debe estar dentro del directorio rendu/$exercise/"
-        echo -e "Los archivos que debes crear son:"
-        if [ "$exercise" = "ft_printf" ]; then
-            echo -e "- ${CYAN}ft_printf.c${NC} ${YELLOW}(NO necesita .h)${NC}"
-        elif [ "$exercise" = "get_next_line" ]; then
-            echo -e "- ${CYAN}get_next_line.c${NC}"
-            echo -e "- ${CYAN}get_next_line.h${NC}"
-        fi
-    else
-        echo -e "${RED}Error: No se encuentra el subject en $subject_path${NC}"
-    fi
-    
-    echo -e "\n${YELLOW}Presiona Enter para continuar...${NC}"
-    read
+# Función para contar ejercicios totales por nivel
+count_total_exercises() {
+    local level=$1
+    find "$EXAM_DIR/level-${level}" -maxdepth 1 -mindepth 1 -type d | wc -l
 }
 
-# Función para practicar un ejercicio específico
-practice_exercise() {
-    local exercise=$1
+# Función para obtener ejercicios disponibles (no completados)
+get_available_exercises() {
+    local level=$1
+    local done_file="$PROGRESS_DIR/level${level}_done.txt"
+    local exercises=()
     
+    # Obtener todos los ejercicios del nivel
+    for dir in level-${level}/*/; do
+        if [ -d "$dir" ]; then
+            dirname=$(basename "$dir")
+            # Verificar si no está completado
+            if ! grep -q "^$dirname$" "$done_file" 2>/dev/null; then
+                exercises+=("$dirname")
+            fi
+        fi
+    done
+    
+    echo "${exercises[@]}"
+}
+
+# Función para mostrar progreso
+show_progress() {
+    echo -e "\n${BLUE}=== PROGRESO ACTUAL ===${NC}"
+    for i in {1..2}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        local total=$(count_total_exercises $i)
+        # Usar sort y uniq para contar solo ejercicios únicos
+        local completed=$(sort "$done_file" 2>/dev/null | uniq | wc -l)
+        echo -e "${GREEN}Nivel $i: $completed/$total ejercicios completados${NC}"
+    done
+    echo
+}
+
+# Función para limpiar duplicados de los archivos de progreso
+clean_progress_files() {
+    for i in {1..2}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        if [ -f "$done_file" ]; then
+            # Crear archivo temporal con entradas únicas
+            sort "$done_file" | uniq > "${done_file}.tmp"
+            # Reemplazar archivo original
+            mv "${done_file}.tmp" "$done_file"
+        fi
+    done
+}
+
+# Función para seleccionar un ejercicio aleatorio de un nivel
+select_random_exercise() {
+    local level=$1
+    local exercises=($(get_available_exercises $level))
+    local count=${#exercises[@]}
+    
+    if [ $count -eq 0 ]; then
+        echo -e "${YELLOW}¡Todos los ejercicios del nivel $level están completados!${NC}"
+        return 1
+    fi
+    
+    local random_index=$((RANDOM % count))
+    echo "${exercises[$random_index]}"
+}
+
+# Función para listar ejercicios por nivel
+list_level_exercises() {
+    local level=$1
+    local exercises=()
+    local index=1
+    
+    echo -e "\n${BLUE}=== EJERCICIOS NIVEL $level ===${NC}"
+    
+    # Obtener y mostrar todos los ejercicios del nivel
+    for dir in level-${level}/*/; do
+        if [ -d "$dir" ]; then
+            dirname=$(basename "$dir")
+            exercises+=("$dirname")
+            echo "$index) $dirname"
+            ((index++))
+        fi
+    done
+    
+    echo -e "\n${YELLOW}Selecciona un ejercicio (1-$((index-1))) o 0 para volver:${NC}"
+    read -r selection
+    
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -gt 0 ] && [ "$selection" -lt "$index" ]; then
+        selected_exercise=${exercises[$((selection-1))]}
+        practice_single_exercise "$level" "$selected_exercise"
+    elif [ "$selection" != "0" ]; then
+        echo -e "${RED}Selección inválida${NC}"
+        read -p "Presiona Enter para continuar..."
+    fi
+}
+
+# Función para seleccionar nivel
+select_level() {
     while true; do
         clear
-        show_subject "$exercise"
+        echo -e "${BLUE}=== SELECCIONAR NIVEL ===${NC}"
+        echo "1. Level 1"
+        echo "2. Level 2"
+        echo "0. Volver"
         
-        echo -e "\n${YELLOW}${BOLD}Opciones:${NC}"
-        echo "1. Validar mi solución"
-        echo "2. Ver ejemplos y guías"
-        echo "3. Volver al menú principal"
+        read -r level_choice
         
-        read -p "Selección: " option
-        
-        case $option in
-            1)
-                validate_exercise "$exercise"
-                echo -e "\n${YELLOW}Presiona Enter para continuar...${NC}"
-                read
+        case $level_choice in
+            [1-2])
+                list_level_exercises "$level_choice"
                 ;;
-            2)
-                echo -e "${YELLOW}Ver ejemplos no implementado en versión corregida${NC}"
-                sleep 2
-                ;;
-            3)
+            0)
                 return
                 ;;
             *)
                 echo -e "${RED}Opción inválida${NC}"
-                sleep 1
+                read -p "Presiona Enter para continuar..."
                 ;;
         esac
     done
 }
 
-# Menú principal simplificado
-main_menu() {
+# Función para practicar un ejercicio específico
+practice_single_exercise() {
+    local level=$1
+    local exercise=$2
+    
+    show_subject $level "$exercise"
     while true; do
-        clear
-        echo -e "${BLUE}${BOLD}=== 42 EXAM RANK 03 PRACTICE (VERSIÓN CORREGIDA) ===${NC}"
-        echo -e "${GREEN}✅ ft_printf: Solo necesita .c (SIN .h)${NC}"
-        echo -e "${GREEN}✅ get_next_line: Necesita .c Y .h${NC}"
-        echo ""
-        echo -e "${YELLOW}${BOLD}Selecciona una opción:${NC}"
-        echo "1. Practicar ft_printf"
-        echo "2. Practicar get_next_line"
-        echo "3. Ver estructura de directorios"
-        echo "4. Limpiar directorio rendu"
-        echo "0. Salir"
+        echo -e "\n${YELLOW}Opciones:${NC}"
+        echo "1. Validar ejercicio"
+        echo "2. Marcar como completado sin validar"
+        echo "3. Dejar pendiente"
+        echo "4. Salir"
+        read -r option
         
-        read -p "Selección: " choice
-        
-        case $choice in
+        case $option in
             1)
-                practice_exercise "ft_printf"
+                if validate_exercise $level "$exercise"; then
+                    mark_as_completed $level "$exercise"
+                    echo -e "${GREEN}Ejercicio $exercise marcado como completado${NC}"
+                    read -p "Presiona Enter para continuar..."
+                    return
+                else
+                    echo -e "${RED}El ejercicio falló la validación${NC}"
+                    read -p "Presiona Enter para continuar..."
+                fi
                 ;;
             2)
-                practice_exercise "get_next_line"
+                mark_as_completed $level "$exercise"
+                echo -e "${GREEN}Ejercicio $exercise marcado como completado${NC}"
+                read -p "Presiona Enter para continuar..."
+                return
                 ;;
             3)
-                clear
-                echo -e "${BLUE}${BOLD}=== ESTRUCTURA DE DIRECTORIOS ===${NC}"
-                echo -e "${CYAN}rendu/ft_printf/${NC} - Para ft_printf.c (sin .h)"
-                echo -e "${CYAN}rendu/get_next_line/${NC} - Para get_next_line.c y get_next_line.h"
-                echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-                read
+                echo -e "${YELLOW}Ejercicio dejado pendiente${NC}"
+                read -p "Presiona Enter para continuar..."
+                return
                 ;;
             4)
-                echo -e "${RED}¿Estás seguro de que quieres limpiar el directorio rendu? (s/n)${NC}"
-                read -r response
-                if [[ "$response" =~ ^[Ss]$ ]]; then
-                    rm -rf "$RENDU_DIR"/*
-                    mkdir -p "$RENDU_DIR/ft_printf"
-                    mkdir -p "$RENDU_DIR/get_next_line"
-                    echo -e "${GREEN}Directorio rendu limpiado y reconstruido.${NC}"
-                    sleep 1
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                ;;
+        esac
+    done
+}
+
+# Función para mostrar el subject
+show_subject() {
+    local level=$1
+    local exercise=$2
+    local subject_file="$EXAM_DIR/level-${level}/${exercise}/subject.txt"
+    
+    clear
+    echo -e "${BLUE}=== EXAM RANK 03 - NIVEL $level ===${NC}"
+    echo -e "${CYAN}Ejercicio: $exercise${NC}"
+    echo ""
+    
+    if [ -f "$subject_file" ]; then
+        cat "$subject_file"
+    else
+        echo -e "${RED}Error: No se encuentra el archivo de subject${NC}"
+        echo "Buscando en: $subject_file"
+    fi
+    
+    echo ""
+    echo -e "${YELLOW}Directorio de trabajo: $PROJECT_ROOT/rendu/${exercise}/${NC}"
+    echo -e "${YELLOW}Archivo esperado: ${exercise}.c${NC}"
+    echo ""
+}
+
+# Función para marcar ejercicio como completado
+mark_as_completed() {
+    local level=$1
+    local exercise=$2
+    local done_file="$PROGRESS_DIR/level${level}_done.txt"
+    
+    echo "$exercise" >> "$done_file"
+    clean_progress_files
+}
+
+# Función para practicar ejercicios aleatorios
+practice_random() {
+    while true; do
+        clear
+        echo -e "${BLUE}=== PRACTICE MODE - EXAM RANK 03 ===${NC}"
+        show_progress
+        
+        echo -e "${YELLOW}Selecciona nivel para ejercicio aleatorio:${NC}"
+        echo "1. Level 1"
+        echo "2. Level 2"
+        echo "0. Volver al menú principal"
+        
+        read -r level_choice
+        
+        case $level_choice in
+            [1-2])
+                exercise=$(select_random_exercise $level_choice)
+                if [ $? -eq 0 ] && [ -n "$exercise" ]; then
+                    echo -e "${GREEN}Ejercicio aleatorio seleccionado: $exercise${NC}"
+                    read -p "Presiona Enter para continuar..."
+                    practice_single_exercise $level_choice "$exercise"
+                else
+                    read -p "Presiona Enter para continuar..."
                 fi
                 ;;
             0)
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                read -p "Presiona Enter para continuar..."
+                ;;
+        esac
+    done
+}
+
+# Función para mostrar estadísticas
+show_stats() {
+    clear
+    echo -e "${BLUE}=== ESTADÍSTICAS - EXAM RANK 03 ===${NC}"
+    show_progress
+    
+    echo -e "${CYAN}=== EJERCICIOS COMPLETADOS ===${NC}"
+    for i in {1..2}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        echo -e "\n${GREEN}Nivel $i:${NC}"
+        if [ -f "$done_file" ] && [ -s "$done_file" ]; then
+            sort "$done_file" | uniq | nl
+        else
+            echo "  Ningún ejercicio completado"
+        fi
+    done
+    
+    echo ""
+    read -p "Presiona Enter para continuar..."
+}
+
+# Función para resetear progreso
+reset_progress() {
+    clear
+    echo -e "${BLUE}=== RESETEAR PROGRESO - EXAM RANK 03 ===${NC}"
+    echo -e "${RED}¿Estás seguro de que quieres resetear todo el progreso? (s/n)${NC}"
+    read -r confirm
+    
+    if [[ "$confirm" =~ ^[Ss]$ ]]; then
+        # Limpiar archivos de progreso
+        > "$LEVEL1_DONE"
+        > "$LEVEL2_DONE"
+        
+        # Limpiar directorio rendu
+        for dir in level-{1,2}/*/; do
+            if [ -d "$dir" ]; then
+                exercise=$(basename "$dir")
+                rm -rf "$RENDU_DIR/$exercise"
+            fi
+        done
+        
+        echo -e "${GREEN}Progreso reseteado y directorio rendu limpiado${NC}"
+    else
+        echo -e "${YELLOW}Operación cancelada${NC}"
+    fi
+    
+    read -p "Presiona Enter para continuar..."
+}
+
+# Menú principal
+main_menu() {
+    # Limpiar archivos de progreso al inicio
+    clean_progress_files
+    
+    while true; do
+        clear
+        echo -e "${BLUE}╔══════════════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║                 EXAM RANK 03 - PRACTICE              ║${NC}"
+        echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        
+        show_progress
+        
+        echo -e "${YELLOW}=== MENÚ PRINCIPAL ===${NC}"
+        echo "1. 🎲 Ejercicio aleatorio por nivel"
+        echo "2. 📋 Elegir ejercicio manualmente"
+        echo "3. 📊 Ver estadísticas y progreso"
+        echo "4. 🔄 Resetear progreso"
+        echo "5. 🚪 Salir"
+        echo ""
+        
+        read -p "Selecciona una opción: " choice
+        
+        case $choice in
+            1)
+                practice_random
+                ;;
+            2)
+                select_level
+                ;;
+            3)
+                show_stats
+                ;;
+            4)
+                reset_progress
+                ;;
+            5)
+                echo -e "${GREEN}¡Hasta luego!${NC}"
                 exit 0
                 ;;
             *)
                 echo -e "${RED}Opción inválida${NC}"
-                sleep 1
+                read -p "Presiona Enter para continuar..."
                 ;;
         esac
     done
 }
 
-# Iniciar menú principal
+# Verificar que estamos en el directorio correcto
+if [ ! -d "level-1" ] && [ ! -d "level-2" ]; then
+    echo -e "${RED}Error: No se encuentran los directorios de niveles${NC}"
+    echo -e "${YELLOW}Asegúrate de ejecutar este script desde el directorio 03${NC}"
+    exit 1
+fi
+
+# Iniciar el menú principal
 main_menu

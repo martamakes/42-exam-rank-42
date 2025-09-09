@@ -10,337 +10,427 @@ CYAN='\033[0;36m'
 
 # Directorios de trabajo
 EXAM_DIR="$(cd "$(dirname "$0")" && pwd)"
-RENDU_DIR="$EXAM_DIR/rendu"
+PROJECT_ROOT="$(dirname "$EXAM_DIR")"
+PROGRESS_DIR="$EXAM_DIR/exam_progress"
+RENDU_DIR="$PROJECT_ROOT/rendu"
 
-# Verificar argumentos
-if [ "$1" = "clean" ]; then
-    echo -e "${RED}Limpiando...${NC}"
-    rm -f $RENDU_DIR/cpp_module_00/cpp_module_00
-    rm -f $RENDU_DIR/cpp_module_01/cpp_module_01
-    rm -f $RENDU_DIR/cpp_module_02/cpp_module_02
-    echo -e "${GREEN}Limpieza completada.${NC}"
-    exit 0
-fi
+# Crear directorios necesarios
+mkdir -p "$PROGRESS_DIR"
+mkdir -p "$RENDU_DIR"
 
-# Título
-echo -e "${BLUE}${BOLD}==========================${NC}"
-echo -e "${BLUE}${BOLD}   EXAM RANK 05 - TESTER${NC}"
-echo -e "${BLUE}${BOLD}==========================${NC}"
-echo ""
+# Archivos para almacenar ejercicios completados por nivel
+LEVEL1_DONE="$PROGRESS_DIR/level1_done.txt"
+LEVEL2_DONE="$PROGRESS_DIR/level2_done.txt"
 
-# Funciones
-show_subject() {
-    local module=$1
-    clear
-    echo -e "${BLUE}=== SUBJECT: cpp_module_$module ===${NC}\n"
-    cat "$EXAM_DIR/cpp_module_$module/subject.en.txt"
-    echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-    read
-}
+# Crear archivos si no existen
+touch "$LEVEL1_DONE" "$LEVEL2_DONE"
 
-run_test() {
-    local module=$1
-    clear
-    echo -e "${BLUE}=== TESTING: cpp_module_$module ===${NC}\n"
+# Función para validar ejercicio
+validate_exercise() {
+    local level=$1
+    local exercise=$2
+    local exercise_dir="$EXAM_DIR/level-${level}/${exercise}"
+    local grademe_dir="$exercise_dir/grademe"
+    local student_dir="$RENDU_DIR/${exercise}"
+    local student_file="${student_dir}/${exercise}.c"
+    local test_script="$grademe_dir/test.sh"
     
-    # Verificar existencia del script de pruebas
-    if [ ! -f "$EXAM_DIR/cpp_module_$module/test.sh" ]; then
-        echo -e "${RED}Error: No se encuentra el script de pruebas para cpp_module_$module${NC}"
-        echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-        read
-        return
+    # Verificar que existe el directorio de tests
+    if [ ! -d "$grademe_dir" ]; then
+        echo -e "${RED}Error: No se encuentran los tests para $exercise${NC}"
+        echo -e "${YELLOW}Creando directorio: $grademe_dir${NC}"
+        mkdir -p "$grademe_dir"
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Error: No se pudo crear el directorio de tests${NC}"
+            return 1
+        fi
+        
+        # Crear archivos vacíos de test
+        touch "$grademe_dir/test.sh"
+        chmod +x "$grademe_dir/test.sh"
+        echo "echo 'Los tests aún no se han creado'" > "$grademe_dir/test.sh"
+        
+        touch "$grademe_dir/test.sh"
+        chmod +x "$grademe_dir/test.sh"
+        echo "echo 'Los tests aún no se han creado'" > "$grademe_dir/test.sh"
     fi
     
-    # Dar permisos de ejecución
-    chmod +x "$EXAM_DIR/cpp_module_$module/test.sh"
+    # Verificar que el estudiante ha creado su directorio
+    if [ ! -d "$student_dir" ]; then
+        echo -e "${RED}Error: No se encuentra el directorio $student_dir${NC}"
+        echo -e "${YELLOW}Crea el directorio: mkdir $student_dir${NC}"
+        return 1
+    fi
     
-    # Ejecutar pruebas
-    cd "$EXAM_DIR/cpp_module_$module"
+    # Para ejercicios de C++, buscar archivos .cpp en lugar de .c
+    local student_cpp_file="${student_dir}/${exercise}.cpp"
+    if [ ! -f "$student_file" ] && [ ! -f "$student_cpp_file" ]; then
+        echo -e "${RED}Error: No se encuentra el archivo $student_file o $student_cpp_file${NC}"
+        return 1
+    fi
+    
+    echo -e "${BLUE}Ejecutando tests para $exercise...${NC}"
+    cd "$grademe_dir"
+    
+    # Ejecutar el script de tests
     ./test.sh
+    local test_result=$?
     
-    echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-    read
+    cd "$EXAM_DIR"
+    
+    if [ $test_result -eq 0 ]; then
+        echo -e "${GREEN}✅ Tests pasados para $exercise${NC}"
+        return 0
+    else
+        echo -e "${RED}❌ Tests fallaron para $exercise${NC}"
+        return 1
+    fi
 }
 
-create_template() {
-    local module=$1
+# Función para contar ejercicios totales por nivel
+count_total_exercises() {
+    local level=$1
+    find "$EXAM_DIR/level-${level}" -maxdepth 1 -mindepth 1 -type d | wc -l
+}
+
+# Función para obtener ejercicios disponibles (no completados)
+get_available_exercises() {
+    local level=$1
+    local done_file="$PROGRESS_DIR/level${level}_done.txt"
+    local exercises=()
     
-    # Verificar si el directorio existe
-    if [ ! -d "$RENDU_DIR/cpp_module_$module" ]; then
-        echo -e "${RED}Error: No se encuentra el directorio cpp_module_$module${NC}"
-        return
+    # Obtener todos los ejercicios del nivel
+    for dir in level-${level}/*/; do
+        if [ -d "$dir" ]; then
+            dirname=$(basename "$dir")
+            # Verificar si no está completado
+            if ! grep -q "^$dirname$" "$done_file" 2>/dev/null; then
+                exercises+=("$dirname")
+            fi
+        fi
+    done
+    
+    echo "${exercises[@]}"
+}
+
+# Función para mostrar progreso
+show_progress() {
+    echo -e "\n${BLUE}=== PROGRESO ACTUAL ===${NC}"
+    for i in {1..2}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        local total=$(count_total_exercises $i)
+        # Usar sort y uniq para contar solo ejercicios únicos
+        local completed=$(sort "$done_file" 2>/dev/null | uniq | wc -l)
+        echo -e "${GREEN}Nivel $i: $completed/$total ejercicios completados${NC}"
+    done
+    echo
+}
+
+# Función para limpiar duplicados de los archivos de progreso
+clean_progress_files() {
+    for i in {1..2}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        if [ -f "$done_file" ]; then
+            # Crear archivo temporal con entradas únicas
+            sort "$done_file" | uniq > "${done_file}.tmp"
+            # Reemplazar archivo original
+            mv "${done_file}.tmp" "$done_file"
+        fi
+    done
+}
+
+# Función para seleccionar un ejercicio aleatorio de un nivel
+select_random_exercise() {
+    local level=$1
+    local exercises=($(get_available_exercises $level))
+    local count=${#exercises[@]}
+    
+    if [ $count -eq 0 ]; then
+        echo -e "${YELLOW}¡Todos los ejercicios del nivel $level están completados!${NC}"
+        return 1
     fi
     
-    case $module in
-        00)
-            echo -e "${YELLOW}Creando template para cpp_module_00...${NC}"
-            cat > "$RENDU_DIR/cpp_module_00/Warlock.hpp" << 'EOL'
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Warlock.hpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvigara- <mvigara-@student.42madrid.com    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/09 16:44:49 by mvigara-          #+#    #+#             */
-/*   Updated: 2025/05/09 16:44:59 by mvigara-         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+    local random_index=$((RANDOM % count))
+    echo "${exercises[$random_index]}"
+}
 
-#ifndef WARLOCK_HPP
-# define WARLOCK_HPP
-
-# include <iostream>
-# include <string>
-
-class Warlock {
-private:
-    // Atributos privados
+# Función para listar ejercicios por nivel
+list_level_exercises() {
+    local level=$1
+    local exercises=()
+    local index=1
     
-    // Constructor por defecto (privado)
+    echo -e "\n${BLUE}=== EJERCICIOS NIVEL $level ===${NC}"
     
-    // Constructor de copia (privado)
+    # Obtener y mostrar todos los ejercicios del nivel
+    for dir in level-${level}/*/; do
+        if [ -d "$dir" ]; then
+            dirname=$(basename "$dir")
+            exercises+=("$dirname")
+            echo "$index) $dirname"
+            ((index++))
+        fi
+    done
     
-    // Operador de asignación (privado)
-
-public:
-    // Constructor con nombre y título
+    echo -e "\n${YELLOW}Selecciona un ejercicio (1-$((index-1))) o 0 para volver:${NC}"
+    read -r selection
     
-    // Destructor
+    if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -gt 0 ] && [ "$selection" -lt "$index" ]; then
+        selected_exercise=${exercises[$((selection-1))]}
+        practice_single_exercise "$level" "$selected_exercise"
+    elif [ "$selection" != "0" ]; then
+        echo -e "${RED}Selección inválida${NC}"
+        read -p "Presiona Enter para continuar..."
+    fi
+}
+
+# Función para seleccionar nivel
+select_level() {
+    while true; do
+        clear
+        echo -e "${BLUE}=== SELECCIONAR NIVEL ===${NC}"
+        echo "1. Level 1"
+        echo "2. Level 2"
+        echo "0. Volver"
+        
+        read -r level_choice
+        
+        case $level_choice in
+            [1-2])
+                list_level_exercises "$level_choice"
+                ;;
+            0)
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                read -p "Presiona Enter para continuar..."
+                ;;
+        esac
+    done
+}
+
+# Función para practicar un ejercicio específico
+practice_single_exercise() {
+    local level=$1
+    local exercise=$2
     
-    // Getters (name y title)
+    show_subject $level "$exercise"
+    while true; do
+        echo -e "\n${YELLOW}Opciones:${NC}"
+        echo "1. Validar ejercicio"
+        echo "2. Marcar como completado sin validar"
+        echo "3. Dejar pendiente"
+        echo "4. Salir"
+        read -r option
+        
+        case $option in
+            1)
+                if validate_exercise $level "$exercise"; then
+                    mark_as_completed $level "$exercise"
+                    echo -e "${GREEN}Ejercicio $exercise marcado como completado${NC}"
+                    read -p "Presiona Enter para continuar..."
+                    return
+                else
+                    echo -e "${RED}El ejercicio falló la validación${NC}"
+                    read -p "Presiona Enter para continuar..."
+                fi
+                ;;
+            2)
+                mark_as_completed $level "$exercise"
+                echo -e "${GREEN}Ejercicio $exercise marcado como completado${NC}"
+                read -p "Presiona Enter para continuar..."
+                return
+                ;;
+            3)
+                echo -e "${YELLOW}Ejercicio dejado pendiente${NC}"
+                read -p "Presiona Enter para continuar..."
+                return
+                ;;
+            4)
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                ;;
+        esac
+    done
+}
+
+# Función para mostrar el subject
+show_subject() {
+    local level=$1
+    local exercise=$2
+    local subject_file="$EXAM_DIR/level-${level}/${exercise}/subject.txt"
     
-    // Setter (title)
+    clear
+    echo -e "${BLUE}=== EXAM RANK 05 - NIVEL $level ===${NC}"
+    echo -e "${CYAN}Ejercicio: $exercise${NC}"
+    echo ""
     
-    // Método introduce
-};
-
-#endif
-EOL
-            cat > "$RENDU_DIR/cpp_module_00/Warlock.cpp" << 'EOL'
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Warlock.cpp                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvigara- <mvigara-@student.42madrid.com    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/09 16:44:49 by mvigara-          #+#    #+#             */
-/*   Updated: 2025/05/09 16:44:59 by mvigara-         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "Warlock.hpp"
-
-// Implementación del constructor
-
-// Implementación del destructor
-
-// Implementación de los getters
-
-// Implementación del setter
-
-// Implementación del método introduce
-
-EOL
-            echo -e "${GREEN}Template para cpp_module_00 creado.${NC}"
-            ;;
-        01)
-            echo -e "${YELLOW}Creando templates para cpp_module_01...${NC}"
-            
-            # Copiar archivos del módulo 00 si existen y modificar Warlock
-            if [ -f "$RENDU_DIR/cpp_module_00/Warlock.hpp" ] && [ -f "$RENDU_DIR/cpp_module_00/Warlock.cpp" ]; then
-                cp "$RENDU_DIR/cpp_module_00/Warlock.hpp" "$RENDU_DIR/cpp_module_01/"
-                cp "$RENDU_DIR/cpp_module_00/Warlock.cpp" "$RENDU_DIR/cpp_module_01/"
-                echo -e "${GREEN}Copiados archivos Warlock desde cpp_module_00.${NC}"
-                echo -e "${YELLOW}Recuerda modificar Warlock para añadir:\n- learnSpell\n- forgetSpell\n- launchSpell${NC}"
-            else
-                # Crear templates desde cero
-                cat > "$RENDU_DIR/cpp_module_01/Warlock.hpp" << 'EOL'
-#ifndef WARLOCK_HPP
-# define WARLOCK_HPP
-
-# include <iostream>
-# include <string>
-# include <map>
-# include "ASpell.hpp"
-
-class Warlock {
-private:
-    std::string name;
-    std::string title;
-    std::map<std::string, ASpell*> spells;
+    if [ -f "$subject_file" ]; then
+        cat "$subject_file"
+    else
+        echo -e "${RED}Error: No se encuentra el archivo de subject${NC}"
+        echo "Buscando en: $subject_file"
+    fi
     
-    Warlock();
-    Warlock(const Warlock&);
-    Warlock& operator=(const Warlock&);
+    echo ""
+    echo -e "${YELLOW}Directorio de trabajo: $PROJECT_ROOT/rendu/${exercise}/${NC}"
+    echo -e "${YELLOW}Archivo esperado: ${exercise}.cpp (o ${exercise}.c)${NC}"
+    echo ""
+}
 
-public:
-    Warlock(const std::string& name, const std::string& title);
-    ~Warlock();
+# Función para marcar ejercicio como completado
+mark_as_completed() {
+    local level=$1
+    local exercise=$2
+    local done_file="$PROGRESS_DIR/level${level}_done.txt"
     
-    const std::string& getName() const;
-    const std::string& getTitle() const;
-    
-    void setTitle(const std::string& title);
-    
-    void introduce() const;
-    
-    void learnSpell(ASpell* spell);
-    void forgetSpell(const std::string& spellName);
-    void launchSpell(const std::string& spellName, const ATarget& target);
-};
+    echo "$exercise" >> "$done_file"
+    clean_progress_files
+}
 
-#endif
-EOL
+# Función para practicar ejercicios aleatorios
+practice_random() {
+    while true; do
+        clear
+        echo -e "${BLUE}=== PRACTICE MODE - EXAM RANK 05 ===${NC}"
+        show_progress
+        
+        echo -e "${YELLOW}Selecciona nivel para ejercicio aleatorio:${NC}"
+        echo "1. Level 1"
+        echo "2. Level 2"
+        echo "0. Volver al menú principal"
+        
+        read -r level_choice
+        
+        case $level_choice in
+            [1-2])
+                exercise=$(select_random_exercise $level_choice)
+                if [ $? -eq 0 ] && [ -n "$exercise" ]; then
+                    echo -e "${GREEN}Ejercicio aleatorio seleccionado: $exercise${NC}"
+                    read -p "Presiona Enter para continuar..."
+                    practice_single_exercise $level_choice "$exercise"
+                else
+                    read -p "Presiona Enter para continuar..."
+                fi
+                ;;
+            0)
+                return
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                read -p "Presiona Enter para continuar..."
+                ;;
+        esac
+    done
+}
+
+# Función para mostrar estadísticas
+show_stats() {
+    clear
+    echo -e "${BLUE}=== ESTADÍSTICAS - EXAM RANK 05 ===${NC}"
+    show_progress
+    
+    echo -e "${CYAN}=== EJERCICIOS COMPLETADOS ===${NC}"
+    for i in {1..2}; do
+        local done_file="$PROGRESS_DIR/level${i}_done.txt"
+        echo -e "\n${GREEN}Nivel $i:${NC}"
+        if [ -f "$done_file" ] && [ -s "$done_file" ]; then
+            sort "$done_file" | uniq | nl
+        else
+            echo "  Ningún ejercicio completado"
+        fi
+    done
+    
+    echo ""
+    read -p "Presiona Enter para continuar..."
+}
+
+# Función para resetear progreso
+reset_progress() {
+    clear
+    echo -e "${BLUE}=== RESETEAR PROGRESO - EXAM RANK 05 ===${NC}"
+    echo -e "${RED}¿Estás seguro de que quieres resetear todo el progreso? (s/n)${NC}"
+    read -r confirm
+    
+    if [[ "$confirm" =~ ^[Ss]$ ]]; then
+        # Limpiar archivos de progreso
+        > "$LEVEL1_DONE"
+        > "$LEVEL2_DONE"
+        
+        # Limpiar directorio rendu
+        for dir in level-{1,2}/*/; do
+            if [ -d "$dir" ]; then
+                exercise=$(basename "$dir")
+                rm -rf "$RENDU_DIR/$exercise"
             fi
-            
-            # Crear ASpell.hpp
-            cat > "$RENDU_DIR/cpp_module_01/ASpell.hpp" << 'EOL'
-#ifndef ASPELL_HPP
-# define ASPELL_HPP
-
-# include <string>
-
-class ATarget;
-
-class ASpell {
-protected:
-    std::string name;
-    std::string effects;
-
-public:
-    ASpell();
-    ASpell(const std::string& name, const std::string& effects);
-    ASpell(const ASpell& other);
-    ASpell& operator=(const ASpell& other);
-    virtual ~ASpell();
+        done
+        
+        echo -e "${GREEN}Progreso reseteado y directorio rendu limpiado${NC}"
+    else
+        echo -e "${YELLOW}Operación cancelada${NC}"
+    fi
     
-    const std::string& getName() const;
-    const std::string& getEffects() const;
-    
-    virtual ASpell* clone() const = 0;
-    
-    void launch(const ATarget& target) const;
-};
-
-# include "ATarget.hpp"
-
-#endif
-EOL
-            
-            # Crear archivos restantes
-            echo -e "${GREEN}Template base para cpp_module_01 creado.${NC}"
-            echo -e "${YELLOW}Falta implementar:\n- ASpell.cpp\n- ATarget.hpp y ATarget.cpp\n- Fwoosh.hpp y Fwoosh.cpp\n- Dummy.hpp y Dummy.cpp${NC}"
-            ;;
-        02)
-            echo -e "${YELLOW}Creando templates básicos para cpp_module_02...${NC}"
-            
-            # Copiar archivos del módulo 01 si existen
-            if [ -d "$RENDU_DIR/cpp_module_01" ]; then
-                for file in "$RENDU_DIR/cpp_module_01"/*; do
-                    basename=$(basename "$file")
-                    cp "$file" "$RENDU_DIR/cpp_module_02/"
-                done
-                echo -e "${GREEN}Copiados archivos desde cpp_module_01.${NC}"
-            fi
-            
-            # Crear SpellBook.hpp
-            cat > "$RENDU_DIR/cpp_module_02/SpellBook.hpp" << 'EOL'
-#ifndef SPELLBOOK_HPP
-# define SPELLBOOK_HPP
-
-# include <map>
-# include <string>
-# include "ASpell.hpp"
-
-class SpellBook {
-private:
-    std::map<std::string, ASpell*> spells;
-    
-    SpellBook(const SpellBook&);
-    SpellBook& operator=(const SpellBook&);
-
-public:
-    SpellBook();
-    ~SpellBook();
-    
-    void learnSpell(ASpell* spell);
-    void forgetSpell(const std::string& spellName);
-    ASpell* createSpell(const std::string& spellName);
-};
-
-#endif
-EOL
-            
-            echo -e "${GREEN}Template base para cpp_module_02 creado.${NC}"
-            echo -e "${YELLOW}Falta implementar:\n- SpellBook.cpp\n- TargetGenerator.hpp y TargetGenerator.cpp\n- Fireball.hpp y Fireball.cpp\n- Polymorph.hpp y Polymorph.cpp\n- BrickWall.hpp y BrickWall.cpp${NC}"
-            ;;
-        *)
-            echo -e "${RED}Módulo inválido: $module${NC}"
-            ;;
-    esac
+    read -p "Presiona Enter para continuar..."
 }
 
 # Menú principal
-while true; do
-    clear
-    echo -e "${BLUE}=== 42 EXAM RANK 05 ====${NC}"
-    echo -e "${YELLOW}Selecciona una opción:${NC}"
-    echo "1. Ver Subject cpp_module_00"
-    echo "2. Ver Subject cpp_module_01"
-    echo "3. Ver Subject cpp_module_02"
-    echo "4. Ejecutar Test cpp_module_00"
-    echo "5. Ejecutar Test cpp_module_01"
-    echo "6. Ejecutar Test cpp_module_02" 
-    echo "7. Crear Template cpp_module_00"
-    echo "8. Crear Template cpp_module_01"
-    echo "9. Crear Template cpp_module_02"
-    echo "0. Salir"
+main_menu() {
+    # Limpiar archivos de progreso al inicio
+    clean_progress_files
     
-    read -p "Selección: " choice
-    
-    case $choice in
-        1)
-            show_subject "00"
-            ;;
-        2)
-            show_subject "01"
-            ;;
-        3)
-            show_subject "02"
-            ;;
-        4)
-            run_test "00"
-            ;;
-        5)
-            run_test "01"
-            ;;
-        6)
-            run_test "02"
-            ;;
-        7)
-            create_template "00"
-            echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-            read
-            ;;
-        8)
-            create_template "01"
-            echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-            read
-            ;;
-        9)
-            create_template "02"
-            echo -e "\n${YELLOW}Presiona Enter para volver...${NC}"
-            read
-            ;;
-        0)
-            echo -e "${GREEN}¡Hasta luego!${NC}"
-            exit 0
-            ;;
-        *)
-            echo -e "${RED}Opción inválida${NC}"
-            sleep 1
-            ;;
-    esac
-done
+    while true; do
+        clear
+        echo -e "${BLUE}╔══════════════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║                 EXAM RANK 05 - PRACTICE              ║${NC}"
+        echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        
+        show_progress
+        
+        echo -e "${YELLOW}=== MENÚ PRINCIPAL ===${NC}"
+        echo "1. 🎲 Ejercicio aleatorio por nivel"
+        echo "2. 📋 Elegir ejercicio manualmente"
+        echo "3. 📊 Ver estadísticas y progreso"
+        echo "4. 🔄 Resetear progreso"
+        echo "5. 🚪 Salir"
+        echo ""
+        
+        read -p "Selecciona una opción: " choice
+        
+        case $choice in
+            1)
+                practice_random
+                ;;
+            2)
+                select_level
+                ;;
+            3)
+                show_stats
+                ;;
+            4)
+                reset_progress
+                ;;
+            5)
+                echo -e "${GREEN}¡Hasta luego!${NC}"
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}Opción inválida${NC}"
+                read -p "Presiona Enter para continuar..."
+                ;;
+        esac
+    done
+}
+
+# Verificar que estamos en el directorio correcto
+if [ ! -d "level-1" ] && [ ! -d "level-2" ]; then
+    echo -e "${RED}Error: No se encuentran los directorios de niveles${NC}"
+    echo -e "${YELLOW}Asegúrate de ejecutar este script desde el directorio 05${NC}"
+    exit 1
+fi
+
+# Iniciar el menú principal
+main_menu
