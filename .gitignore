@@ -9,4 +9,4 @@ p
 extra/progress/
 .progress/
 *.dSYM
-a.out*
+a.out.dSYM/
