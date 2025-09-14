@@ -10,3 +10,5 @@ extra/progress/
 .progress/
 *.dSYM
 a.out.dSYM/
+test
+vbc
