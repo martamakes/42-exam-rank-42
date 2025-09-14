@@ -42,25 +42,42 @@ cp test_main.c "$TEMP_DIR"
 # Ir al directorio temporal
 cd "$TEMP_DIR"
 
-# Crear una versión limpia del archivo del estudiante (sin main si lo tiene)
-if grep -q "^int main(" ft_popen.c; then
-    echo -e "${YELLOW}ℹ️  Removing main function from student file for testing...${NC}"
-    sed '/^int main(/,$d' ft_popen.c > ft_popen_clean.c
-    mv ft_popen_clean.c ft_popen.c
-fi
-
-# Compilar
+# Smart compilation with compiler-based main conflict detection
 echo -e "${BLUE}📦 Compilando...${NC}"
-gcc -Wall -Wextra -Werror test_main.c ft_popen.c -o test_program 2>/dev/null
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}❌ Error de compilación${NC}"
-    echo -e "${YELLOW}💡 Revisa que tu función ft_popen esté correctamente implementada${NC}"
-    echo -e "${YELLOW}💡 Asegúrate de que compile con -Wall -Wextra -Werror${NC}"
-    exit 1
+if gcc -Wall -Wextra -Werror ft_popen.c test_main.c -o test_program 2>compile_error.txt; then
+    echo -e "${GREEN}✅ Compilación exitosa${NC}"
+else
+    # Check if the error is specifically about multiple main functions
+    if grep -q -E "(multiple definition.*main|duplicate symbol.*main)" compile_error.txt; then
+        echo -e "${YELLOW}⚠️  Conflicto de función main detectado - limpiando...${NC}"
+        
+        # Remove main function from student file
+        sed '/^[[:space:]]*int[[:space:]]*main[[:space:]]*(/,$d' ft_popen.c > ft_popen_clean.c
+        mv ft_popen_clean.c ft_popen.c
+        
+        # Try to compile again
+        echo -e "${BLUE}📦 Recompilando sin función main...${NC}"
+        if gcc -Wall -Wextra -Werror ft_popen.c test_main.c -o test_program 2>/dev/null; then
+            echo -e "${GREEN}✅ Conflicto de main resuelto${NC}"
+        else
+            echo -e "${RED}❌ Error de compilación persiste después de limpiar main${NC}"
+            echo -e "${YELLOW}💡 Revisa tu implementación de ft_popen${NC}"
+            rm -f compile_error.txt
+            exit 1
+        fi
+    else
+        echo -e "${RED}❌ Error de compilación (no relacionado con main)${NC}"
+        echo -e "${YELLOW}Detalles del error:${NC}"
+        cat compile_error.txt
+        echo -e "${YELLOW}💡 Revisa que tu función ft_popen esté correctamente implementada${NC}"
+        echo -e "${YELLOW}💡 Asegúrate de que compile con -Wall -Wextra -Werror${NC}"
+        rm -f compile_error.txt
+        exit 1
+    fi
 fi
 
-echo -e "${GREEN}✓ Compilación exitosa${NC}"
+# Clean up error file
+rm -f compile_error.txt
 echo ""
 
 # Ejecutar tests
