@@ -42,41 +42,26 @@ cp test_main.c "$TEMP_DIR"
 # Ir al directorio temporal
 cd "$TEMP_DIR"
 
-# Smart compilation with compiler-based main conflict detection
+# Intentar compilar directamente - que el estudiante vea los errores
 echo -e "${BLUE}📦 Compilando...${NC}"
 if gcc -Wall -Wextra -Werror ft_popen.c test_main.c -o test_program 2>compile_error.txt; then
     echo -e "${GREEN}✅ Compilación exitosa${NC}"
 else
-    # Check if the error is specifically about multiple main functions
+    echo -e "${RED}❌ Error de compilación${NC}"
+    echo -e "${YELLOW}Detalles del error:${NC}"
+    cat compile_error.txt
+    echo
     if grep -q -E "(multiple definition.*main|duplicate symbol.*main)" compile_error.txt; then
-        echo -e "${YELLOW}⚠️  Conflicto de función main detectado - limpiando...${NC}"
-        
-        # Remove main function from student file
-        sed '/^[[:space:]]*int[[:space:]]*main[[:space:]]*(/,$d' ft_popen.c > ft_popen_clean.c
-        mv ft_popen_clean.c ft_popen.c
-        
-        # Try to compile again
-        echo -e "${BLUE}📦 Recompilando sin función main...${NC}"
-        if gcc -Wall -Wextra -Werror ft_popen.c test_main.c -o test_program 2>/dev/null; then
-            echo -e "${GREEN}✅ Conflicto de main resuelto${NC}"
-        else
-            echo -e "${RED}❌ Error de compilación persiste después de limpiar main${NC}"
-            echo -e "${YELLOW}💡 Revisa tu implementación de ft_popen${NC}"
-            rm -f compile_error.txt
-            exit 1
-        fi
+        echo -e "${YELLOW}💡 Tienes una función main en tu código. Para este ejercicio, solo implementa la función ft_popen.${NC}"
+        echo -e "${YELLOW}💡 Elimina o comenta el main de tu archivo.${NC}"
     else
-        echo -e "${RED}❌ Error de compilación (no relacionado con main)${NC}"
-        echo -e "${YELLOW}Detalles del error:${NC}"
-        cat compile_error.txt
         echo -e "${YELLOW}💡 Revisa que tu función ft_popen esté correctamente implementada${NC}"
         echo -e "${YELLOW}💡 Asegúrate de que compile con -Wall -Wextra -Werror${NC}"
-        rm -f compile_error.txt
-        exit 1
     fi
+    rm -f compile_error.txt
+    exit 1
 fi
 
-# Clean up error file
 rm -f compile_error.txt
 echo ""
 
