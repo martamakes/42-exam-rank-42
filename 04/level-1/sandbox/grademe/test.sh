@@ -42,23 +42,27 @@ cp test_main.c "$TEMP_DIR"
 # Ir al directorio temporal
 cd "$TEMP_DIR"
 
-# Crear una versión limpia del archivo del estudiante (sin main si lo tiene)
-if grep -q "^int main(" sandbox.c; then
-    echo -e "${YELLOW}ℹ️  Removing main function from student file for testing...${NC}"
-    sed '/^int main(/,$d' sandbox.c > sandbox_clean.c
-    mv sandbox_clean.c sandbox.c
-fi
-
-# Compilar
+# Intentar compilar directamente - que el estudiante vea los errores
 echo -e "${BLUE}📦 Compilando...${NC}"
-gcc -Wall -Wextra -Werror test_main.c sandbox.c -o test_program 2>/dev/null
-
-if [ $? -ne 0 ]; then
+if gcc -Wall -Wextra -Werror sandbox.c test_main.c -o test_program 2>compile_error.txt; then
+    echo -e "${GREEN}✅ Compilación exitosa${NC}"
+else
     echo -e "${RED}❌ Error de compilación${NC}"
-    echo -e "${YELLOW}💡 Revisa que tu función sandbox esté correctamente implementada${NC}"
-    echo -e "${YELLOW}💡 Asegúrate de que compile con -Wall -Wextra -Werror${NC}"
+    echo -e "${YELLOW}Detalles del error:${NC}"
+    cat compile_error.txt
+    echo
+    if grep -q -E "(multiple definition.*main|duplicate symbol.*main)" compile_error.txt; then
+        echo -e "${YELLOW}💡 Tienes una función main en tu código. Para este ejercicio, solo implementa la función sandbox.${NC}"
+        echo -e "${YELLOW}💡 Elimina o comenta el main de tu archivo.${NC}"
+    else
+        echo -e "${YELLOW}💡 Revisa que tu función sandbox esté correctamente implementada${NC}"
+        echo -e "${YELLOW}💡 Asegúrate de que compile con -Wall -Wextra -Werror${NC}"
+    fi
+    rm -f compile_error.txt
     exit 1
 fi
+
+rm -f compile_error.txt
 
 echo -e "${GREEN}✓ Compilación exitosa${NC}"
 echo ""

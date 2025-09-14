@@ -17,59 +17,48 @@ gcc -Wall -Wextra -Werror student_file.c test_main.c -o test_program
 
 With this new pattern:
 ```bash
-# NEW - GOOD: Only removes main if compiler reports conflict
+# NEW - EDUCATIONAL: Show errors to student, let them fix main conflicts
 echo "📦 Compilando..."
 if gcc -Wall -Wextra -Werror student_file.c test_main.c -o test_program 2>compile_error.txt; then
     echo "✅ Compilación exitosa"
 else
-    # Check if the error is specifically about multiple main functions
+    echo "❌ Error de compilación"
+    echo "Detalles del error:"
+    cat compile_error.txt
+    echo
     if grep -q -E "(multiple definition.*main|duplicate symbol.*main)" compile_error.txt; then
-        echo "⚠️  Conflicto de función main detectado - limpiando..."
-        
-        # Remove main function from student file
-        sed '/^[[:space:]]*int[[:space:]]*main[[:space:]]*(/,$d' student_file.c > student_file_clean.c
-        mv student_file_clean.c student_file.c
-        
-        # Try to compile again
-        echo "📦 Recompilando sin función main..."
-        if gcc -Wall -Wextra -Werror student_file.c test_main.c -o test_program 2>/dev/null; then
-            echo "✅ Conflicto de main resuelto"
-        else
-            echo "❌ Error de compilación persiste después de limpiar main"
-            echo "💡 Revisa tu implementación"
-            rm -f compile_error.txt
-            exit 1
-        fi
+        echo "💡 Tienes una función main en tu código. Para este ejercicio, solo implementa la función."
+        echo "💡 Elimina o comenta el main de tu archivo."
     else
-        echo "❌ Error de compilación (no relacionado con main)"
-        echo "Detalles del error:"
-        cat compile_error.txt
         echo "💡 Revisa que tu función esté correctamente implementada"
         echo "💡 Asegúrate de que compile con -Wall -Wextra -Werror"
-        rm -f compile_error.txt
-        exit 1
     fi
+    rm -f compile_error.txt
+    exit 1
 fi
 
-# Clean up error file
 rm -f compile_error.txt
 ```
 
 ## Benefits
 
-1. **Respects commented main**: `/* int main() {} */` won't be removed unnecessarily
-2. **Compiler-based detection**: Uses actual compilation errors, not text patterns
+1. **Educational approach**: Student sees real compiler errors and learns to fix them
+2. **Respects commented main**: `/* int main() {} */` compiles fine, no false errors
 3. **Better error reporting**: Shows actual compilation errors when they occur
-4. **Works for all cases**: Functions, programs, mixed exercises
-5. **No false positives**: Only acts when there's a real conflict
+4. **Clear guidance**: Specific hints for main conflicts vs other compilation errors
+5. **Student responsibility**: Teaches proper file management and error interpretation
 
-## Scripts that need updating
+## Scripts that have been updated
 
-- [x] `/04/level-1/ft_popen/grademe/test.sh` (already updated)
-- [ ] `/04/level-1/picoshell/grademe/test.sh`
-- [ ] `/04/level-1/sandbox/grademe/test.sh` 
-- [ ] `/04/level-2/argo/grademe/test.sh`
-- [ ] Any other scripts using the old pattern
+- [x] `/04/level-1/ft_popen/grademe/test.sh` ✅
+- [x] `/04/level-1/picoshell/grademe/test.sh` ✅
+- [x] `/04/level-1/sandbox/grademe/test.sh` ✅
+- [x] `/04/level-2/argo/grademe/test.sh` ✅
+
+## Other scripts that may need updating
+
+- [ ] Any scripts in `/02/` directories that use the old pattern
+- [ ] Any scripts in `/03/` or `/05/` directories that use the old pattern
 
 ## Template for quick updating
 

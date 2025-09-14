@@ -42,16 +42,27 @@ cp test_main.c "$TEMP_DIR"
 # Ir al directorio temporal
 cd "$TEMP_DIR"
 
-# Crear una versión limpia del archivo del estudiante (sin main si lo tiene)
-if grep -q "^int main(" picoshell.c; then
-    echo -e "${YELLOW}ℹ️  Removing main function from student file for testing...${NC}"
-    sed '/^int main(/,$d' picoshell.c > picoshell_clean.c
-    mv picoshell_clean.c picoshell.c
+# Intentar compilar directamente - que el estudiante vea los errores
+echo -e "${BLUE}📦 Compilando...${NC}"
+if gcc -Wall -Wextra -Werror picoshell.c test_main.c -o test_program 2>compile_error.txt; then
+    echo -e "${GREEN}✅ Compilación exitosa${NC}"
+else
+    echo -e "${RED}❌ Error de compilación${NC}"
+    echo -e "${YELLOW}Detalles del error:${NC}"
+    cat compile_error.txt
+    echo
+    if grep -q -E "(multiple definition.*main|duplicate symbol.*main)" compile_error.txt; then
+        echo -e "${YELLOW}💡 Tienes una función main en tu código. Para este ejercicio, solo implementa la función picoshell.${NC}"
+        echo -e "${YELLOW}💡 Elimina o comenta el main de tu archivo.${NC}"
+    else
+        echo -e "${YELLOW}💡 Revisa que tu función picoshell esté correctamente implementada${NC}"
+        echo -e "${YELLOW}💡 Asegúrate de que compile con -Wall -Wextra -Werror${NC}"
+    fi
+    rm -f compile_error.txt
+    exit 1
 fi
 
-# Compilar
-echo -e "${BLUE}📦 Compilando...${NC}"
-gcc -Wall -Wextra -Werror test_main.c picoshell.c -o test_program 2>/dev/null
+rm -f compile_error.txt
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}❌ Error de compilación${NC}"
