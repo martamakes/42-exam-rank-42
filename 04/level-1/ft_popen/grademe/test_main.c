@@ -151,6 +151,64 @@ int test_cat_write() {
     return 0;
 }
 
+// Test 9: Chained pipes - ls | grep (from subject example)
+int test_chained_pipes() {
+    // Create temp file with known content
+    int temp_fd = open("test_files.txt", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (temp_fd == -1) return 0;
+    write(temp_fd, "test.c\n", 7);
+    write(temp_fd, "test.txt\n", 9);
+    write(temp_fd, "main.c\n", 7);
+    write(temp_fd, "readme.md\n", 10);
+    close(temp_fd);
+
+    // Simulate: cat test_files.txt | grep c
+    int fd1 = ft_popen("cat", (char *const []){"cat", "test_files.txt", NULL}, 'r');
+    if (fd1 == -1) {
+        unlink("test_files.txt");
+        return 0;
+    }
+
+    // Save original stdin
+    int saved_stdin = dup(0);
+
+    // Redirect fd1 to stdin
+    dup2(fd1, 0);
+    close(fd1);
+
+    // Now grep reads from stdin (which is the output of cat)
+    int fd2 = ft_popen("grep", (char *const []){"grep", "c", NULL}, 'r');
+
+    // Restore stdin
+    dup2(saved_stdin, 0);
+    close(saved_stdin);
+
+    if (fd2 == -1) {
+        unlink("test_files.txt");
+        return 0;
+    }
+
+    char buffer[1024];
+    int bytes = read_with_timeout(fd2, buffer, sizeof(buffer) - 1);
+    close(fd2);
+    wait(NULL);
+    wait(NULL);
+
+    unlink("test_files.txt");
+
+    if (bytes > 0) {
+        buffer[bytes] = '\0';
+        // Should contain "test.c" and "main.c" but NOT "readme.md" or "test.txt"
+        int has_test_c = (strstr(buffer, "test.c") != NULL);
+        int has_main_c = (strstr(buffer, "main.c") != NULL);
+        int has_test_txt = (strstr(buffer, "test.txt") != NULL);
+        int has_readme = (strstr(buffer, "readme.md") != NULL);
+
+        return (has_test_c && has_main_c && !has_test_txt && !has_readme);
+    }
+    return 0;
+}
+
 int main() {
     printf("🧪 FT_POPEN TESTER\n");
     printf("==================\n\n");
@@ -161,7 +219,10 @@ int main() {
     run_test("Read from ls", test_ls_read);
     run_test("Multiple arguments", test_multiple_args);
     run_test("Write to cat", test_cat_write);
-    
+
+    printf("\n🔗 ADVANCED TESTS (from subject):\n");
+    run_test("Chained pipes (cat | grep)", test_chained_pipes);
+
     printf("\n🛡️  ERROR HANDLING TESTS:\n");
     run_test("Invalid type", test_invalid_type);
     run_test("NULL file parameter", test_null_file);

@@ -219,7 +219,45 @@ int test_complex_pipeline() {
     return 0;
 }
 
-// Test 8: Four command pipeline
+// Test 8: Subject example - echo | cat | sed (exact match from subject)
+int test_subject_example() {
+    char *cmd1[] = {"echo", "squalala", NULL};
+    char *cmd2[] = {"cat", NULL};
+    char *cmd3[] = {"sed", "s/a/b/g", NULL};
+    char **cmds[] = {cmd1, cmd2, cmd3, NULL};
+
+    // Redirect output to file for verification
+    int fd = open("test_output.txt", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    if (fd == -1) return 0;
+
+    int saved_stdout = dup(STDOUT_FILENO);
+    dup2(fd, STDOUT_FILENO);
+
+    int result = picoshell(cmds);
+
+    dup2(saved_stdout, STDOUT_FILENO);
+    close(fd);
+    close(saved_stdout);
+
+    if (result != 0) return 0;
+
+    // Check output - should be "squblblb"
+    fd = open("test_output.txt", O_RDONLY);
+    if (fd == -1) return 0;
+
+    char buffer[100];
+    ssize_t bytes = read(fd, buffer, sizeof(buffer) - 1);
+    close(fd);
+    unlink("test_output.txt");
+
+    if (bytes > 0) {
+        buffer[bytes] = '\0';
+        return (strstr(buffer, "squblblb") != NULL);
+    }
+    return 0;
+}
+
+// Test 9: Four command pipeline
 int test_four_command_pipeline() {
     char *cmd1[] = {"echo", "a b c d", NULL};
     char *cmd2[] = {"tr", " ", "\\n", NULL};  // Replace spaces with newlines
@@ -270,6 +308,7 @@ int main() {
     
     printf("\n🔧 ADVANCED TESTS:\n");
     run_test("Complex pipeline (sed)", test_complex_pipeline);
+    run_test("Subject example (echo|cat|sed)", test_subject_example);
     run_test("Four command pipeline", test_four_command_pipeline);
     
     printf("\n🛡️  ERROR HANDLING TESTS:\n");
