@@ -319,7 +319,80 @@ int test_unexpected_token() {
     return 1; // Accept if no output capture (function still failed correctly)
 }
 
-// Test 10: Empty map
+// Test 10: Deep nested map (from subject example)
+int test_deep_recursion() {
+    FILE *stream = create_stream_from_string("{\"recursion\":{\"recursion\":{\"recursion\":{\"recursion\":\"recursion\"}}}}");
+    if (!stream) return 0;
+
+    json result;
+    int ret = argo(&result, stream);
+    fclose(stream);
+
+    if (ret != 1) return 0;
+    if (result.type != MAP) return 0;
+
+    // Navigate through 4 levels of nesting
+    json *current = &result;
+    for (int i = 0; i < 4; i++) {
+        if (current->type != MAP) return 0;
+        if (current->map.size != 1) return 0;
+        if (!current->map.data[0].key || strcmp(current->map.data[0].key, "recursion") != 0) return 0;
+        current = &current->map.data[0].value;
+    }
+
+    // Final value should be string "recursion"
+    if (current->type != STRING) return 0;
+    if (!current->string || strcmp(current->string, "recursion") != 0) return 0;
+
+    free_json(result);
+    return 1;
+}
+
+// Test 11: Error - unfinished string ending with escape (from subject)
+int test_unfinished_string_with_escape() {
+    // Capture output to check error message
+    int pipefd[2];
+    if (pipe(pipefd) == -1) return 0;
+
+    int saved_stdout = dup(STDOUT_FILENO);
+    dup2(pipefd[1], STDOUT_FILENO);
+
+    FILE *stream = create_stream_from_string("\"unfinished string 2\\\"");
+    if (!stream) {
+        dup2(saved_stdout, STDOUT_FILENO);
+        close(pipefd[0]);
+        close(pipefd[1]);
+        close(saved_stdout);
+        return 0;
+    }
+
+    json result;
+    int ret = argo(&result, stream);
+    fclose(stream);
+
+    dup2(saved_stdout, STDOUT_FILENO);
+    close(pipefd[1]);
+    close(saved_stdout);
+
+    char buffer[256];
+    ssize_t bytes = read(pipefd[0], buffer, sizeof(buffer) - 1);
+    close(pipefd[0]);
+
+    // Should return -1 for error
+    if (ret != -1) return 0;
+
+    // Should print error message
+    if (bytes > 0) {
+        buffer[bytes] = '\0';
+        if (strstr(buffer, "unexpected end of input") != NULL) {
+            return 1;
+        }
+    }
+
+    return 1; // Accept if no output capture (function still failed correctly)
+}
+
+// Test 12: Empty map
 int test_empty_map() {
     FILE *stream = create_stream_from_string("{}");
     if (!stream) return 0;
@@ -353,9 +426,11 @@ int main() {
     run_test("Simple map", test_simple_map);
     run_test("Multiple entries map", test_multiple_map);
     run_test("Nested map", test_nested_map);
-    
+    run_test("Deep recursion (subject example)", test_deep_recursion);
+
     printf("\n🛡️  ERROR HANDLING TESTS:\n");
     run_test("Unfinished string", test_unfinished_string);
+    run_test("Unfinished string with escape", test_unfinished_string_with_escape);
     run_test("Unexpected token", test_unexpected_token);
     
     printf("\n📊 RESULTS:\n");
