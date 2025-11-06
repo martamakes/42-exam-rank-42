@@ -1,88 +1,101 @@
+//given code: get_next_line.h
+#ifndef GNL
+# define GNL
 
 
-#include<stdio.h>
-#include<unistd.h>
-#include<stdlib.h>
-#include<string.h>
-#include <fcntl.h>
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 10
+# endif
 
-//cc broken_gnl.c -Wall -Wextra -Werror -D BUFFER_SIZE=3 -o gnl
+char    *get_next_line(int fd);
 
+#endif
 
-int ft_strlen(char *c)
-{
-	int i;
+//given code 2: get_next_line.c
 
-
-	return(i);
-}
+#include "get_next_line.h"
 
 char *ft_strchr(char *s, int c)
 {
-
-
-	return(NULL);
+  int i = 0;
+  while(s[i] != c)
+    i++;
+  if (s[i] == c)
+    return s + i;
+  else
+    return NULL;
 }
 
-char *ft_memmove(char *dest, char *src, int n)
+void *ft_memcpy(void *dest, const void *src, size_t n)
 {
-
-
-	return(dest);
+  while(--n > 0)
+    ((char *)dest)[n - 1] = ((char *)src)[n - 1];
+  return dest;
 }
 
-char *ft_join(char *s1, char *s2, int n)
+size_t ft_strlen(char *s)
 {
-
-	ft_memmove(retj, s1, size1);
-	ft_memmove(retj + size1, s2, n);
-	return(retj);
+  size_t res = 0;
+  while (*s)
+  {
+    s++;
+    res++;
+  }
+  return res;
 }
 
-char *b_gnl(fd)
+int str_append_mem(char **s1, char *s2, size_t size2)
 {
-	static char buf;
-	char *tmp = NULL;
-	char *rest = NULL;
-	int nb_read = 0;
-
-//	printf("buffer_size  = %d\n", BUFFER_SIZE);
-
-	while()
-	{
-		if(buf[0] == '\0')
-		{
-
-		}
-		rest = ft_strchr(buf, '\n');
-		if()
-		{
-			return();
-		}
-		else
-		{
-
-		}
-	}
-	return();
+  size_t size1 = ft_strlen(*s1);
+  char *tmp = malloc(size2 + size1 + 1);
+  if (!tmp)
+    return 0;
+  ft_memcpy(tmp, *s1, size1);
+  ft_memcpy(tmp + size1, s2, size2);
+  tmp[size1 + size2] = '\0';
+  free(*s1);
+  *s1 = tmp;
+  return 1; 
 }
 
-int main(void)
+int str_append_str(char **s1, char *s2)
 {
-	int fd = 0;
+  return str_append_mem(s1, s2, ft_strlen(s2));
+}
 
-	fd = open("text1.txt", O_RDONLY);
-	if(fd < 0)
-		perror("open");
+void *ft_memmove(void *dest, const void *src, size_t n)
+{
+  if (dest > src)
+    return ft_memmove(dest, src, n);
+  else if (dest == src)
+    return dest;
+  size_t i = ft_strlen((char *)src) - 1;
+  while (i >= 0)
+  {
+    ((char *)dest)[i] = ((char *)src)[i];
+    i--;
+  }
+  return dest;
+}
 
-	printf("line = %s", b_gnl(fd));
-	printf("line = %s", b_gnl(fd));
-	printf("line = %s", b_gnl(fd));
-	printf("line = %s", b_gnl(fd));
-	printf("line = %s", b_gnl(fd));
-	printf("line = %s", b_gnl(fd));
-	printf("line = %s", b_gnl(fd));
-
-
-	return(0);
+char *get_next_line(int fd)
+{
+  static char b[BUFFER_SIZE + 1] = "";
+  char *ret = NULL;
+  char *tmp = ft_strchr(b, '\n');
+  while(!tmp)
+  {
+    if (!str_append_str(&ret, b))
+      return (NULL);
+    int read_ret = read(fd, b, BUFFER_SIZE);
+    if (read_ret == -1)
+      return (NULL);
+    b[read_ret] = 0;
+  }
+  if (!str_append_mem(&ret, b, tmp - b + 1))
+  {
+    free(ret);
+    return NULL;
+  }
+  return ret;
 }
