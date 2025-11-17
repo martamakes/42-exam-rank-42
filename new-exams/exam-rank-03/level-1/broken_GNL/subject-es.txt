@@ -1,0 +1,48 @@
+Nombre del ejercicio : broken_GNL
+Archivos esperados  : get_next_line.c get_next_line.h
+Funciones permitidas : read, free, malloc
+--------------------------------------------------------------------------------
+Repara la función ‘get_next_line’ en el archivo get_next_line.c, cuyo prototipo debe ser:
+char *get_next_line(int fd);
+
+También puede que necesites reparar otras funciones.
+
+Descripción de la función ‘get_next_line’:
+
+Tu función debe devolver una línea que haya sido leída desde el descriptor de archivo
+pasado como parámetro.
+
+Una ‘línea leída’ se define como una sucesión de 0 a n caracteres
+que termina con ‘\n’ (código ASCII 0x0a) o con el fin de archivo (EOF).
+
+La línea debe devolverse incluyendo el carácter ‘\n’ si está presente al final
+de la línea leída.
+
+Cuando llegues al EOF, debes almacenar el contenido actual del búfer en un puntero
+a char * y devolverlo. Si el búfer está vacío, debes devolver NULL.
+
+En caso de error, devuelve NULL.
+
+Si no devuelve NULL, el puntero devuelto debe poder liberarse con free.
+
+Tu programa será compilado con la bandera -D BUFFER_SIZE=xx, la cual debe usarse
+como el tamaño del búfer en las llamadas a read dentro de tus funciones.
+
+Tu función no debe provocar fugas de memoria.
+
+Cuando llegues al EOF, tu función no debe mantener ninguna memoria asignada
+con malloc excepto la línea que ha sido devuelta.
+
+Llamar a tu función get_next_line en un bucle permitirá leer
+el texto disponible en un descriptor de archivo una línea a la vez hasta el final del texto,
+sin importar el tamaño del texto ni de sus líneas.
+
+Asegúrate de que tu función se comporte correctamente al leer un archivo,
+la salida estándar, una redirección, etc.
+
+No se realizará ninguna otra llamada a funciones sobre el descriptor de archivo
+entre dos llamadas consecutivas a get_next_line.
+
+Finalmente, consideramos que get_next_line tiene un comportamiento indefinido
+al leer un archivo binario.
+--------------------------------------------------------------------------------
