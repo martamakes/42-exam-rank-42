@@ -1,0 +1,51 @@
+NAssignment name: filter
+Expected files: filter.c
+Allowed functions: read, write, strlen, memmem, memmove, malloc, calloc,
+realloc, free, printf, fprintf, stdout, stderr, perror
+--------------------------------------------------------------------------------
+Escribe un programa que tome un solo argumento y solo uno.
+
+Tu programa debe leer desde la entrada estándar (stdin) y escribir todo el contenido 
+leído en la salida estándar (stdout), excepto que cada ocurrencia de s debe ser 
+reemplazada por ‘*’ (tantos asteriscos como la longitud de s). Tu programa será 
+probado con tamaños de búfer aleatorios, usando una función read personalizada. 
+Por lo tanto, el búfer definido en tu programa se llenará con un número diferente de 
+caracteres en cada llamada.
+
+Por ejemplo:
+
+./filter bonjour
+se comportará de la misma manera que:
+sed 's/bonjour/*******/g'
+
+./filter abc
+se comportará de la misma manera que:
+sed 's/abc/***/g'
+
+De forma más general, tu programa debe ser equivalente al script de shell filter.sh 
+presente en este directorio (puedes comparar tu programa con él).
+
+En caso de error durante una llamada a read o malloc, debes escribir “Error: ” seguido 
+del mensaje de error en stderr y devolver 1.
+
+Si el programa se llama sin argumentos, con un argumento vacío o con múltiples argumentos, 
+debe devolver 1.
+
+Por ejemplo, esto debería funcionar:
+
+$> echo 'abcdefaaaabcdeabcabcdabc' | ./filter abc | cat -e
+defaaade***d$
+$> echo 'ababcabababc' | ./filter ababc | cat -e
+ab$
+$>
+
+Notas:
+memmem incluye:
+#define _GNU_SOURCE
+#include <string.h>
+
+perror incluye:
+#include <errno.h>
+
+read incluye:
+#include <fcntl.h>
