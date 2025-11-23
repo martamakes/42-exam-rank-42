@@ -1,97 +1,97 @@
-# 🎓 EXAM RANK 03 - Sistema de Práctica
+# 🎓 Exam Rank 03 - Sistema de Práctica Automatizado
 
-## 📍 **Ubicación**
-```
-/home/ubuntu/projects/42-exam-rank-42/new-exams/exam-rank-03/
-```
-
-Este directorio contiene un sistema completo de práctica para el Exam Rank 03 de 42 School, basado en la estructura de [martamakes/42-exam-rank-42](https://github.com/martamakes/42-exam-rank-42).
+Sistema completo de práctica para el Exam Rank 03 de 42 School con validación automática, seguimiento de progreso y material educativo.
 
 ---
 
-## 🚀 **Inicio Rápido**
+## 🚀 Inicio Rápido
 
-### **Para practicar:**
 ```bash
-cd /home/ubuntu/projects/42-exam-rank-42/new-exams/exam-rank-03/
 ./exam.sh
 ```
 
-### **Para crear nuevo ejercicio:**
-```bash
-./init.sh <nivel> <nombre_ejercicio>
-# Ejemplo: ./init.sh 1 nuevo_ejercicio
-```
+El sistema te guiará a través de ejercicios aleatorios o específicos, validará automáticamente tus soluciones y mantendrá registro de tu progreso.
 
 ---
 
-## 📁 **Estructura del Proyecto**
+## 📁 Estructura del Proyecto
 
 ```
-exam-rank-03/
-├── 🎯 exam.sh                 # Script principal de práctica
-├── 🔧 init.sh                # Generador de entornos de test
-├── 📚 level-1/               # Ejercicios Level 1 (ENUNCIADOS Y TESTS)
+42-exam-rank-03-automation/
+├── exam.sh                           # Sistema principal de práctica
+├── README.md                         # Este archivo
+├── HERRAMIENTAS_DEBUGGING.md        # Guía de gdb, valgrind, debugging
+├── REFERENCIA_RAPIDA.md             # Conceptos C rápidos (malloc, sizeof)
+│
+├── level-1/                          # Ejercicios nivel 1
 │   ├── filter/
-│   │   ├── ✅ grademe/        # Tests automáticos
-│   │   │   └── test.sh
-│   │   ├── 📋 subject.txt     # Enunciado en inglés
-│   │   └── 📋 subject-es.txt  # Enunciado en español
+│   │   ├── grademe/test.sh          # Tests automáticos
+│   │   ├── subject.txt              # Enunciado en inglés
+│   │   └── subject-es.txt           # Enunciado en español
 │   ├── ft_scanf/
-│   │   ├── ✅ grademe/test.sh
-│   │   ├── 📋 subject.txt
-│   │   ├── 📋 subject-es.txt
-│   │   └── 📝 explicaciones.md
+│   │   ├── grademe/test.sh
+│   │   ├── subject.txt
+│   │   ├── subject-es.txt
+│   │   └── explicaciones.md
 │   └── broken_GNL/
-│       ├── ✅ grademe/test.sh
-│       ├── 📋 subject.txt
-│       ├── 📋 subject-es.txt
-│       ├── given_code.c       # Código proporcionado
-│       ├── given_code_gnl.c
-│       └── given_code_gnl.h
-├── 📚 level-2/               # Ejercicios Level 2 (ENUNCIADOS Y TESTS)
-│   ├── permutations/grademe/test.sh
-│   ├── powerset/grademe/test.sh
-│   ├── n_queens/grademe/test.sh
-│   ├── rip/grademe/test.sh
-│   └── tsp/grademe/test.sh
-├── 🔒 rendu3/                # SOLUCIONES VALIDADAS (REFERENCIA)
-│   ├── filter/
-│   │   └── filter.c           # Solución funcional
+│       ├── grademe/test.sh
+│       ├── subject.txt
+│       ├── subject-es.txt
+│       └── given_code*.c/h          # Código proporcionado
+│
+├── level-2/                          # Ejercicios nivel 2
+│   ├── permutations/
+│   ├── powerset/
+│   ├── n_queens/
+│   ├── rip/
+│   └── tsp/
+│       └── grademe/test.sh
+│
+├── rendu3/                           # Soluciones validadas (referencia)
+│   ├── COMPARATIVA_POWERSET_VS_PERMUTATIONS.md
+│   ├── filter/filter.c
 │   ├── ft_scanf/
 │   │   ├── ft_scanf.c
-│   │   ├── ft_scanf_academico.c
-│   │   └── scanf.c
+│   │   └── readme_ft_scanf.md       # Explicación detallada
 │   ├── broken_GNL/
-│   │   ├── broken_GNL.c
-│   │   ├── broken_gnl_academico
 │   │   ├── get_next_line.c
 │   │   ├── get_next_line_comentado.c
-│   │   └── reparired/
-│   ├── permutations/permutations.c
-│   ├── powerset/powerset.c
-│   ├── n_queens/n_queens.c
-│   ├── rip/rip.c
-│   └── tsp/tsp.c
-├── 🎯 rendu/                 # ZONA DE TRABAJO (auto-generada, ignorada en git)
-└── 📊 exam_progress/         # Seguimiento automático de progreso
+│   │   └── readme_broken_gnl.md     # 8 errores explicados
+│   ├── permutations/
+│   │   ├── permutations.c
+│   │   ├── permutations.h
+│   │   └── readme_permutations.md   # Algoritmo backtracking
+│   ├── powerset/
+│   │   ├── powerset_bits.c          # Solución con máscaras
+│   │   ├── powerset_bits.h
+│   │   ├── powerset_backtraking.c   # Solución con backtracking
+│   │   ├── powerset_backtraking.h
+│   │   └── EXPLICACION_BACKTRACKING.md
+│   ├── n_queens/
+│   │   ├── n_queens.c
+│   │   └── n_queens.h
+│   ├── rip/rip.c                    # Balanceo de paréntesis
+│   └── tsp/tsp.c                    # Traveling Salesman Problem
+│
+├── rendu/                            # Zona de trabajo (auto-generada, ignorada en git)
+└── exam_progress/                    # Seguimiento de progreso
     ├── level1_done.txt
     └── level2_done.txt
 ```
 
 ---
 
-## 🎯 **Flujo de Trabajo Completo**
+## 🎯 Cómo Funciona
 
-### **1. Iniciar sistema de práctica**
+### 1. **Ejecutar el sistema**
 ```bash
 ./exam.sh
 ```
 
-### **2. Menú principal**
+### 2. **Menú principal**
 ```
 1. Practicar ejercicios (aleatorio de todos los niveles)
-2. Practicar Level 1 (aleatorio) 
+2. Practicar Level 1 (aleatorio)
 3. Practicar Level 2 (aleatorio)
 4. Seleccionar ejercicio específico
 5. Ver progreso
@@ -99,197 +99,182 @@ exam-rank-03/
 7. Salir
 ```
 
-### **3. Cuando el sistema te asigna un ejercicio:**
-- **Te muestra el subject** del ejercicio
-- **Te indica la carpeta** donde trabajar (ej: `level-1/filter/`)
+### 3. **Flujo de trabajo**
 
-### **4. Implementar tu solución:**
-```bash
-cd level-1/filter/           # Ir a la carpeta del ejercicio
-vim filter.c                 # Crear/editar tu solución
-# O usar cualquier editor: nano, code, etc.
-```
-
-### **5. Probar tu solución:**
-- Presiona **ENTER** en el terminal del script
-- El sistema **automáticamente**:
-  - Ejecuta `grademe/test.sh`
-  - Te dice si pasaste o fallaste
-  - Si pasas → marca como completado
-  - Si fallas → puedes intentar de nuevo
-
-### **6. Si fallas y necesitas ayuda:**
-```bash
-cd rendu3/filter/
-cat filter.c                 # Ver solución funcional validada
-# O revisar las versiones comentadas en rendu3/
-```
+1. El sistema te asigna/muestras un ejercicio y su enunciado
+2. Implementas tu solución en `level-X/ejercicio/`
+3. El sistema ejecuta automáticamente `grademe/test.sh`
+4. Si pasas → marca como completado y guarda en `rendu3/`
+5. Si fallas → puedes reintentar o consultar soluciones en `rendu3/`
 
 ---
 
-## 🔒 **Sistema de Protección de Soluciones**
+## 📚 Material Educativo
 
-### **Carpeta `rendu3/` = SOLUCIONES VALIDADAS**
-- Contiene **todas las soluciones funcionales** de los ejercicios
-- Son tu **referencia permanente** cuando te atascas
-- Incluye versiones comentadas y académicas
-- **NO se modifica** durante la práctica (protegida en git)
+### **Guías Generales** (raíz del proyecto)
+- **[HERRAMIENTAS_DEBUGGING.md](HERRAMIENTAS_DEBUGGING.md)** - gdb, valgrind, printf debugging, estrategias para el examen
+- **[REFERENCIA_RAPIDA.md](REFERENCIA_RAPIDA.md)** - Conceptos C (malloc, sizeof, punteros)
 
-### **Carpeta `rendu/` = ZONA DE TRABAJO**
-- Se **crea automáticamente** cuando ejecutas `exam.sh`
-- Es donde trabajas los ejercicios durante la práctica
-- **Ignorada en git** (no se sube al repositorio)
-- Se puede limpiar y recrear sin perder nada
+### **Guías por Ejercicio** (rendu3/)
+- **[readme_broken_gnl.md](rendu3/broken_GNL/readme_broken_gnl.md)** - 8 errores críticos explicados paso a paso
+- **[readme_ft_scanf.md](rendu3/ft_scanf/readme_ft_scanf.md)** - Argumentos variables, parsing, dudas frecuentes
+- **[readme_permutations.md](rendu3/permutations/readme_permutations.md)** - Backtracking con contador de frecuencias
 
-### **Carpetas `level-X/` = ENUNCIADOS Y TESTS**
-- Solo contienen subjects (enunciados) y tests
-- **NO contienen soluciones** (están en rendu3/)
-- Scripts de corrección automática en `grademe/`
+### **Comparativas**
+- **[COMPARATIVA_POWERSET_VS_PERMUTATIONS.md](rendu3/COMPARATIVA_POWERSET_VS_PERMUTATIONS.md)** - Cuándo usar máscaras vs recursión, checklist para el examen
 
 ---
 
-## 🧪 **Sistema de Tests**
+## 💡 Ejercicios Disponibles
 
-### **Tests automáticos en `grademe/test.sh`:**
+### **Level 1** (Básicos)
 
-#### **Level 1 (Tests completos):**
-- **filter**: Tests de reemplazo, casos edge, manejo de argumentos
-- **ft_scanf**: Tests de string, integer, character parsing
-- **broken_gnl**: Tests de lectura línea por línea con diferentes casos
+| Ejercicio | Descripción | Conceptos Clave |
+|-----------|-------------|-----------------|
+| **filter** | Reemplazo de strings con asteriscos | read, write, memmem, gestión memoria |
+| **ft_scanf** | Implementación de scanf (%s, %d, %c) | va_list, parsing, streams, construcción de números |
+| **broken_GNL** | Encontrar y reparar 8 errores en get_next_line | Debugging, punteros, unsigned/signed, EOF |
 
-#### **Level 2 (Tests básicos):**
-- **permutations, powerset, n_queens, rip, tsp**: Compilación + ejecución básica
-- Verificación manual del output requerida
+### **Level 2** (Avanzados)
 
-### **Busca tests en este orden:**
-1. `ejercicio/grademe/test.sh` (prioritario)
-2. `ejercicio/test.sh` (alternativo)
-3. `ejercicio/tester/run_exam.sh` (legacy)
-
----
-
-## 🔧 **init.sh - Generador de Entornos**
-
-### **Uso:**
-```bash
-./init.sh <nivel> <nombre_ejercicio>
-```
-
-### **Ejemplos:**
-```bash
-./init.sh 1 new_exercise      # Crear en level-1/
-./init.sh 2 advanced_algo     # Crear en level-2/
-```
-
-### **Qué crea automáticamente:**
-- 📁 Estructura de directorios
-- 🧪 `test_main.c` adaptado al tipo de ejercicio
-- ✅ `test.sh` con compilación y testing
-- 📋 `Makefile` con targets útiles
+| Ejercicio | Descripción | Conceptos Clave |
+|-----------|-------------|-----------------|
+| **permutations** | Generación de permutaciones en orden alfabético | Backtracking, contador de frecuencias, recursión |
+| **powerset** | Subconjuntos que suman un valor objetivo | Máscaras de bits o backtracking recursivo |
+| **n_queens** | Problema de las N reinas | Backtracking, validación de posiciones |
+| **rip** | Balanceo mínimo de paréntesis | Backtracking en dos fases, validación |
+| **tsp** | Traveling Salesman Problem | Permutaciones, distancia euclidiana, optimización |
 
 ---
 
-## 📊 **Seguimiento de Progreso**
+## 🔒 Sistema de Protección
 
-### **Archivos automáticos:**
-- `exam_progress/level1_done.txt` - Ejercicios Level 1 completados
-- `exam_progress/level2_done.txt` - Ejercicios Level 2 completados
+### **rendu3/** = Soluciones Validadas (Permanente)
+- ✅ Todas las soluciones funcionales verificadas
+- ✅ Versiones con y sin comentarios
+- ✅ READMEs educativos con explicaciones detalladas
+- ✅ **NUNCA se modifican** durante la práctica
+- ✅ Tu referencia cuando te atascas
 
-### **Ver progreso:**
+### **rendu/** = Zona de Trabajo (Temporal)
+- 🔧 Se crea automáticamente al practicar
+- 🔧 Espacio de trabajo para implementar soluciones
+- 🔧 **Ignorada en git** (no se sube al repositorio)
+- 🔧 Puede limpiarse sin perder nada importante
+
+---
+
+## 🧪 Sistema de Tests
+
+Todos los ejercicios incluyen tests automáticos en `grademe/test.sh`:
+
+### **Level 1** (Tests completos)
+- **filter**: Casos de reemplazo, edge cases, validación de argumentos
+- **ft_scanf**: Parsing de strings, integers, characters
+- **broken_GNL**: Lectura línea por línea, diferentes casos
+
+### **Level 2** (Tests básicos)
+- Compilación + ejecución básica
+- Verificación del output por el estudiante
+
+---
+
+## 📊 Seguimiento de Progreso
+
+El sistema mantiene registro automático en:
+- `exam_progress/level1_done.txt`
+- `exam_progress/level2_done.txt`
+
+**Ver progreso:**
 ```bash
 ./exam.sh → Opción 5
 ```
 
-### **Resetear progreso:**
+**Resetear progreso:**
 ```bash
 ./exam.sh → Opción 6
 ```
 
 ---
 
-## 🎓 **Ejercicios Disponibles**
+## 🛠️ Consejos para el Examen
 
-### **Level 1 (Básicos) - ✅ COMPLETADOS**
-- **filter** - Reemplazo de strings con asteriscos
-- **ft_scanf** - Implementación de scanf con %s, %d, %c
-- **broken_gnl** - Debugging de get_next_line
+### **Antes de empezar**
+1. Lee completamente el enunciado
+2. Identifica las funciones permitidas
+3. Planifica tu solución antes de codificar
 
-### **Level 2 (Avanzados) - 🔄 EN PROGRESO**
-- **permutations** - Generación de permutaciones lexicográficas
-- **powerset** - Generación de subconjuntos ordenados
-- **n_queens** - Problema de las N reinas con backtracking
-- **rip** - Balanceo de paréntesis
-- **tsp** - Traveling Salesman Problem
+### **Durante el desarrollo**
+1. Compila frecuentemente: `gcc -Wall -Wextra -Werror archivo.c`
+2. Prueba casos edge: NULL, vacío, límites
+3. Usa debugging: consulta [HERRAMIENTAS_DEBUGGING.md](HERRAMIENTAS_DEBUGGING.md)
 
----
-
-## ⚙️ **Configuración y Personalización**
-
-### **Colores del terminal:**
-Los scripts usan colores ANSI estándar. Si tienes problemas, verifica que tu terminal los soporte.
-
-### **Modificar tests:**
-Puedes personalizar los tests editando los archivos `grademe/test.sh` de cada ejercicio.
-
-### **Añadir nuevos ejercicios:**
-1. Usar `./init.sh` para crear la estructura
-2. Añadir el ejercicio a la lista en `exam.sh` (líneas 22-23)
+### **Si te atascas**
+1. Revisa el README del ejercicio en `rendu3/`
+2. Consulta soluciones comentadas
+3. Compara tu enfoque con las soluciones de referencia
 
 ---
 
-## 🆘 **Resolución de Problemas**
+## ⚙️ Compilación
+
+### **Flags estándar**
+```bash
+gcc -Wall -Wextra -Werror archivo.c -o programa
+```
+
+### **Con debugging**
+```bash
+gcc -Wall -Wextra -Werror -g archivo.c -o programa
+```
+
+### **Con librerías matemáticas** (tsp)
+```bash
+gcc -Wall -Wextra -Werror archivo.c -lm -o programa
+```
+
+---
+
+## 🆘 Resolución de Problemas
 
 ### **Error: "No se encontró script de test"**
-Verifica que existe `grademe/test.sh` y tiene permisos de ejecución:
 ```bash
 chmod +x level-X/ejercicio/grademe/test.sh
 ```
 
 ### **Error de compilación**
-Verifica:
-- Nombre del archivo correcto (ej: `filter.c`, no `Filter.c`)
-- Sintaxis C correcta
-- Funciones permitidas según el subject
+- Verifica nombre del archivo (case-sensitive)
+- Revisa funciones permitidas en el subject
+- Compila con flags: `-Wall -Wextra -Werror`
 
-### **El script no encuentra mis archivos**
-Asegúrate de estar trabajando en la carpeta correcta del ejercicio, NO en `solutions/`.
-
----
-
-## 📝 **Notas Importantes**
-
-### **🔒 Protección de datos:**
-- Tus soluciones validadas están protegidas en `rendu3/`
-- El sistema NUNCA modifica archivos en `rendu3/` durante la práctica
-- Puedes practicar sin miedo a perder tu trabajo
-
-### **🎯 Zona de trabajo:**
-- El script crea automáticamente `rendu/ejercicio/` cuando practicas
-- Trabaja en esa carpeta temporal
-- Los archivos en `rendu/` NO se suben a git (están ignorados)
-
-### **📚 Compatibilidad:**
-- Sistema basado en martamakes/42-exam-rank-42
-- Compatible con estructura estándar de 42 School
-- Tests adaptados a los requisitos específicos de cada ejercicio
+### **Segmentation fault**
+Consulta [HERRAMIENTAS_DEBUGGING.md](HERRAMIENTAS_DEBUGGING.md) para usar gdb/valgrind
 
 ---
 
-## 🤝 **Créditos**
+## 🤝 Contribución
 
-- Basado en: [martamakes/42-exam-rank-42](https://github.com/martamakes/42-exam-rank-42)
-- Adaptado para: Exam Rank 03
-- Ejercicios implementados por: [Tu nombre]
-- Sistema de automatización: Configurado para tu flujo de trabajo
+Este repositorio está estructurado para ser:
+- ✅ Educativo: READMEs detallados por ejercicio
+- ✅ Profesional: Código limpio con comentarios útiles
+- ✅ Práctico: Sistema automatizado de validación
+- ✅ Completo: Múltiples enfoques de solución donde aplica
 
 ---
 
-## 🚀 **¡Empezar a Practicar!**
+## 📝 Notas Importantes
+
+- **Protección de soluciones**: `rendu3/` está protegido, practica sin miedo
+- **Zona de trabajo**: `rendu/` se ignora en git, es temporal
+- **Tests automáticos**: Validan tu código igual que en el examen real
+- **Material educativo**: READMEs explican conceptos difíciles paso a paso
+
+---
+
+## 🚀 ¡Comienza Ahora!
 
 ```bash
-cd /home/ubuntu/projects/42-exam-rank-42/new-exams/exam-rank-03/
 ./exam.sh
-# ¡Selecciona una opción y a practicar! 🎯
 ```
 
 **¡Buena suerte en tu preparación para el examen! 🍀**
