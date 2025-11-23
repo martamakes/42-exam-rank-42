@@ -1,0 +1,48 @@
+Assignment name : broken_GNL
+Expected files  : get_next_line.c get_next_line.h
+Allowed functions : read, free, malloc
+--------------------------------------------------------------------------------
+Repair the function ‘get_next_line’ in the file get_next_line.c, whose prototype should be:
+char *get_next_line(int fd);
+
+You may need to repair other functions as well.
+
+Description of the ‘get_next_line’ function:
+
+Your function must return a line that has been read from the file descriptor
+passed as a parameter.
+
+A ‘line that has been read’ is defined as a succession of 0 to n characters
+ending with ‘\n’ (ASCII code 0x0a) or with End of File (EOF).
+
+The line should be returned including the ‘\n’ if there is one at the end
+of the line that has been read.
+
+When you reach the EOF, you must store the current buffer in a char * and
+return it. If the buffer is empty, you must return NULL.
+
+In case of an error, return NULL.
+
+If not returning NULL, the pointer should be freeable.
+
+Your program will be compiled with the flag -D BUFFER_SIZE=xx, which must be
+used as the buffer size for the read calls in your functions.
+
+Your function must be free of memory leaks.
+
+When you reach the EOF, your function should not keep any memory allocated with
+malloc except for the line that has been returned.
+
+Calling your function get_next_line in a loop will allow you to read
+the text available on a file descriptor one line at a time until the end of the
+text, regardless of the size of the text or any of its lines.
+
+Make sure that your function behaves correctly when reading from a file, from the
+standard output, from a redirection etc.
+
+No call to another function will be done on the file descriptor between two calls
+of get_next_line.
+
+Finally, we consider that get_next_line has undefined behavior when reading
+from a binary file.
+--------------------------------------------------------------------------------

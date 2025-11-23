@@ -4,11 +4,31 @@
 exam_progress/
 rendu/
 a.out
+*.out
 p
 .vscode/
 extra/progress/
-.progress/
-*.dSYM
-a.out.dSYM/
-test
-vbc
+
+# Documentación privada (no subir al fork)
+new-exams/exam-rank-03/docs/
+
+# Ejecutables compilados
+**/filter
+!**/filter/
+**/powerset
+!**/powerset/
+**/ft_scanf
+!**/ft_scanf/
+**/n_queens
+!**/n_queens/
+**/permutations
+!**/permutations/
+**/tsp
+!**/tsp/
+**/rip
+!**/rip/
+**/gnl_test
+**/gnl_original
+**/broken_gnl
+!**/broken_gnl/
+!**/broken_GNL/
