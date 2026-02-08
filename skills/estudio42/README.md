@@ -65,6 +65,7 @@ El skill:
 - **"dame una pista"** → Siguiente nivel de pista (1-7)
 - **"revisa mi código"** → Análisis constructivo sin dar solución
 - **"¿por qué este error?"** → Explica errores de compilación
+- **"ayúdame con el main"** → Te guía para escribir el main de test (modo socrático)
 - **"añade mi tip: [texto]"** → Guarda un consejo personal
 - **"escríbelo tú"** → Excepción: Claude escribe código
 - **"siguiente ejercicio"** → Cambia de ejercicio
@@ -308,6 +309,7 @@ The skill:
 - **"give me a hint"** → Next hint level (1-7)
 - **"review my code"** → Constructive analysis without giving solution
 - **"why this error?"** → Explains compilation errors
+- **"help me with the main"** → Guides you to write test main (Socratic mode)
 - **"add my tip: [text]"** → Saves a personal tip
 - **"write it for me"** → Exception: Claude writes code
 - **"next exercise"** → Change exercise

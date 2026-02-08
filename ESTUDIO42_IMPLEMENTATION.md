@@ -31,6 +31,7 @@
 ### Documentación
 - ✅ `ESTUDIO42_QUICKSTART.md` - Guía rápida bilingüe
 - ✅ `ESTUDIO42_IMPLEMENTATION.md` - Este archivo
+- ✅ `EJEMPLO_AYUDA_MAIN.md` - Ejemplo completo del comando "ayúdame con el main"
 
 ### Actualización de .gitignore
 - ✅ Añadidas reglas para excluir config.json y progress.json
@@ -73,6 +74,13 @@
   - Pistas usadas por ejercicio
   - Ejercicios completados
 
+- ✅ **Ayuda con mains de test** (NUEVO)
+  - Comando "ayúdame con el main"
+  - Guía socrática para crear tests
+  - Extrae casos de prueba del subject
+  - No genera código, guía con preguntas
+  - Enfoque: solo probar lo que pide el subject
+
 - ✅ **Sistema de 7 niveles de pistas**
   1. Pregunta diagnóstica
   2. Pregunta específica
@@ -98,6 +106,7 @@ Durante sesión `/estudio42`:
 | `dame una pista` | Siguiente nivel (1-7) | ✅ Lógica en prompts |
 | `revisa mi código` | Análisis constructivo | ✅ Modo de lectura |
 | `¿por qué este error?` | Modo debug | ✅ Explicación de errores |
+| `ayúdame con el main` | Guía para main test | ✅ Modo socrático |
 | `añade mi tip: [texto]` | Guarda consejo | ✅ generator.addUserTip() |
 | `escríbelo tú` | Excepción: escribir | ✅ En reglas |
 | `mi progreso` | Stats | ✅ progress.json |

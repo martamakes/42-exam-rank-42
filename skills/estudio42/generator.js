@@ -52,6 +52,15 @@ function generateTipsFromSubject(exerciseInfo, subjectContent, language = 'es') 
       complexityLabel: '\n**Complejidad:**',
       allowedLabel: '\n**Allowed functions:**',
       approachSection: '\n## 🎯 Enfoque Sugerido (7 Niveles de Pistas)\n\n',
+      testSection: '\n## 🧪 Casos de Prueba del Subject\n\n',
+      testGuidance: `
+**Cuando digas "ayúdame con el main", te guiaré con preguntas:**
+- ¿Qué casos del subject necesitas probar?
+- ¿Qué output esperas para cada caso?
+- ¿Qué funciones auxiliares necesitas?
+
+Solo prueba lo que el subject pide. No inventes edge cases adicionales.
+`,
       userSection: '\n## 👤 Tips de Usuarios\n\n',
       waitingTip: '[Esperando tu primer tip personal]\n\n',
       collaborative: '[Otros usuarios añadirán sus tips aquí sin borrar los tuyos]\n'
@@ -65,6 +74,15 @@ function generateTipsFromSubject(exerciseInfo, subjectContent, language = 'es') 
       complexityLabel: '\n**Complexity:**',
       allowedLabel: '\n**Allowed functions:**',
       approachSection: '\n## 🎯 Suggested Approach (7 Hint Levels)\n\n',
+      testSection: '\n## 🧪 Subject Test Cases\n\n',
+      testGuidance: `
+**When you say "help me with the main", I'll guide you with questions:**
+- What cases from the subject do you need to test?
+- What output do you expect for each case?
+- What helper functions do you need?
+
+Only test what the subject asks. Don't invent additional edge cases.
+`,
       userSection: '\n## 👤 User Tips\n\n',
       waitingTip: '[Waiting for your first personal tip]\n\n',
       collaborative: '[Other users will add their tips here without deleting yours]\n'
@@ -105,6 +123,11 @@ function generateTipsFromSubject(exerciseInfo, subjectContent, language = 'es') 
   // Add approach section with hint levels template
   content += t.approachSection;
   content += generateHintLevelsTemplate(exerciseInfo, subjectContent, language);
+
+  // Add test cases section
+  content += t.testSection;
+  content += extractTestCases(subjectContent, language);
+  content += t.testGuidance;
 
   // Add user tips section
   content += t.userSection;
@@ -198,6 +221,41 @@ function estimateComplexity(exerciseInfo, subject) {
   }
 
   return 'Media';
+}
+
+/**
+ * Extracts test cases from subject
+ */
+function extractTestCases(subject, language = 'es') {
+  const templates = {
+    es: {
+      found: 'El subject muestra estos ejemplos:\n\n',
+      notFound: 'Busca la sección de ejemplos en el subject.\n\n'
+    },
+    en: {
+      found: 'The subject shows these examples:\n\n',
+      notFound: 'Look for the examples section in the subject.\n\n'
+    }
+  };
+
+  const t = templates[language];
+
+  // Look for examples section
+  const examplesMatch = subject.match(/(?:Examples?|For example)[:\s]+([\s\S]*?)(?=\n\n|Hints?:|$)/i);
+
+  if (examplesMatch) {
+    const examples = examplesMatch[1].trim();
+    return t.found + '```\n' + examples + '\n```\n\n';
+  }
+
+  // Look for code blocks that might be examples
+  const codeBlockMatch = subject.match(/```[\s\S]*?```|(?:int\s+main|void\s+\w+)\s*\([^)]*\)\s*{[\s\S]*?}/g);
+
+  if (codeBlockMatch && codeBlockMatch.length > 0) {
+    return t.found + codeBlockMatch.join('\n\n') + '\n\n';
+  }
+
+  return t.notFound;
 }
 
 /**

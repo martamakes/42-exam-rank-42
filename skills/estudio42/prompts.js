@@ -16,6 +16,7 @@ Comandos disponibles:
 - "dame una pista" → Siguiente nivel de pista
 - "revisa mi código" → Análisis constructivo
 - "¿por qué este error?" → Modo debug activado
+- "ayúdame con el main" → Guía para escribir main de test
 - "añade mi tip: [texto]" → Guarda tu consejo personal
 - "escríbelo tú" → Excepción: escribo código
 - "siguiente ejercicio" → Cambiar de ejercicio
@@ -51,6 +52,7 @@ Available commands:
 - "give me a hint" → Next hint level
 - "review my code" → Constructive analysis
 - "why this error?" → Debug mode activated
+- "help me with the main" → Guide to write test main
 - "add my tip: [text]" → Save your personal advice
 - "write it for me" → Exception: I write code
 - "next exercise" → Change exercise
