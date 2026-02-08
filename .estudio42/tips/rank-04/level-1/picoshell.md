@@ -292,6 +292,71 @@ Problema: "Leak de FDs"
 → Asegúrate de cerrar en padre E hijos
 ```
 
+## 🧪 Casos de Prueba del Subject
+
+El subject muestra ejemplos específicos que DEBEN funcionar:
+
+### Ejemplo 1: Pipeline simple (2 comandos)
+```bash
+./picoshell /bin/ls "|" /usr/bin/grep picoshell
+# Output esperado: picoshell
+```
+
+**¿Qué prueba?**
+- 2 comandos: ls | grep
+- Output de ls va al input de grep
+- Rutas completas (/bin/ls, /usr/bin/grep)
+
+### Ejemplo 2: Pipeline de 3 comandos
+```bash
+./picoshell echo 'squalala' "|" cat "|" sed 's/a/b/g'
+# Output esperado: squblblb
+```
+
+**¿Qué prueba?**
+- 3 comandos encadenados: echo | cat | sed
+- Transformación de datos a través del pipe
+- El sed debe recibir correctamente el output
+
+### Tu Main de Test - Guía Socrática
+
+**El subject dice: "you will find in this directory a file main.c"**
+
+1. **Primero:** Busca si hay main.c en el directorio del ejercicio
+2. **Si existe:** Úsalo como base (ya convierte argv en cmds[])
+3. **Si no existe:** Te guiaré para crearlo
+
+**Cuando digas "ayúdame con el main", te preguntaré:**
+
+1. ¿Encontraste el main.c de ejemplo?
+2. ¿Entiendes cómo convierte argv en cmds[]?
+3. ¿Qué casos del subject necesitas probar? (los 2 ejemplos de arriba)
+4. ¿Cómo parsea el "|" para separar comandos?
+
+**NO necesitas probar:**
+- Pipes con 10 comandos
+- Comandos que no existen
+- Todos los edge cases imaginables
+
+**SÍ necesitas probar:**
+- Los 2 ejemplos del subject (2 y 3 comandos)
+- Que el output sea el esperado
+- Que los pipes conecten correctamente
+
+### Estructura del cmds[] según el subject
+
+```c
+// Para: ls | grep picoshell
+char **cmds[] = {
+    (char *[]){"/bin/ls", NULL},
+    (char *[]){"grep", "picoshell", NULL},
+    NULL
+};
+```
+
+Cada comando es un array de strings (argv para execvp).
+cmds[] es un array de estos arrays, terminado en NULL.
+
 ## 📚 Recursos Adicionales
 
 ### Visualización del Pipeline

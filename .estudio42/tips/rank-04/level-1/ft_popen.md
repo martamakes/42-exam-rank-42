@@ -243,6 +243,66 @@ Padre (type='w'):
 - Si norminette falla → Revisa longitud de línea
 ```
 
+## 🧪 Casos de Prueba del Subject
+
+El subject muestra dos ejemplos de uso:
+
+### Ejemplo 1: Leer output de comando
+```c
+int main() {
+    int  fd;
+    char *line;
+
+    fd = ft_popen("ls", (char *const []){"ls", NULL}, 'r');
+    while ((line = get_next_line(fd)))
+        ft_putstr(line);
+    return (0);
+}
+```
+
+**¿Qué prueba este caso?**
+- type='r' (lectura del output)
+- Comando simple: `ls`
+- Leer línea por línea con get_next_line
+- El padre LEE lo que el hijo ESCRIBE
+
+### Ejemplo 2: Pipeline con grep
+```c
+int main() {
+    int  fd = ft_popen("ls", (char *const []){"ls", NULL}, 'r');
+    dup2(fd, 0);  // Conecta output de ls al stdin
+    fd = ft_popen("grep", (char *const []){"grep", "c", NULL}, 'r');
+    char *line;
+    while ((line = get_next_line(fd)))
+        printf("%s", line);
+}
+```
+
+**¿Qué prueba este caso?**
+- Encadenar dos ft_popen (ls | grep)
+- dup2 para redirigir output de uno al stdin del otro
+- type='r' en ambos casos
+
+### Tu Main de Test - Guía Socrática
+
+**Cuando digas "ayúdame con el main", te preguntaré:**
+
+1. ¿Qué casos del subject necesitas probar?
+2. ¿Tienes get_next_line implementado? (lo necesitas para leer)
+3. ¿Cómo verificarás que funciona type='r'?
+4. ¿Necesitas probar type='w'?
+5. ¿Qué comando simple usarás para probar? (ls, echo, cat...)
+
+**NO necesitas probar:**
+- Todos los edge cases imaginables
+- NULL pointers (el subject no lo menciona)
+- Comandos complejos
+
+**SÍ necesitas probar:**
+- Los casos que están en el subject
+- Que el fd retornado funcione
+- Que puedas leer/escribir según type
+
 ## 📚 Recursos Adicionales
 
 ### Man Pages Críticas

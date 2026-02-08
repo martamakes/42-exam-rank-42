@@ -5,5 +5,10 @@
   "main": "index.js",
   "keywords": ["42", "education", "tutor", "exam", "socratic"],
   "author": "mvigara-",
-  "license": "MIT"
+  "license": "MIT",
+  "claude": {
+    "skillType": "prompt",
+    "invocations": ["/estudio42", "/study42"],
+    "description": "Activates Socratic tutor mode for 42 School exercises"
+  }
 }

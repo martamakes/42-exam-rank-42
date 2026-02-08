@@ -34,6 +34,7 @@ El tutor **NO escribe código** por ti (salvo que digas "escríbelo tú"). En su
 | `dame una pista` | Siguiente nivel de pista (1→7) |
 | `revisa mi código` | Análisis constructivo |
 | `¿por qué este error?` | Modo debug (explica error) |
+| `ayúdame con el main` | Te guía para escribir main de test |
 | `añade mi tip: [texto]` | Guarda consejo personal |
 | `escríbelo tú` | Excepción: Claude escribe |
 | `mi progreso` | Muestra estadísticas |
@@ -181,6 +182,7 @@ The tutor **DOES NOT write code** for you (unless you say "write it for me"). In
 | `give me a hint` | Next hint level (1→7) |
 | `review my code` | Constructive analysis |
 | `why this error?` | Debug mode (explains error) |
+| `help me with the main` | Guides you to write test main |
 | `add my tip: [text]` | Save personal advice |
 | `write it for me` | Exception: Claude writes |
 | `my progress` | Show statistics |
