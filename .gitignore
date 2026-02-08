@@ -12,3 +12,9 @@ extra/progress/
 a.out.dSYM/
 test
 vbc
+
+# Estudio42 skill personal data (keep tips if you want to share)
+.estudio42/config.json
+.estudio42/progress.json
+# Uncomment to ignore tips too:
+# .estudio42/tips/
