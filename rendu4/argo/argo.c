@@ -211,14 +211,16 @@ int parse_object(json *dst, FILE *stream)
 			return -1;
 		}
 		
-		// Add pair to array
-		dst->map.data = realloc(dst->map.data, (dst->map.size + 1) * sizeof(pair));
-		if (!dst->map.data)
+		// Add pair to array (usar tmp: realloc devuelve NULL en error sin liberar el original)
+		pair *tmp = realloc(dst->map.data, (dst->map.size + 1) * sizeof(pair));
+		if (!tmp)
 		{
 			free_json(key_json);
 			free_json(value_json);
+			free_json(*dst);
 			return -1;
 		}
+		dst->map.data = tmp;
 		
 		dst->map.data[dst->map.size].key = key_json.string;
 		dst->map.data[dst->map.size].value = value_json;
@@ -254,6 +256,61 @@ int parse_value(json *dst, FILE *stream)
 		unexpected(stream);
 		return -1;
 	}
+}
+
+// declaración anticipada (main llama a argo que está definido después)
+int argo(json *dst, FILE *stream);
+
+// --- SERIALIZE y MAIN (dados en el subject) ---
+
+void	serialize(json j)
+{
+	switch (j.type)
+	{
+		case INTEGER:
+			printf("%d", j.integer);
+			break ;
+		case STRING:
+			putchar('"');
+			for (int i = 0; j.string[i]; i++)
+			{
+				if (j.string[i] == '\\' || j.string[i] == '"')
+					putchar('\\');
+				putchar(j.string[i]);
+			}
+			putchar('"');
+			break ;
+		case MAP:
+			putchar('{');
+			for (size_t i = 0; i < j.map.size; i++)
+			{
+				if (i != 0)
+					putchar(',');
+				serialize((json){.type = STRING, .string = j.map.data[i].key});
+				putchar(':');
+				serialize(j.map.data[i].value);
+			}
+			putchar('}');
+			break ;
+	}
+}
+
+int	main(int argc, char **argv)
+{
+	if (argc != 2)
+		return 1;
+	FILE *stream = fopen(argv[1], "r");
+	json file;
+	if (argo(&file, stream) != 1)
+	{
+		free_json(file);
+		return 1;
+	}
+	serialize(file);
+	printf("\n");
+	free_json(file);
+	fclose(stream);
+	return 0;
 }
 
 // Main parsing function
