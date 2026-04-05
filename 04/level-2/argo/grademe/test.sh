@@ -36,8 +36,10 @@ TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
 # Copiar archivos necesarios
-cp "$STUDENT_DIR"/* "$TEMP_DIR"
+cp "$STUDENT_DIR/argo.c" "$TEMP_DIR"
 cp test_main.c "$TEMP_DIR"
+# Copiar argo.h si existe en el directorio del estudiante
+[ -f "$STUDENT_DIR/argo.h" ] && cp "$STUDENT_DIR/argo.h" "$TEMP_DIR"
 
 # Ir al directorio temporal
 cd "$TEMP_DIR"

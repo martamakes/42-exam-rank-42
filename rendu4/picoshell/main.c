@@ -1,14 +1,12 @@
-#include <stdio.h>                                                  
-                                                                    
-int picoshell(char **cmds[]);                                       
+int picoshell(char **cmds[]);                                 
                                                                     
 int main(void)                                                      
 {
     // test 2
     char *cmd2[] = {"grep", "picoshell", NULL};
-    char **cmds[] = {cmd1, cmd2, NULL};
+    //char **cmds[] = {cmd1, cmd2, NULL};
 
-    return picoshell(cmds);
+    return picoshell(cmd2);
 }
 
 /*
