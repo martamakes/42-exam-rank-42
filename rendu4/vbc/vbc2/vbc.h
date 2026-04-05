@@ -1,5 +1,5 @@
 #ifndef VBC_H
-#define VBC_H
+# define VBC_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,14 +16,9 @@ typedef struct node {
     struct node *r;
 }   node;
 
-node *parse_expr(char **s);
-node *parse_factor(char **s);
-node *parse_val(char **s);
-
-int expect(char **s, char c);
-int accept(char **s, char c);
-void    unexpected(char c);
-void    destroy_tree(node *n);
-node    *new_node(node n);
+node *parse_factor(char **s);                                                                         
+node *parse_mul(char **s);                                                                            
+node *parse_add(char **s);                                                                          
+node *parse_expr(char *s);  
 
 #endif
