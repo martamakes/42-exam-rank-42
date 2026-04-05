@@ -1,72 +1,67 @@
-#include <unistd.h>
-#include <sys/wait.h>
 #include <stdbool.h>
-#include <signal.h>
+#include <unistd.h>
 #include <stdio.h>
-#include <string.h>
+#include  <sys/wait.h>
 #include <stdlib.h>
+#include <string.h>
+#include <signal.h>
 
-static void	handle_alrm(int sig)
+void handler(int sig){ (void)sig; }
+
+int sandbox(void (*f)(void), unsigned int timeout, bool verbose)
 {
-	(void)sig;
-	// handler vacío: solo interrumpe waitpid con EINTR
-}
+    if(!f)
+        return -1;
+    
+    //conf SIGACTION
+    struct sigaction sa = {0};
+    sa.sa_handler = handler;
+    sigaction(SIGALRM, &sa, NULL);
 
-int	sandbox(void (*f)(void), unsigned int timeout, bool verbose)
-{
-	pid_t				pid;
-	int					status;
-	int					ret;
-	struct sigaction	sa;
-	struct sigaction	old_sa;
 
-	if (!f)
-		return (-1);
-	pid = fork();
-	if (pid == -1)
-		return (-1);
-	if (pid == 0) // HIJO: ejecutar f y salir limpio
-	{
-		f();
-		_exit(0); // _exit no vacía buffers de stdio (evita doble output al hacer fork)
-	}
-	// PADRE: instalar handler de SIGALRM sin SA_RESTART
-	// así alarm() interrumpe waitpid() con EINTR cuando expira el tiempo
-	sa.sa_handler = handle_alrm;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0; // sin SA_RESTART es clave
-	sigaction(SIGALRM, &sa, &old_sa);
-	alarm(timeout);
-	ret = waitpid(pid, &status, 0);
-	alarm(0); // cancelar alarma pendiente
-	sigaction(SIGALRM, &old_sa, NULL); // restaurar handler original
+    pid_t pid = fork();
+    if(pid == -1) return -1;
+    
+    if(pid == 0)
+    {
+        f();
+        exit (0);
+    }
+    int status;
+    alarm(timeout); //arranca timeout
+    int ret = waitpid(pid, &status, 0);
+    alarm(0); //cancela si termina antes
 
-	if (ret == -1) // waitpid interrumpido → timeout
-	{
-		kill(pid, SIGKILL);
-		waitpid(pid, NULL, 0); // recoger zombie
-		if (verbose)
-			printf("Bad function: timed out after %u seconds\n", timeout);
-		return (0);
-	}
-	if (WIFEXITED(status))
-	{
-		int code = WEXITSTATUS(status);
-		if (code == 0)
-		{
-			if (verbose)
-				printf("Nice function!\n");
-			return (1);
-		}
-		if (verbose)
-			printf("Bad function: exited with code %d\n", code);
-		return (0);
-	}
-	if (WIFSIGNALED(status))
-	{
-		if (verbose)
-			printf("Bad function: %s\n", strsignal(WTERMSIG(status)));
-		return (0);
-	}
-	return (-1);
+    if(ret == -1) //timeout
+    {
+        kill(pid, SIGKILL); //matar hijo
+        waitpid(pid, NULL, 0); //recojo zombie
+        if(verbose) printf("Bad function: timed out after %u seconds\n", timeout);
+        return 0;
+    }
+
+    if(WIFEXITED(status))
+    {
+        int code = WEXITSTATUS(status);
+        if(code == 0)
+        {
+            //nice
+            if(verbose) printf("Nice function!\n");
+            return 1;
+        }
+        else
+        {
+            //bad
+            if(verbose) printf("Bad function: exited with code %d\n", code);
+            return 0;
+        }
+    }
+    else if(WIFSIGNALED(status))
+    {
+        //recurperar señal error
+        char *code = strsignal(WTERMSIG(status));
+        if(verbose) printf("Bad function: %s\n",code);
+        return 0;
+    }
+    return -1;
 }
