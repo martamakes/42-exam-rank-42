@@ -28,12 +28,3 @@ picoshell
 ./picoshell echo 'squalala' "|" cat "|" sed 's/a/b/g'
 squblblb
 
-___________________________________________________________________
-
-Old summary by a student:
-You are given a main function. It converts received arguments into cmds array
-of strings. When there is a pipe the commands after the pipe are in the next
-array of strings. You have to create a pipeline using the cmds you receive from
-the main, and execute them. If there is any error the function should return 1.
-Close all FFS before returning. If the cmds executed successfully wait all
-child processes and return 0.
