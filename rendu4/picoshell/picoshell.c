@@ -39,7 +39,7 @@ int picoshell(char **cmds[])
 			// El hijo leerá la salida del comando previo como si fuera el teclado
 			if (prev_fd != -1)
 			{
-				dup2(prev_fd, STDIN_FILENO);
+				dup2(prev_fd, 0);
 				close(prev_fd);
 			}
 
@@ -48,7 +48,7 @@ int picoshell(char **cmds[])
 			if (cmds[i + 1])
 			{
 				close(fd[0]);                   // el hijo no lee de este pipe
-				dup2(fd[1], STDOUT_FILENO);     // stdout → pipe
+				dup2(fd[1], 1);     // stdout → pipe
 				close(fd[1]);
 			}
 
