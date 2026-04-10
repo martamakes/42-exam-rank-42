@@ -77,27 +77,22 @@ node *parse_add(char **s)
 }
 node *parse_mul(char **s)
 {
-    node *left = parse_factor(s);
-    if(!left)
-        return NULL;
+    node *l = parse_factor(**s);
+    if(!l) return NULL;
     while(accept(s, '*'))
     {
-        node *right = parse_factor(s);
-        if(!right)
+        node *r = parse_factor(**s);
+        if(!r) {destroy_tree(r); return NULL;}
+        node *t = new_node((node){.type = MULTI, .l = l, .r = r});
+        if(!t)
         {
-            destroy_tree(left);
+            destroy_tree(l);
+            destroy_tree(r);
             return NULL;
         }
-        node *tmp = new_node((node){.type = MULTI, .l = left, .r = right});                                                                                                  
-        if (!tmp)                                                                                                                                                            
-        {
-            destroy_tree(left);                                                                                                                                              
-            destroy_tree(right);                                                                                                                                           
-            return NULL;
-        }
-        left = tmp;
+        l = t;
     }
-    return left;
+    return l;
 }
 node *parse_factor(char **s)
 {
