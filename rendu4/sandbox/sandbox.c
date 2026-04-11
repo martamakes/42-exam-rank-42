@@ -5,15 +5,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/errno.h>
 
-void handler(int sig){ (void)sig; }
+volatile sig_atomic_t g_timeout;
+void handler(int sig){ (void)sig; g_timeout = 1;}
 
 int sandbox(void (*f)(void), unsigned int timeout, bool verbose)
 {
     if(!f)
         return -1;
     
-    //g_timeout = 0;
+    g_timeout = 0;
         //conf SIGACTION
     struct sigaction sa = {0};
     sa.sa_handler = handler;
@@ -31,15 +33,17 @@ int sandbox(void (*f)(void), unsigned int timeout, bool verbose)
     int status;
     alarm(timeout); //arranca timeout
     int ret = waitpid(pid, &status, 0);
+    int val_err = errno;
     alarm(0); //cancela si termina antes
 
-    if(ret == -1) //timeout
+    if(ret == -1 && val_err == EINTR && g_timeout ) //timeout
     {
         kill(pid, SIGKILL); //matar hijo
         waitpid(pid, NULL, 0); //recojo zombie
         if(verbose) printf("Bad function: timed out after %u seconds\n", timeout);
         return 0;
     }
+    if(ret == -1) return -1;
 
     if(WIFEXITED(status))
     {
