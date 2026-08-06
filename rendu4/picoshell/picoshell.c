@@ -1,116 +1,75 @@
-#include <unistd.h>
-#include <sys/wait.h>
 #include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int picoshell(char **cmds[])
 {
-    // Paso 1: Validaci�n b�sica
-    if (!cmds || !cmds[0])
-        return 1;
-    
-    // Contar cu�ntos comandos tenemos
-    int cmd_count = 0;
-    while (cmds[cmd_count])
-        cmd_count++;
-    
-    // Si solo hay un comando, caso especial (sin pipes)
-    if (cmd_count == 1)
-    {
-        pid_t pid = fork();
-        if (pid == 0)
-        {
-            // Proceso hijo: ejecutar el comando
-            execvp(cmds[0][0], cmds[0]);
-            exit(1); // Si execvp falla
-        }
-        else if (pid > 0)
-        {
-            // Proceso padre: esperar al hijo
-            int status;
-            wait(&status);
-            return 0;
-        }
-        else
-        {
-            // Error en fork
-            return 1;
-        }
-    }
-    
-    // Múltiples comandos: necesitamos pipeline
-    int pipes[cmd_count - 1][2]; // Array de pipes
-    pid_t pids[cmd_count]; // Array de PIDs de procesos hijos
-    
-    // Crear todos los pipes
-    for (int i = 0; i < cmd_count - 1; i++)
-    {
-        if (pipe(pipes[i]) == -1)
-        {
-            // Error: cerrar pipes ya creados
-            for (int j = 0; j < i; j++)
-            {
-                close(pipes[j][0]);
-                close(pipes[j][1]);
-            }
-            return 1;
-        }
-    }
-    
-    // Crear procesos hijos para cada comando
-    for (int i = 0; i < cmd_count; i++)
-    {
-        pids[i] = fork();
-        if (pids[i] == 0)
-        {
-            // Proceso hijo
-            // Conectar stdin si no es el primer comando
-            if (i > 0)
-            {
-                dup2(pipes[i-1][0], STDIN_FILENO);
-            }
-            
-            // Conectar stdout si no es el último comando
-            if (i < cmd_count - 1)
-            {
-                dup2(pipes[i][1], STDOUT_FILENO);
-            }
-            
-            // Cerrar todos los pipes en el hijo
-            for (int j = 0; j < cmd_count - 1; j++)
-            {
-                close(pipes[j][0]);
-                close(pipes[j][1]);
-            }
-            
-            // Ejecutar el comando
-            execvp(cmds[i][0], cmds[i]);
-            exit(1); // Si execvp falla
-        }
-        else if (pids[i] == -1)
-        {
-            // Error en fork: cerrar todos los pipes y matar procesos previos
-            for (int j = 0; j < cmd_count - 1; j++)
-            {
-                close(pipes[j][0]);
-                close(pipes[j][1]);
-            }
-            return 1;
-        }
-    }
-    
-    // Proceso padre: cerrar todos los pipes
-    for (int i = 0; i < cmd_count - 1; i++)
-    {
-        close(pipes[i][0]);
-        close(pipes[i][1]);
-    }
-    
-    // Esperar a todos los procesos hijos
-    for (int i = 0; i < cmd_count; i++)
-    {
-        int status;
-        wait(&status);
-    }
-    
-    return 0;
+	// Caso de error: no hay comandos
+	if (!cmds || !cmds[0])
+		return 1;
+
+	int		fd[2];       // pipe actual: fd[0]=lectura, fd[1]=escritura
+	int		prev_fd = -1; // lectura del pipe ANTERIOR (-1 = no hay, es el primer comando)
+	int		i = 0;
+	pid_t	pid;
+
+	while (cmds[i])
+	{
+		// Creamos pipe solo si hay un comando siguiente que reciba la salida
+		// Ej: "ls | grep" necesita pipe. Solo "ls" no.
+		if (cmds[i + 1] && pipe(fd) == -1)
+			return 1;
+
+		pid = fork(); // duplicamos el proceso para ejecutar cmds[i] en el hijo
+		if (pid == -1) // fork falló
+		{
+			if (cmds[i + 1]) // cerramos el pipe recién creado
+			{
+				close(fd[0]);
+				close(fd[1]);
+			}
+			while (wait(NULL) != -1) // esperamos hijos ya lanzados
+				;
+			return (1);
+		}
+
+		if (pid == 0) // ── HIJO ──────────────────────────────────────────────
+		{
+			// Si hay pipe anterior → redirigir stdin al extremo de lectura
+			// El hijo leerá la salida del comando previo como si fuera el teclado
+			if (prev_fd != -1)
+			{
+				dup2(prev_fd, 0);
+				close(prev_fd);
+			}
+
+			// Si hay comando siguiente → redirigir stdout al extremo de escritura
+			// Lo que el hijo escriba lo leerá el siguiente hijo
+			if (cmds[i + 1])
+			{
+				close(fd[0]);                   // el hijo no lee de este pipe
+				dup2(fd[1], 1);     // stdout → pipe
+				close(fd[1]);
+			}
+
+			execvp(cmds[i][0], cmds[i]); // ejecutar el comando (reemplaza el hijo)
+			exit(1);                      // solo llega aquí si execvp falla
+		}
+
+		// ── PADRE ─────────────────────────────────────────────────────────────
+		if (prev_fd != -1)
+			close(prev_fd); // ya se lo pasamos al hijo, el padre no lo necesita
+
+		if (cmds[i + 1])
+		{
+			close(fd[1]);       // el padre no escribe en el pipe
+			prev_fd = fd[0];    // guardamos la lectura para el PRÓXIMO hijo
+		}
+		i++;
+	}
+
+	// Esperamos a todos los hijos antes de volver
+	while (wait(NULL) != -1)
+		;
+	return 0;
 }

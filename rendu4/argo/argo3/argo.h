@@ -6,7 +6,6 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 typedef struct  json {
         enum {
@@ -30,13 +29,11 @@ typedef struct  pair {
 }       pair;
 
 int     argo(json *dst, FILE *stream);
+int     parse_map(json *dst, FILE *stream);
+int     parse_string(char **dst, FILE *stream);
 int     peek(FILE *stream);
 void    unexpected(FILE *stream);
 int     accept(FILE *stream, char c);
 int     expect(FILE *stream, char c);
-int parse_string(json *dst, FILE *stream);
-int parse_value(json *dst, FILE *stream);
-void free_json(json j);
-
 
 #endif
