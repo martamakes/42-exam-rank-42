@@ -134,15 +134,9 @@ int ft_popen(const char *file, char *const argv[], char type)
       if (pid == 0)  // Proceso hijo
       {
           if (type == 'r')
-          {
               dup2(fd[1], STDOUT_FILENO);
-              close(fd[0]);
-          }
-          else  // type == 'w'
-          {
+          else
               dup2(fd[0], STDIN_FILENO);
-              close(fd[1]);
-          }
           close(fd[0]);
           close(fd[1]);
           execvp(file, argv);

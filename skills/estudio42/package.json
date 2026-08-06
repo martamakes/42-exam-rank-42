@@ -1,0 +1,14 @@
+{
+  "name": "estudio42",
+  "version": "1.0.0",
+  "description": "Socratic tutor for 42 exams | Tutor socrático para exámenes 42",
+  "main": "index.js",
+  "keywords": ["42", "education", "tutor", "exam", "socratic"],
+  "author": "mvigara-",
+  "license": "MIT",
+  "claude": {
+    "skillType": "prompt",
+    "invocations": ["/estudio42", "/study42"],
+    "description": "Activates Socratic tutor mode for 42 School exercises"
+  }
+}

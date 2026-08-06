@@ -1,0 +1,68 @@
+EXAMPLES         top
+       The following program creates a pipe, and then fork(2)s to create
+       a child process; the child inherits a duplicate set of file
+       descriptors that refer to the same pipe.  After the fork(2), each
+       process closes the file descriptors that it doesn't need for the
+       pipe (see pipe(7)).  The parent then writes the string contained
+       in the program's command-line argument to the pipe, and the child
+       reads this string a byte at a time from the pipe and echoes it on
+       standard output.
+
+   Program source
+       #include <err.h>
+       #include <stdio.h>
+       #include <stdlib.h>
+       #include <string.h>
+       #include <sys/types.h>
+       #include <sys/wait.h>
+       #include <unistd.h>
+
+       int
+       main(int argc, char *argv[])
+       {
+           int    pipefd[2];
+           char   buf;
+           pid_t  cpid;
+
+           if (argc != 2) {
+               fprintf(stderr, "Usage: %s <string>\n", argv[0]);
+               exit(EXIT_FAILURE);
+           }
+
+           if (pipe(pipefd) == -1)
+               err(EXIT_FAILURE, "pipe");
+
+           cpid = fork();
+           if (cpid == -1)
+               err(EXIT_FAILURE, "fork");
+
+           if (cpid == 0) {    /* Child reads from pipe */
+               if (close(pipefd[1]) == -1)  /* Close unused write end */
+                   err(EXIT_FAILURE, "close");
+
+               while (read(pipefd[0], &buf, 1) > 0) {
+                   if (write(STDOUT_FILENO, &buf, 1) != 1)
+                       err(EXIT_FAILURE, "write");
+               }
+
+               if (write(STDOUT_FILENO, "\n", 1) != 1)
+                   err(EXIT_FAILURE, "write");
+               if (close(pipefd[0]) == -1)
+                   err(EXIT_FAILURE, "close");
+               _exit(EXIT_SUCCESS);
+
+           } else {            /* Parent writes argv[1] to pipe */
+               if (close(pipefd[0]) == -1)  /* Close unused read end */
+                   err(EXIT_FAILURE, "close");
+               if (write(pipefd[1], argv[1], strlen(argv[1])) != strlen(argv[1]))
+                   err(EXIT_FAILURE, "write");
+               if (close(pipefd[1]) == -1)  /* Reader will see EOF */
+                   err(EXIT_FAILURE, "close");
+               if (wait(NULL) == -1)        /* Wait for child */
+                   err(EXIT_FAILURE, "wait");
+               exit(EXIT_SUCCESS);
+           }
+       }
+SEE ALSO         top
+       fork(2), read(2), socketpair(2), splice(2), tee(2), vmsplice(2),
+       write(2), popen(3), pipe(7)

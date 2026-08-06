@@ -95,14 +95,16 @@ node *parse_term(char **s)
             destroy_tree(left);
             return NULL;
         }
-        left = new_node((node){MULTI, 0, left, right});
-        if (!left)
+        node *n = new_node((node){MULTI, 0, left, right});
+        if (!n) // si new_node falla, liberar ambos lados antes de salir
         {
+            destroy_tree(left);
             destroy_tree(right);
             return NULL;
         }
+        left = n;
     }
-    
+
     return left;
 }
 
@@ -121,12 +123,14 @@ node *parse_expression(char **s)
             destroy_tree(left);
             return NULL;
         }
-        left = new_node((node){ADD, 0, left, right});
-        if (!left)
+        node *n = new_node((node){ADD, 0, left, right});
+        if (!n) // si new_node falla, liberar ambos lados antes de salir
         {
+            destroy_tree(left);
             destroy_tree(right);
             return NULL;
         }
+        left = n;
     }
     
     return left;
