@@ -1,5 +1,6 @@
 #include "searchable_bag.hpp"
 
+#include <cstdlib>
 #include <iostream>
 
 int main(int argc, char **argv) {
@@ -40,14 +41,8 @@ int main(int argc, char **argv) {
     sa.get_bag().print();
     st.print();
     sa.clear();
-    sa.insert(
-        (int[]){
-            1,
-            2,
-            3,
-            4,
-        },
-        4);
+    int arr[] = {1, 2, 3, 4,};
+    sa.insert(arr, 4);
     std::cout << std::endl;
   }
 
