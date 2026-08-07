@@ -64,8 +64,15 @@ validate_exercise() {
     
     # Para ejercicios de C++, buscar archivos .cpp en lugar de .c
     local student_cpp_file="${student_dir}/${exercise}.cpp"
-    if [ ! -f "$student_file" ] && [ ! -f "$student_cpp_file" ]; then
-        echo -e "${RED}Error: No se encuentra el archivo $student_file o $student_cpp_file${NC}"
+    # Ejercicios multi-archivo (p.ej. polyset: set.cpp, searchable_*.cpp...)
+    # no tienen un "<ejercicio>.cpp" propio. Si no existe ese archivo único
+    # pero el directorio del alumno contiene al menos algún archivo, dejamos
+    # que sea grademe/test.sh quien valide qué archivos concretos hacen falta.
+    local has_any_file
+    has_any_file=$(find "$student_dir" -maxdepth 1 -type f | head -1)
+    if [ ! -f "$student_file" ] && [ ! -f "$student_cpp_file" ] && [ -z "$has_any_file" ]; then
+        echo -e "${RED}Error: No se encuentra ningún archivo en $student_dir${NC}"
+        echo -e "${YELLOW}Crea tus archivos dentro de $student_dir${NC}"
         return 1
     fi
     
