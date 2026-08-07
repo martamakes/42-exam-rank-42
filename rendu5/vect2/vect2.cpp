@@ -25,6 +25,10 @@ vect2& vect2::operator=(const vect2& other) {
     return *this;  // devolvemos el objeto actual para poder encadenar: a = b = c;
 }
 
+// Destructor: no hay recursos que liberar (solo dos ints), cuerpo vacío.
+// Se declara explícito para dejar la forma canónica completa.
+vect2::~vect2() {}
+
 // ============================================================
 // SUMA
 // ============================================================
@@ -98,11 +102,23 @@ vect2 vect2::operator*(int scalar) const {
     return vect2(x * scalar, y * scalar);
 }
 
+// v *= 3  →  modifica v en sitio (igual patrón que += y -=)
+vect2& vect2::operator*=(int scalar) {
+    x *= scalar;
+    y *= scalar;
+    return *this;
+}
+
 // 3 * v  →  igual resultado, pero el 3 va PRIMERO.
 // Como el 3 no es un vect2, esta función NO puede ser un método de la clase.
 // Va fuera, como función libre.
 vect2 operator*(int scalar, const vect2& vec) {
     return vec * scalar;  // llama a operator*(int) de arriba, que sí es método
+}
+
+// -v  →  {-x, -y}  (negación unaria, un solo operando)
+vect2 vect2::operator-() const {
+    return vect2(-x, -y);
 }
 
 // ============================================================

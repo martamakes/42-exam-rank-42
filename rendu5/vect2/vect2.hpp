@@ -25,6 +25,9 @@ public:
     vect2(int x, int y);        // con valores:   vect2 v(3, 5); → {3, 5}
     vect2(const vect2& other);  // copia:         vect2 b(a);    → copia exacta de a
     vect2& operator=(const vect2& other);  // asignación: b = a;
+    ~vect2();  // destructor: no hay memoria dinámica que liberar, pero se
+               // declara explícito para completar la forma canónica ortodoxa
+               // (ctor por defecto, copia, operator=, destructor).
 
     // ----------------------------------------------------------
     // SUMA
@@ -54,6 +57,14 @@ public:
     // ----------------------------------------------------------
 
     vect2 operator*(int scalar) const;  // v * 3
+    vect2& operator*=(int scalar);      // v *= 3  → modifica v en sitio
+
+    // Negación unaria: -v  →  {-x, -y}
+    // OJO: es DISTINTO del operator- de arriba (esa es la resta binaria,
+    // v1 - v2). Aquí solo hay UN operando, así que el compilador elige
+    // esta versión cuando ve "-v" y la de arriba cuando ve "v1 - v2".
+    // El main.cpp dado usa "-v2", así que sin este operador no compila.
+    vect2 operator-() const;
 
     // ----------------------------------------------------------
     // ACCESO CON []
