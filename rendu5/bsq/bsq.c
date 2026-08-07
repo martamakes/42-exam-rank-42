@@ -36,7 +36,10 @@ char	**read_map(FILE *stream, t_data *data)
 		|| data->rows < 1
 		|| data->empty == data->obstacle
 		|| data->empty == data->full
-		|| data->obstacle == data->full)
+		|| data->obstacle == data->full
+		|| !isprint((unsigned char)data->empty)
+		|| !isprint((unsigned char)data->obstacle)
+		|| !isprint((unsigned char)data->full))
 		goto fail;
 
 	/* --- reservar array de filas --- */
@@ -55,6 +58,13 @@ char	**read_map(FILE *stream, t_data *data)
 		w = 0;
 		while (line[w] && line[w] != '\n')
 			w++;
+
+		/* subject: "At each end of line, there's a line break" —
+		   si llegamos al final del buffer sin encontrar '\n', esta
+		   fila no terminaba en salto de linea (p.ej. EOF sin '\n'
+		   final) y el mapa es invalido. */
+		if (line[w] != '\n')
+			goto fail_map;
 
 		/* primera fila fija el ancho */
 		if (data->width == -1)
