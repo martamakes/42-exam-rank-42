@@ -1,42 +1,29 @@
-# 🎓 42 Exam Practice - UNIFIED SYSTEM 🚀
+# 🎓 42 Exam Practice 🚀
 
-¡Sistema completo e integrado para practicar **TODOS** los Exámenes Rank de 42! Combina el mejor de ambos mundos: sistema legacy para principiantes y EXAMSHELL auténtico para experiencia real.
+Sistema para practicar los Exámenes Rank de 42 (02 a 06): menú guiado, ejercicios aleatorios por rango/nivel, y validación automática.
 
-## ⚡ **NUEVO: Sistema Unificado**
+## ⚡ **Inicio rápido**
 
 ```bash
-# 🚀 ACCESO ÚNICO A TODO
-./unified_exam.sh
+./exam_master.sh
+# o, equivalente:
+make
 ```
 
-## 🎯 **Características Principales**
+## 🎯 **Características**
 
-**🔧 Sistema Legacy (02, 06):**
-- Ideal para principiantes
-- Menús guiados paso a paso
-- 4 niveles progresivos (Rank 02)
-- Tests automáticos con validación
-
-**🚀 Sistema EXAMSHELL (03, 04, 05):**
-- **Réplica exacta del examshell real de 42**
-- Workflow idéntico al examen oficial
-- Ejercicios aleatorios por sesión
-- Tracking de tiempo real
-- Estructura auténtica subject/ y rendu/
-
-**🎯 Integración Total:**
-- Acceso unificado a TODOS los exam ranks
-- Detección automática de sistemas disponibles
-- Acceso directo por exam rank
-- Compilación automática de EXAMSHELL
+- Acceso unificado a los ranks 02, 03, 04, 05 y 06 desde un único menú
+- Workflow por rango: elige examen → nivel → ejercicio, lee el subject y escribe tu solución
+- Progreso por nivel guardado en `<rango>/exam_progress/`
+- Validación automática vía `grademe/test.sh` por ejercicio (donde exista)
 
 ## 📋 Requisitos
 
 - Sistema operativo Unix/Linux o macOS
-- Compilador GCC
+- Compilador GCC/Clang
 - Make
 
-## 🛠 **Instalación Rápida**
+## 🛠 **Instalación rápida**
 
 ```bash
 # Clonar el repositorio
@@ -45,92 +32,64 @@ git clone https://github.com/martamakes/42-exam-rank-42.git
 # Entrar al directorio
 cd 42-exam-rank-42
 
-# 🚀 INICIAR SISTEMA UNIFICADO
-./unified_exam.sh
+# Iniciar el sistema
+./exam_master.sh
 ```
 
-## 🎮 **Uso del Sistema Unificado**
+## 🎮 **Uso**
 
-### **Método Recomendado (Nuevo):**
+### **Método recomendado:**
 ```bash
-./unified_exam.sh      # Acceso a TODOS los exam ranks
+./exam_master.sh       # Menú: elige rango 02-06, luego nivel/ejercicio
+# o
+make                   # Equivalente vía Makefile (make run_exam_05, etc.)
 ```
 
-### **Métodos Alternativos:**
+### **Acceso directo a un rango:**
 ```bash
-# Sistema Legacy específico
-./exam_master.sh       # Solo ranks 02, 03, 04, 05, 06 (legacy)
-
-# Sistema EXAMSHELL específico  
-cd new-exams && ./init.sh    # Solo ranks 03, 04, 05 (EXAMSHELL)
-
-# Métodos clásicos
-make                   # Sistema legacy
-make run_exam_02      # Solo Rank 02
+cd 02 && ./exam.sh
+cd 03 && ./exam.sh
+cd 04 && ./exam.sh
+cd 05 && ./exam.sh
+cd 06 && ./exam.sh
 ```
 
-## 📦 **Estructura Unificada del Proyecto**
+> Nota: existen también las carpetas `new-exams/` (un prototipo EXAMSHELL, solo con `exam-rank-03/`) y `legacy/` (intentos antiguos `03-old`/`04-old`/`05-old`). No forman parte del flujo activo — el sistema real es el descrito arriba (`exam_master.sh` → `<rango>/exam.sh`).
+
+## 📦 **Estructura del proyecto**
 
 ```
 42-exam-rank-42/
-├── unified_exam.sh       # 🚀 NUEVO: Acceso unificado a todo
-├── exam_master.sh        # Sistema legacy original
+├── exam_master.sh        # Menú principal: elige rango 02-06
+├── Makefile               # make / make run_exam_0X (llama a exam_master.sh o al exam.sh del rango)
 │
-├── 02/                   # 🔧 SISTEMA LEGACY
-│   ├── Level1/ Level2/ Level3/ Level4/
-│   ├── exam.sh
-│   └── rendu/
-├── 06/                   # 🔧 SISTEMA LEGACY  
-│   ├── exam.sh
-│   └── ...
+├── 02/ 03/ 04/ 05/ 06/    # Un directorio por rango
+│   ├── exam.sh            # Selecciona nivel/ejercicio, corre grademe/test.sh, guarda progreso
+│   ├── exam_progress/
+│   ├── level-1/ level-2/… # Un subdirectorio por ejercicio: subject + código dado + grademe/test.sh
+│   └── rendu/              # (por rango; no usado en la práctica — ver nota abajo)
 │
-├── new-exams/            # 🚀 SISTEMA EXAMSHELL
-│   ├── examshell         # Binario EXAMSHELL (compilado)
-│   ├── init.sh           # Menu EXAMSHELL
-│   ├── exam-rank-03/
-│   │   ├── level-1/ level-2/
-│   │   └── [exercises]
-│   ├── exam-rank-04/
-│   │   ├── level-1/ level-2/
-│   │   └── [exercises]
-│   ├── exam-rank-05/
-│   │   ├── level-1/ level-2/
-│   │   └── [exercises]
-│   ├── rendu/            # Soluciones EXAMSHELL
-│   └── subject/          # Subjects temporales
+├── rendu/                 # Área de práctica REAL, compartida por todos los rangos.
+│                           # exam.sh de cada rango escribe/lee aquí (PROJECT_ROOT/rendu/<ejercicio>).
+│                           # Debe quedar vacía entre sesiones: aquí escribes en fresco cuando practicas.
 │
-├── 03/ 04/ 05/           # Legacy duplicados (compatibilidad)
-└── rendu/                # Soluciones legacy
+└── rendu2/ rendu4/ rendu5/…  # Archivo personal de soluciones ya resueltas, por rango, solo para
+                               # consulta/estudio. No lo lee exam.sh. Ver 05/CONTEXT.md para el detalle
+                               # del modelo given/rendu/rendu5 usado en el rango 05.
 ```
 
-## 🎯 **Guía de Uso por Sistema**
+## 🎯 **Cómo se usa**
 
-### **🚀 Sistema EXAMSHELL (Ranks 03, 04, 05) - RECOMENDADO**
+**Workflow estándar:**
+1. Lanza `./exam_master.sh` (o `make`)
+2. Elige tu rango de examen (02, 03, 04, 05 o 06)
+3. El sistema te asigna/deja elegir un ejercicio y muestra el subject
+4. Escribe tu solución dentro de `rendu/<ejercicio>/` (en la raíz del proyecto)
+5. Valida con la opción del menú — internamente ejecuta `<rango>/level-X/<ejercicio>/grademe/test.sh`
 
-**Workflow auténtico de 42:**
-1. Lanza: `./unified_exam.sh` → Opción 2 o 3
-2. El sistema te asigna un ejercicio aleatorio
-3. Lee: `cat subject/[ejercicio]/subject.txt`
-4. Programa: `mkdir rendu/[ejercicio]` y crea tu solución
-5. Valida: `grademe` en el sistema
-
-**Ventajas:**
-- ✅ Experiencia **exacta** al examen real
-- ✅ Tracking de tiempo real
-- ✅ Workflow idéntico a 42
-
-### **🔧 Sistema Legacy (Ranks 02, 06) - Para Principiantes**
-
-**Workflow guiado:**
-1. Lanza: `./unified_exam.sh` → Opción 1 o 3
-2. Menú te guía paso a paso
-3. Ejercicios organizados por niveles
-4. Tests automáticos incluidos
-
-**Ventajas:**
-- ✅ Ideal para empezar
-- ✅ Progresión por niveles
-- ✅ Tests automáticos
+**Tips:**
+- ✅ El progreso por nivel se guarda automáticamente en `<rango>/exam_progress/`
+- ✅ Si un ejercicio no tiene `grademe/test.sh` todavía, `exam.sh` genera un placeholder que siempre "pasa" — no confundir con una validación real
 
 ## 📚 Contenido de los exámenes
 
@@ -154,8 +113,23 @@ Consta de dos ejercicios principales:
 - **ft_printf**: Implementación simplificada de la función printf
 - **get_next_line**: Función para leer líneas de un archivo
 
-### Exámenes Rank 04, 05 y 06
-Se irán añadiendo a medida que estén disponibles. El sistema está preparado para incorporarlos fácilmente.
+### Exam Rank 04
+Disponible en el directorio `04/`, con ejercicios organizados por niveles.
+
+### Exam Rank 05
+Consta de 2 niveles con ejercicios avanzados de C y C++:
+
+#### Nivel 1 (3 ejercicios — C++)
+- **bigint**: clase de precisión arbitraria para enteros sin signo. Soporta suma, comparación y "digitshift" (desplazar dígitos en base 10, p. ej. `42 << 3 == 42000`). Debe implementar `+`, `+=`, `<<`, `>>`, `<<=`, `>>=`, `++`, `--`, comparadores y el operador de salida `<<`.
+- **vect2**: vector matemático 2D de enteros. Suma, resta, multiplicación por escalar, `[]` para acceder a componentes, operador de salida `<<`, comparadores, `+=`/`-=`/`*=` e incremento/decremento.
+- **polyset**: implementación de Set y Bag con array y árbol binario de búsqueda. Se crean `searchable_array_bag` y `searchable_tree_bag` (heredan de `array_bag`/`tree_bag`, dados) implementando `searchable_bag`; luego `set`, que envuelve un searchable_bag para no permitir duplicados. Forma canónica completa y const-correctness en las 6 clases que se escriben. Ver `05/CONTEXT.md` para el modelo de carpetas (given/rendu/rendu5) usado en este rango.
+
+#### Nivel 2 (2 ejercicios — C)
+- **bsq**: encuentra el mayor cuadrado posible en un mapa evitando obstáculos, leyendo el mapa de fichero o stdin.
+- **game_of_life**: simulación del Juego de la Vida de Conway; el tablero inicial se dibuja con comandos tipo "pluma" (`w a s d x`) leídos de stdin, y luego se simulan N iteraciones.
+
+### Exam Rank 06
+Disponible en el directorio `06/`.
 
 ## 📝 Tips para los exámenes
 

@@ -61,9 +61,11 @@ cd 06 && ./exam.sh    # Rank 06
 
 ### **Alternative Method:**
 ```bash
-make                  # Legacy system
+make                  # Equivalent, via Makefile
 make run_exam_02      # Run only Rank 02
 ```
+
+> Note: `new-exams/` (an EXAMSHELL prototype, only `exam-rank-03/` actually exists there) and `legacy/` (older abandoned attempts `03-old`/`04-old`/`05-old`) are not part of the active workflow — the real system is `exam_master.sh` → `<rank>/exam.sh` as described above.
 
 ## 📦 **Project Structure**
 
@@ -80,8 +82,8 @@ make run_exam_02      # Run only Rank 02
 │
 ├── 03/                   # Exam Rank 03
 │   ├── exam.sh
-│   ├── level-1/ level-2/
-│   └── rendu/
+│   ├── level-1/ level-2/    # subject + given code + grademe/test.sh per exercise
+│   └── rendu/                # per-rank folder — not actually read by exam.sh, see note below
 │
 ├── 04/                   # Exam Rank 04
 │   ├── exam.sh
@@ -92,14 +94,22 @@ make run_exam_02      # Run only Rank 02
 │   ├── exam.sh
 │   ├── level-1/ level-2/
 │   ├── exam_progress/
+│   ├── CONTEXT.md         # vocabulary + decisions for this rank's given/rendu/rendu5 model
 │   └── rendu/
 │
 ├── 06/                   # Exam Rank 06
 │   ├── exam.sh
 │   └── ...
 │
-└── rendu/                # Global solutions directory
+├── rendu/                # The REAL practice workspace, shared by every rank.
+│                          # Each rank's exam.sh reads/writes PROJECT_ROOT/rendu/<exercise> here.
+│                          # Stays empty between sessions — write fresh here while practicing.
+│
+└── rendu2/ rendu4/ rendu5/…  # Personal archive of already-solved solutions, one per rank,
+                               # for reference/study only — never read by exam.sh.
 ```
+
+> The `rendu/` folders shown *inside* each rank directory above (`02/rendu`, `03/rendu`, ...) exist on disk but aren't the ones `exam.sh` actually uses — every rank's `exam.sh` resolves `RENDU_DIR` to the shared root `rendu/`. Treat the per-rank ones as stale/unused.
 
 ## 🎯 **How to Use the Exam System**
 
@@ -149,7 +159,7 @@ Consists of 2 levels with advanced C and C++ exercises:
 
 - **vect2**: Class representing a 2-dimensional mathematical vector with integer components. Implements addition, subtraction, scalar multiplication, and complete operator overloading including `[]` for component access, `<<` for output, comparison operators (`==`, `!=`), compound assignment operators (`+=`, `-=`, `*=`), and increment/decrement operators (`++`, `--`). Must support expressions like `v2 = v3 + v3 * 2` and `v2 = 3 * v2`.
 
-- **polyset**: Implementation of Set and Bag data structures using arrays and binary search trees. Create `searchable_array_bag` and `searchable_tree_bag` classes that inherit from provided `array_bag` and `tree_bag` classes, implementing the searchable_bag abstract interface. Then create a `set` class that wraps a searchable_bag to enforce set semantics (no duplicates). All classes must follow Orthodox Canonical Form with proper const-correctness.
+- **polyset**: Implementation of Set and Bag data structures using arrays and binary search trees. Create `searchable_array_bag` and `searchable_tree_bag` classes that inherit from provided `array_bag` and `tree_bag` classes, implementing the searchable_bag abstract interface. Then create a `set` class that wraps a searchable_bag to enforce set semantics (no duplicates). All classes must follow Orthodox Canonical Form with proper const-correctness. See [`05/CONTEXT.md`](./05/CONTEXT.md) for the given/rendu/rendu5 folder model used in this rank.
 
 #### Level 2 (2 exercises - C)
 - **bsq**: Finds the largest square on a map while avoiding obstacles. The program reads a map from a file or stdin where the first line specifies: number of lines, empty character, obstacle character, and full character (space-separated). The program must identify and mark the biggest square possible using the "full" character. If multiple solutions exist, choose the topmost, then leftmost square. Must handle map validation and output "map error" to stderr for invalid maps.

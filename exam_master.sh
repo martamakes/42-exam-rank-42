@@ -79,10 +79,14 @@ launch_exam_06() {
 
 # Verificar y crear directorios de rendu necesarios
 setup_directories() {
-    # Crear directorio rendu principal si no existe
+    # Crear directorio rendu principal si no existe.
+    # OJO: este es el ÚNICO que usan los exam.sh de cada rango (RENDU_DIR
+    # resuelve siempre a "$PROJECT_ROOT/rendu", compartido entre 02-06).
     mkdir -p "$SCRIPT_DIR/rendu"
-    
-    # Crear directorios rendu para cada nivel
+
+    # Los "<rango>/rendu" que se crean abajo NO los lee ningún exam.sh — quedan
+    # como carpetas sueltas sin uso real. Se mantienen por compatibilidad con
+    # scripts antiguos; no confundir con "$SCRIPT_DIR/rendu" de arriba.
     if [ -d "$SCRIPT_DIR/02" ]; then
         mkdir -p "$SCRIPT_DIR/02/exam_progress"
     fi
