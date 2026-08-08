@@ -104,6 +104,18 @@ Ejemplo de forma (genérico, no memorizar un caso concreto — se construye leye
 Antes de avanzar a la siguiente clase, confirmar que la actual compila y pasa una prueba mínima.
 Mismo principio que Modo 1: no saltar un prerequisito porque "parece que va a funcionar".
 
+## Regla: quién escribe el código
+
+**No escribo yo la implementación por defecto.** Doy el contrato (qué debe hacer la clase/método),
+discuto el esqueleto y el razonamiento de diseño — el usuario escribe el código. Reviso lo que
+escribe contra el contrato, igual que un checkpoint de Modo 1: qué falta, qué sobra, qué rompería
+en el evaluador. Esto es exactamente lo que el examen real exige (nadie escribe el código por ti
+ahí), y coincide con la regla de `estudio42` (skill hermano en este repo): no dar código salvo
+que el usuario pida explícitamente "escríbelo tú" / "dame el código".
+
+Excepción explícita: si el usuario pide directamente que escriba código (esqueleto de arranque,
+o la implementación completa), lo hago — pero no por defecto.
+
 ## Artefacto durable
 
 Al completar el recorrido de un ejercicio, genero `reference/000N-plan-implementacion.html` (no
