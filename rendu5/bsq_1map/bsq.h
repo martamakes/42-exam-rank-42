@@ -6,7 +6,13 @@
 # include <stdio.h>
 # include <stdlib.h>
 /* NOTE: no <ctype.h> — isprint() is not in "Allowed functions and
-   globals", the printable-char check in read_map is done by hand. */
+   globals" for this subject either, the printable-char check in
+   read_map is done by hand. */
+
+/* NOTE (vs the multi-map variant in rendu5/bsq/): "stderr" is NOT in this
+   subject's "Allowed functions and globals" list. Every message this
+   program prints — valid solution AND errors — goes through fputs/fprintf
+   to stdout only. Never touch stderr here. */
 
 typedef struct s_data
 {

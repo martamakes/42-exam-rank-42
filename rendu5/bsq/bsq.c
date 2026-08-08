@@ -20,12 +20,21 @@ void	free_map(char **map, int rows)
 }
 
 /*! PSEUDOCODE — read_map:
- *  1. getline() the FIRST line (header): "rows empty obstacle full"
- *       - sscanf "%d %c %c %c", must match exactly 4 fields
+ *  1. read the header DIRECTLY off the stream with fscanf("%d %c %c %c",
+ *     ...) — "sscanf" is NOT in "Allowed functions and globals" (only
+ *     "fscanf" is), so the header can't be getline()'d into a buffer
+ *     and parsed with sscanf there; fscanf reads straight from the
+ *     FILE* instead, no intermediate buffer needed
  *       - reject if rows < 1, if any two of empty/obstacle/full are
- *         equal, or if any of them is not printable (isprint)
- *  2. malloc an array of `rows` char* pointers
- *  3. for each of the `rows` remaining lines:
+ *         equal, or if any of them isn't printable — checked BY HAND
+ *         (32 <= c <= 126, the ASCII printable range) since isprint()
+ *         isn't in the allowed list either
+ *  2. %c does NOT skip the header's own trailing '\n' the way %d does —
+ *     discard characters one at a time (fscanf("%c", &c) in a loop)
+ *     until that '\n' (or EOF), so the first getline() below starts
+ *     exactly at row 1, not mid-header
+ *  3. malloc an array of `rows` char* pointers
+ *  4. for each of the `rows` remaining lines:
  *       - getline() it
  *       - find its length up to '\n'; if no '\n' was found -> invalid
  *         (subject: every row ends with a line break)
@@ -34,9 +43,9 @@ void	free_map(char **map, int rows)
  *       - every char must be `empty` or `obstacle` (never `full` —
  *         that symbol is OUTPUT-only)
  *       - malloc(width + 1), copy the row, terminate with '\0'
- *  4. after reading all `rows` rows, if the stream still has another
+ *  5. after reading all `rows` rows, if the stream still has another
  *     non-blank line left -> invalid (extra garbage rows)
- *  5. on ANY failure at any step: free whatever was allocated so far
+ *  6. on ANY failure at any step: free whatever was allocated so far
  *     and return NULL — the caller prints "map error" on stderr
  */
 char	**read_map(FILE *stream, t_data *data)
@@ -47,20 +56,25 @@ char	**read_map(FILE *stream, t_data *data)
 	int		rows_read = 0;
 	int		w;
 	int		j;
+	char	c;
 
-	/* --- leer y validar encabezado --- */
-	if (getline(&line, &n, stream) == -1)
-		goto fail;
-	if (sscanf(line, "%d %c %c %c",
+	/* --- leer y validar encabezado: fscanf DIRECTO sobre el stream,
+	   sscanf no esta en la lista de funciones permitidas --- */
+	if (fscanf(stream, "%d %c %c %c",
 		&data->rows, &data->empty, &data->obstacle, &data->full) != 4
 		|| data->rows < 1
 		|| data->empty == data->obstacle
 		|| data->empty == data->full
 		|| data->obstacle == data->full
-		|| !isprint((unsigned char)data->empty)
-		|| !isprint((unsigned char)data->obstacle)
-		|| !isprint((unsigned char)data->full))
+		|| (unsigned char)data->empty < 32 || (unsigned char)data->empty > 126
+		|| (unsigned char)data->obstacle < 32 || (unsigned char)data->obstacle > 126
+		|| (unsigned char)data->full < 32 || (unsigned char)data->full > 126)
 		goto fail;
+	/* consumir el resto de la linea de cabecera (normalmente solo el
+	   '\n' final) para que el primer getline() de abajo empiece justo
+	   en la fila 1 del mapa, no a mitad de la cabecera */
+	while (fscanf(stream, "%c", &c) == 1 && c != '\n')
+		;
 
 	/* --- reservar array de filas --- */
 	map = malloc(sizeof(char *) * data->rows);
