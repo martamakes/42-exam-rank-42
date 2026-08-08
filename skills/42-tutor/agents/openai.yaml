@@ -1,0 +1,5 @@
+interface:
+  display_name: "42 Tutor"
+  short_description: "Bottom-up tutor for 42 School's curriculum"
+policy:
+  allow_implicit_invocation: false
