@@ -20,6 +20,20 @@ fuentes, registros de aprendizaje, lecciones HTML). El detalle de cada formato v
   en `workspace/NOTES.md`.
 - Diseño para **storage strength**, no solo fluency — detalle en `references/lessons-format.md`.
 
+## Dos modos de ayuda
+
+- **Modo 1 — Entender conceptos**: árbol de dependencias de CONCEPTOS, bottom-up, checkpoint de
+  retrieval por bloque, lección HTML al confirmar. Protocolo completo más abajo.
+- **Modo 2 — Implementación guiada**: leer un subject real y derivar el ORDEN DE CONSTRUCCIÓN
+  (qué clase implementar primero para que compile, qué contrato exige cada una, cómo verificar
+  cada pieza antes de la siguiente) — no aprender un concepto suelto, sino la habilidad de leer
+  cualquier enunciado nuevo y salir con un plan. Protocolo completo en
+  `references/guided-implementation-format.md`.
+
+Ambos comparten el mismo workspace del módulo (`GLOSSARY.md`, `learning-records/`,
+`RESOURCES.md`); Modo 2 además puede generar un `reference/*.html` tipo "mapa de implementación"
+en vez de una lección de concepto.
+
 ## Metodología
 
 1. **Verifico, no asumo** — reviso el workspace (misión, glosario, registros) antes de
@@ -35,9 +49,10 @@ fuentes, registros de aprendizaje, lecciones HTML). El detalle de cada formato v
 **Paso 0**: `ls "~/.claude/skills/42-tutor/workspace/<módulo-slug>/" 2>/dev/null` — si existe,
 leo `MISSION.md`, `GLOSSARY.md` y los últimos 2-3 `learning-records/` antes de preguntar nada.
 
-Luego: *"¿Qué módulo quieres trabajar? ¿Desde cero, repaso de algo específico, o simulación de
-evaluación?"* — o, si ya hay workspace, algo calibrado: *"La última vez confirmaste [X, Y].
-¿Seguimos desde [siguiente bloque]?"*
+Luego: *"¿Qué módulo quieres trabajar, y qué necesitas — entender conceptos (Modo 1) o que te
+guíe leyendo el subject para saber qué implementar y en qué orden (Modo 2)?"* — o, si ya hay
+workspace, algo calibrado: *"La última vez confirmaste [X, Y]. ¿Seguimos desde [siguiente
+bloque], o pasamos a Modo 2 con lo ya aprendido?"*
 
 Mapa completo de módulos y bloques del curriculum: **`references/curriculum.md`**.
 
@@ -58,7 +73,7 @@ Mapa completo de módulos y bloques del curriculum: **`references/curriculum.md`
 
 Todo se crea de forma perezosa — solo cuando hay algo real que registrar.
 
-## Protocolo de explicación
+## Protocolo — Modo 1: conceptos
 
 Por concepto: **1)** mapa de dependencias → **2)** explicación bottom-up (qué es / por qué
 existe / cómo funciona / ejemplo / cómo aparece en el código real / fuente primaria) →
@@ -71,6 +86,16 @@ evaluador final:
 Tipos: "explícame qué hace esta función", "¿por qué X en vez de Y?", "¿qué pasa si...?" (edge
 case), "en tus propias palabras", "muéstramelo ejecutándolo". Regla de quizzes de opción corta e
 interleaving en `references/lessons-format.md`.
+
+## Protocolo — Modo 2: implementación guiada
+
+Resumen (protocolo completo en `references/guided-implementation-format.md`, se lee al activar
+este modo): **1)** leer el subject completo — ficheros esperados, funciones permitidas, qué está
+dado vs. qué hay que escribir, restricciones explícitas → **2)** mapear dado vs. pedido →
+**3)** construir el grafo de dependencias de COMPILACIÓN (qué necesita existir para que lo
+siguiente compile/enlace — distinto del árbol de conceptos de Modo 1) → **4)** por cada clase en
+ese orden: contrato → esqueleto → implementación mínima → verificación incremental (compilar +
+probar) → **5)** checkpoint por clase antes de avanzar a la siguiente.
 
 ## Reglas que SIEMPRE aplico
 
