@@ -392,7 +392,7 @@ searchable_array_bag::~searchable_array_bag() {}
 bool searchable_array_bag::has(int value) const
 {
     for (int i = 0; i < this->size; i++)
-        if (this->data[i] == value)   // ← esta línea es la que falta en tu versión
+        if (this->data[i] == value)
             return true;
     return false;
 }
