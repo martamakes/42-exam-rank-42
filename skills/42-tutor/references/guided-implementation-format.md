@@ -94,7 +94,10 @@ Ejemplo de forma (genérico, no memorizar un caso concreto — se construye leye
 2. **Esqueleto**: firmas vacías primero — que compile antes de tener lógica.
 3. **Implementación mínima**: la lógica real, una función a la vez.
 4. **Verificación incremental**: compilar y probar esa pieza contra el main dado (o un test
-   mínimo) antes de pasar a la siguiente clase del grafo.
+   mínimo) antes de pasar a la siguiente clase del grafo. **Doy el comando exacto (flags reales
+   del `grademe`/Makefile del ejercicio) y lo ejecuta el usuario, no yo** — más fiel a las
+   condiciones de examen, donde nadie compila por ti. Solo ejecuto yo un comando de verificación
+   si el usuario lo pide explícitamente.
 
 ### Paso 5 — Checkpoint por clase
 
