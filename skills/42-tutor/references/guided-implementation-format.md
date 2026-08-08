@@ -20,6 +20,40 @@ centra en el orden y la verificación.
 
 ## Protocolo
 
+### Paso 0 — Clasificar el tipo de subject
+
+No todos los subjects dan lo mismo de partida. Antes de leer nada más a fondo:
+
+- **Tipo A — esqueleto dado** (Polyset, tree_bag, la mayoría de exámenes de rank corto): 42 ya
+  define las clases/interfaces (`bag`, `array_bag`...). El trabajo es extenderlas. El grafo de
+  compilación se construye directamente sobre los ficheros que ya existen — ir a Paso 1.
+- **Tipo B — solo protocolo/especificación** (ft_irc, webserv, minishell, cub3d/miniRT,
+  Transcendence): 42 define QUÉ debe hacer el programa (protocolo, comportamiento, restricciones
+  técnicas) — no CÓMO estructurarlo en clases. Nadie te da `Server.hpp`. Antes del grafo de
+  compilación hace falta un paso extra: **diseñar el modelo de dominio**.
+
+Para Tipo B, insertar esto entre el Paso 1 y el Paso 3:
+
+#### Paso 1.5 (solo Tipo B) — Categorizar los requisitos, luego derivar el modelo de dominio
+
+Los subjects Tipo B mezclan tipos de requisito muy distintos en el mismo texto — sepáralos antes
+de diseñar nada, porque cada tipo restringe el diseño de forma diferente:
+
+1. **Reglas técnicas duras** (binarias, pass/fail — no son features, son restricciones de
+   arquitectura): ej. "un solo poll() para todo", "prohibido fork", "nunca debe crashear". Estas
+   determinan la FORMA del programa (ej. un único bucle de eventos) antes de pensar en clases.
+2. **Funciones/librerías permitidas**: define qué herramientas del SO tienes — y, por omisión,
+   qué NO puedes usar (sin lista de threads → nada de hilos; sin librerías externas → sin Boost).
+3. **Requisitos funcionales** (lo que el usuario final puede hacer — normalmente en una lista de
+   viñetas de "features"): estos SÍ son candidatos directos a clases/métodos.
+4. **Entregables no-código**: Makefile con reglas específicas, README con secciones específicas.
+
+Con eso separado, **derivar el modelo de dominio**: qué sustantivos del enunciado (y del dominio
+que describe — protocolo, RFC, etc.) se convierten en clases candidatas, y qué reglas técnicas
+duras se convierten en un componente arquitectónico central (ej. el bucle de eventos) en vez de
+en una clase cualquiera. Este modelo de dominio recién diseñado es lo que alimenta el Paso 3 —
+los nodos del grafo de compilación ya no vienen dados por 42, los decidiste aquí.
+
 ### Paso 1 — Leer el subject completo, extraer el contrato
 
 Del `subject.txt` (o `subject.en.txt`) real del ejercicio:
