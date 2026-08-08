@@ -43,14 +43,11 @@ the `## 👤 Tips de Usuarios` / `## 👤 User Tips` section — username comes
 from `.estudio42/config.json` — and append the tip as a bullet under it.
 Never edit another user's subsection.
 
-## Known limitations (not yet fixed — work around, don't silently trust)
+## Known limitations
 
-- **Subject lookup misses `subject.en.txt`**, used by several Rank 05
-  exercises — `generator.js::findSubjectFile` only checks `README.md` and
-  `subject.txt`. If tip generation reports it can't find the subject but one
-  exists under a different filename in the exercise's given directory, read
-  it yourself and use it, or ask the user to point you at it.
-- **English mode is partially untranslated** — some of the final prompt
-  assembly in `index.js` hardcodes Spanish labels regardless of
-  `config.json`'s `language`. If `language` is `"en"`, respond in English
-  yourself even where the printed block slips into Spanish.
+None currently tracked. `subject.en.txt` lookup and the `es`/`en` translation
+gaps (in both `index.js`'s prompt assembly and `generator.js`'s auto-generated
+concepts/complexity/resources) were fixed and verified end-to-end in both
+languages — if you spot Spanish leaking through while `config.json`'s
+`language` is `"en"` (or vice versa), that's a regression, not a known gap;
+flag it.

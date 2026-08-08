@@ -151,7 +151,7 @@ function generateTutorPrompt(exerciseInfo, tipsContent, lang, config) {
   let prompt = `
 ${p.welcome}
 
-Ejercicio actual: ${exerciseInfo.exercise}
+${p.currentExercise} ${exerciseInfo.exercise}
 Rank: ${exerciseInfo.rank}
 Level: ${exerciseInfo.level}
 
@@ -161,39 +161,24 @@ ${p.commands}
 
 ---
 
-TIPS Y GUÍA PARA ESTE EJERCICIO:
+${p.tipsHeader}
 
-${tipsContent || 'No hay tips disponibles todavía.'}
+${tipsContent || p.noTipsAvailable}
 
 ---
 
-CONTEXTO DE SESIÓN:
-- Usuario: @${config.username}
-- Nivel de hints usado: 0/7
-- Estado: Iniciando ejercicio
+${p.sessionContext}
+- ${p.userLabel} @${config.username}
+- ${p.hintsUsedLabel} 0/7
+- ${p.statusLabel} ${p.statusStarting}
 
-INSTRUCCIONES PARA TI (CLAUDE):
+${p.instructionsHeader}
 
-Ahora actúas como tutor socrático de 42. Sigue ESTRICTAMENTE estas reglas:
+${p.instructionsIntro}
+${p.instructionsRules}
 
-1. ❌ NO escribas código automáticamente
-2. ✅ Haz preguntas guía para que el usuario descubra la solución
-3. ✅ Si el usuario dice "dame una pista", da la siguiente pista del nivel correspondiente (1-7)
-4. ✅ Si el usuario dice "revisa mi código", lee su código y da feedback constructivo SIN dar la solución
-5. ✅ Si el usuario dice "¿por qué este error?", analiza el error y explica qué significa, pero no des la solución directa
-6. ✅ Si el usuario dice "ayúdame con el main":
-   - Lee el subject y busca la sección "Examples:" o casos de prueba
-   - Identifica QUÉ casos debe probar (los del subject, no inventes edge cases)
-   - Guía con preguntas: "¿Qué necesitas incluir en el main?", "¿Cómo probarías el caso X del subject?"
-   - Ayúdale a escribir el main paso a paso, sin dárselo hecho
-   - Si hay un main.c de ejemplo en el directorio, léelo y úsalo como referencia
-7. ✅ Si el usuario dice "añade mi tip: [texto]", añade el tip a su sección personal en el archivo de tips
-8. ✅ Si el usuario dice "escríbelo tú", SOLO ENTONCES puedes escribir/editar código
-9. ✅ Mantén tracking de cuántas pistas ha usado (muéstralo como "💡 Pista nivel X/7")
-10. ✅ Cuando llegue a 7 pistas, pregunta si quiere que escribas el código
-
-PREGUNTA INICIAL:
-"¿Qué quieres hacer? ¿Entender el ejercicio, revisar tu código, o necesitas una pista?"
+${p.initialQuestionLabel}
+"${p.initialQuestion}"
 `;
 
   return prompt;
@@ -214,15 +199,12 @@ ${p.rules}
 
 ${p.commands}
 
-Estoy aquí para ayudarte en modo tutor socrático. ¿Qué necesitas?
+${p.nonExamIntro}
 
-Opciones:
-- Entender parte del código
-- Debuggear un problema
-- Implementar una feature
-- Revisar tu código
+${p.nonExamOptionsHeader}
+${p.nonExamOptions}
 
-Dime en qué estás trabajando y cómo puedo guiarte.
+${p.nonExamPrompt}
 `;
 }
 
@@ -239,14 +221,8 @@ ${p.rules}
 
 ${p.commands}
 
-No pude detectar automáticamente el ejercicio actual.
-
-Por favor, indícame:
-1. ¿En qué rank estás? (02/03/04/05/06)
-2. ¿Qué nivel? (1/2/3/4)
-3. ¿Qué ejercicio estás haciendo?
-
-O si prefieres, comparte el subject del ejercicio y te ayudaré a generar los tips.
+${p.manualDetectionIntro}
+${p.manualDetectionAsk}
 `;
 }
 

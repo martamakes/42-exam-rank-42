@@ -8,26 +8,39 @@ const path = require('path');
  * @returns {string|null} - Path to subject file or null
  */
 function findSubjectFile(exerciseInfo, projectRoot) {
-  const possiblePaths = [
-    // Pattern 1: 02/Level4/exercise/README.md
-    path.join(projectRoot, exerciseInfo.rank, `Level${exerciseInfo.level}`, exerciseInfo.exercise, 'README.md'),
-    // Pattern 2: 02/Level4/exercise/subject.txt
-    path.join(projectRoot, exerciseInfo.rank, `Level${exerciseInfo.level}`, exerciseInfo.exercise, 'subject.txt'),
-    // Pattern 3: 03/level-1/exercise/README.md
-    path.join(projectRoot, exerciseInfo.rank, `level-${exerciseInfo.level}`, exerciseInfo.exercise, 'README.md'),
-    // Pattern 4: 03/level-1/exercise/subject.txt
-    path.join(projectRoot, exerciseInfo.rank, `level-${exerciseInfo.level}`, exerciseInfo.exercise, 'subject.txt'),
-    // Pattern 5: In exercise path directly
-    path.join(exerciseInfo.path, 'README.md'),
-    path.join(exerciseInfo.path, 'subject.txt'),
-    // Pattern 6: One level up
-    path.join(path.dirname(exerciseInfo.path), 'README.md'),
-    path.join(path.dirname(exerciseInfo.path), 'subject.txt'),
+  // Candidate "given" directories for this exercise, covering both naming
+  // styles seen in this repo (02/Level4/... vs 03+/level-1/...), plus the
+  // exercise path itself and its parent (covers exerciseInfo.path values
+  // that already point at the given dir, e.g. from Strategy 3 detection).
+  const candidateDirs = [
+    path.join(projectRoot, exerciseInfo.rank, `Level${exerciseInfo.level}`, exerciseInfo.exercise),
+    path.join(projectRoot, exerciseInfo.rank, `level-${exerciseInfo.level}`, exerciseInfo.exercise),
+    exerciseInfo.path,
+    path.dirname(exerciseInfo.path),
   ];
 
-  for (const filePath of possiblePaths) {
-    if (fs.existsSync(filePath)) {
-      return filePath;
+  // Known filenames, checked in priority order, per directory.
+  const candidateNames = ['README.md', 'subject.txt', 'subject.en.txt'];
+
+  for (const dir of candidateDirs) {
+    for (const name of candidateNames) {
+      const filePath = path.join(dir, name);
+      if (fs.existsSync(filePath)) {
+        return filePath;
+      }
+    }
+
+    // Fallback: any subject*.txt in the directory — covers subject.en.txt
+    // variants not in candidateNames without hardcoding every language.
+    if (fs.existsSync(dir)) {
+      try {
+        const match = fs.readdirSync(dir).find((f) => /^subject.*\.txt$/i.test(f));
+        if (match) {
+          return path.join(dir, match);
+        }
+      } catch (err) {
+        // Ignore unreadable directories and keep trying other candidates.
+      }
     }
   }
 
@@ -97,10 +110,10 @@ Only test what the subject asks. Don't invent additional edge cases.
   content += '```\n' + subjectContent.trim() + '\n```\n';
 
   // Extract information from subject
-  const concepts = extractConcepts(subjectContent);
+  const concepts = extractConcepts(subjectContent, language);
   const allowedFunctions = extractAllowedFunctions(subjectContent);
-  const resources = generateResources(concepts, allowedFunctions);
-  const complexity = estimateComplexity(exerciseInfo, subjectContent);
+  const resources = generateResources(allowedFunctions, language);
+  const complexity = estimateComplexity(exerciseInfo, subjectContent, language);
 
   // Add tips section
   content += t.tipsSection;
@@ -140,25 +153,47 @@ Only test what the subject asks. Don't invent additional edge cases.
 /**
  * Extracts key concepts from subject
  */
-function extractConcepts(subject) {
-  const concepts = [];
-  const conceptMap = {
-    'pipe': 'Pipes (comunicación entre procesos)',
-    'fork': 'Fork (crear proceso hijo)',
-    'dup2': 'Redirección de file descriptors',
-    'exec': 'Ejecución de comandos',
-    'malloc': 'Asignación dinámica de memoria',
-    'linked list': 'Listas enlazadas',
-    'recursion': 'Recursión',
-    'string': 'Manipulación de strings',
-    'pointer': 'Punteros',
-    'array': 'Arrays',
-    'loop': 'Iteración',
-    'write': 'Salida estándar (write)',
-    'read': 'Lectura de archivos/entrada',
-    'file descriptor': 'File descriptors'
+function extractConcepts(subject, language = 'es') {
+  const conceptMaps = {
+    es: {
+      'pipe': 'Pipes (comunicación entre procesos)',
+      'fork': 'Fork (crear proceso hijo)',
+      'dup2': 'Redirección de file descriptors',
+      'exec': 'Ejecución de comandos',
+      'malloc': 'Asignación dinámica de memoria',
+      'linked list': 'Listas enlazadas',
+      'recursion': 'Recursión',
+      'string': 'Manipulación de strings',
+      'pointer': 'Punteros',
+      'array': 'Arrays',
+      'loop': 'Iteración',
+      'write': 'Salida estándar (write)',
+      'read': 'Lectura de archivos/entrada',
+      'file descriptor': 'File descriptors'
+    },
+    en: {
+      'pipe': 'Pipes (inter-process communication)',
+      'fork': 'Fork (create a child process)',
+      'dup2': 'File descriptor redirection',
+      'exec': 'Command execution',
+      'malloc': 'Dynamic memory allocation',
+      'linked list': 'Linked lists',
+      'recursion': 'Recursion',
+      'string': 'String manipulation',
+      'pointer': 'Pointers',
+      'array': 'Arrays',
+      'loop': 'Iteration',
+      'write': 'Standard output (write)',
+      'read': 'Reading files/input',
+      'file descriptor': 'File descriptors'
+    }
   };
+  const conceptMap = conceptMaps[language] || conceptMaps.es;
+  const fallback = language === 'en'
+    ? ['To be determined from the subject']
+    : ['A determinar según el subject'];
 
+  const concepts = [];
   const lowerSubject = subject.toLowerCase();
   for (const [keyword, concept] of Object.entries(conceptMap)) {
     if (lowerSubject.includes(keyword)) {
@@ -166,7 +201,7 @@ function extractConcepts(subject) {
     }
   }
 
-  return concepts.length > 0 ? concepts : ['A determinar según el subject'];
+  return concepts.length > 0 ? concepts : fallback;
 }
 
 /**
@@ -183,7 +218,7 @@ function extractAllowedFunctions(subject) {
 /**
  * Generates resource recommendations
  */
-function generateResources(concepts, allowedFunctions) {
+function generateResources(allowedFunctions, language = 'es') {
   const resources = [];
 
   allowedFunctions.forEach(func => {
@@ -194,11 +229,15 @@ function generateResources(concepts, allowedFunctions) {
 
   // Add special recommendations
   if (allowedFunctions.includes('pipe')) {
-    resources.push('`man pipe` ⭐ (tiene función de ejemplo útil)');
+    resources.push(language === 'en'
+      ? '`man pipe` ⭐ (has a useful example function)'
+      : '`man pipe` ⭐ (tiene función de ejemplo útil)');
   }
 
   if (resources.length === 0) {
-    resources.push('man pages relevantes según funciones usadas');
+    resources.push(language === 'en'
+      ? 'relevant man pages depending on the functions used'
+      : 'man pages relevantes según funciones usadas');
   }
 
   return resources;
@@ -207,20 +246,24 @@ function generateResources(concepts, allowedFunctions) {
 /**
  * Estimates complexity based on exercise info
  */
-function estimateComplexity(exerciseInfo, subject) {
-  const level = parseInt(exerciseInfo.level);
+function estimateComplexity(exerciseInfo, subject, language = 'es') {
+  const labels = language === 'en'
+    ? { low: 'Low', medium: 'Medium', mediumHigh: 'Medium-High', high: 'High' }
+    : { low: 'Baja', medium: 'Media', mediumHigh: 'Media-Alta', high: 'Alta' };
 
-  if (level <= 1) return 'Baja';
-  if (level === 2) return 'Media';
-  if (level === 3) return 'Media-Alta';
-  if (level >= 4) return 'Alta';
+  const level = parseInt(exerciseInfo.level, 10);
+
+  if (level <= 1) return labels.low;
+  if (level === 2) return labels.medium;
+  if (level === 3) return labels.mediumHigh;
+  if (level >= 4) return labels.high;
 
   // Check subject content
   if (subject.toLowerCase().includes('pipe') && subject.toLowerCase().includes('fork')) {
-    return 'Alta';
+    return labels.high;
   }
 
-  return 'Media';
+  return labels.medium;
 }
 
 /**
