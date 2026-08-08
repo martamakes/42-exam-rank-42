@@ -13,16 +13,12 @@ async function execute(args, context) {
   // Initialize configuration
   const config = await initializeConfig(cwd);
   const lang = config.language;
-  const p = prompts[lang];
 
-  // Welcome message
-  console.log(p.welcome);
-  console.log(p.rules);
-  console.log(p.commands);
-
-  // Check if it's an exam repository
+  // Check if it's an exam repository. Every branch below returns ONE
+  // self-contained prompt block (welcome + rules + commands + situation-
+  // specific content) — nothing is printed piecemeal, since the caller
+  // (cli.js) prints exactly what this function returns, once.
   if (!isExamRepository(cwd)) {
-    console.log('\n' + p.noExamStructure);
     return generateNonExamPrompt(lang);
   }
 
@@ -31,13 +27,9 @@ async function execute(args, context) {
 
   let exerciseInfo;
   if (detected) {
-    // Confirm detection
-    console.log('\n' + p.detected.replace('{exercise}',
-      `${detected.exercise} (Rank ${detected.rank}, Level ${detected.level})`));
     exerciseInfo = detected;
   } else {
     // Ask user for exercise info
-    console.log('\n' + p.notFound);
     return generateManualPrompt(lang);
   }
 
@@ -50,7 +42,6 @@ async function execute(args, context) {
     tipsContent = fs.readFileSync(tipsPath, 'utf8');
   } else {
     // Generate tips from subject
-    console.log('\n' + p.generatingTips);
     tipsContent = await generateTips(exerciseInfo, cwd, lang);
 
     if (tipsContent) {
@@ -60,7 +51,6 @@ async function execute(args, context) {
         fs.mkdirSync(tipsDir, { recursive: true });
       }
       fs.writeFileSync(tipsPath, tipsContent, 'utf8');
-      console.log(p.tipsGenerated);
     }
   }
 
@@ -145,8 +135,6 @@ async function generateTips(exerciseInfo, cwd, lang) {
   const subjectPath = findSubjectFile(exerciseInfo, projectRoot);
 
   if (!subjectPath) {
-    const p = prompts[lang];
-    console.log('\n' + p.notFound);
     return null;
   }
 
@@ -224,6 +212,8 @@ ${p.noExamStructure}
 
 ${p.rules}
 
+${p.commands}
+
 Estoy aquí para ayudarte en modo tutor socrático. ¿Qué necesitas?
 
 Opciones:
@@ -244,6 +234,10 @@ function generateManualPrompt(lang) {
 
   return `
 ${p.welcome}
+
+${p.rules}
+
+${p.commands}
 
 No pude detectar automáticamente el ejercicio actual.
 
