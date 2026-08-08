@@ -45,14 +45,6 @@ Never edit another user's subsection.
 
 ## Known limitations (not yet fixed — work around, don't silently trust)
 
-- **Detection is unreliable inside `rendu/<exercise>/`** — the shared,
-  root-level live-practice workspace where the student actually writes code
-  (see `05/CONTEXT.md` for the `rendu` vs `rank/level` layout). `detect.js`'s
-  heuristics assume `rendu` is nested under a rank folder, which it isn't in
-  this repo. If the script reports the wrong exercise, or falls back to
-  asking for manual input while the user is clearly mid-exercise in
-  `rendu/`, ask them to confirm or correct it — don't trust the detection
-  blindly.
 - **Subject lookup misses `subject.en.txt`**, used by several Rank 05
   exercises — `generator.js::findSubjectFile` only checks `README.md` and
   `subject.txt`. If tip generation reports it can't find the subject but one
