@@ -19,6 +19,26 @@ void	free_map(char **map, int rows)
 	free(map);
 }
 
+/*! PSEUDOCODE — read_map:
+ *  1. getline() the FIRST line (header): "rows empty obstacle full"
+ *       - sscanf "%d %c %c %c", must match exactly 4 fields
+ *       - reject if rows < 1, if any two of empty/obstacle/full are
+ *         equal, or if any of them is not printable (isprint)
+ *  2. malloc an array of `rows` char* pointers
+ *  3. for each of the `rows` remaining lines:
+ *       - getline() it
+ *       - find its length up to '\n'; if no '\n' was found -> invalid
+ *         (subject: every row ends with a line break)
+ *       - the FIRST row read fixes the expected width; every other row
+ *         must match it exactly, or the map is invalid
+ *       - every char must be `empty` or `obstacle` (never `full` —
+ *         that symbol is OUTPUT-only)
+ *       - malloc(width + 1), copy the row, terminate with '\0'
+ *  4. after reading all `rows` rows, if the stream still has another
+ *     non-blank line left -> invalid (extra garbage rows)
+ *  5. on ANY failure at any step: free whatever was allocated so far
+ *     and return NULL — the caller prints "map error" on stderr
+ */
 char	**read_map(FILE *stream, t_data *data)
 {
 	char	*line = NULL;
@@ -111,6 +131,23 @@ fail:
 	return (NULL);
 }
 
+/*! PSEUDOCODE — solve_and_mark (dynamic programming):
+ *  1. dp[i][j] = side length of the LARGEST all-empty square whose
+ *     BOTTOM-RIGHT corner sits at (i, j)
+ *  2. base cases: dp[i][j] = 0 if map[i][j] is an obstacle;
+ *     dp[i][j] = 1 if map[i][j] is empty AND (i == 0 or j == 0)
+ *     (top row / left column can never fit more than a 1x1 square)
+ *  3. recurrence: dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+ *     (the square can only grow as far as its SMALLEST neighboring
+ *     square allows, in all 3 directions)
+ *  4. track the best (largest) dp value while filling the table; use
+ *     STRICT '>' (never >=) when updating so the FIRST square found —
+ *     scanning row by row, left to right — wins ties (subject:
+ *     top-most, then left-most)
+ *  5. once you have best_size / best_y / best_x (bottom-right corner),
+ *     walk back best_size cells up and left and overwrite those cells
+ *     with `full` in the map
+ */
 void	solve_and_mark(char **map, t_data data)
 {
 	int	**dp;
@@ -193,6 +230,11 @@ void	print_map(char **map, t_data data)
 	}
 }
 
+/*! PSEUDOCODE — process_map (one map):
+ *  1. read_map(); if NULL -> "map error" to stderr and return (skip
+ *     this map, but the caller keeps going to the next one)
+ *  2. else: solve_and_mark() + print_map() + free_map()
+ */
 void	process_map(FILE *stream)
 {
 	t_data	data;
@@ -215,6 +257,14 @@ void	process_map(FILE *stream)
 	free_map(map, data.rows);
 }
 
+/*! PSEUDOCODE — main:
+ *  1. no argv (ac == 1) -> read a single map from stdin
+ *  2. argv given -> treat EACH argument as a filename, process_map()
+ *     each one in order, printing a blank line BETWEEN maps (never
+ *     after the last one)
+ *  3. unreadable file (fopen fails) -> "map error" too, keep going,
+ *     don't crash
+ */
 int	main(int ac, char *av[])
 {
 	int		i;

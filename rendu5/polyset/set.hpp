@@ -4,9 +4,22 @@
 #include "searchable_bag.hpp"
 
 
-/*! PSEUD-OCODE:
-	
-*/
+/*! PSEUDOCODE — set (wrapper, not a container of its own):
+ *  1. `set` does NOT store values itself — it holds a `searchable_bag *`
+ *     (either an array_bag or a tree_bag, chosen by whoever builds it)
+ *  2. every "set" behavior is just "check with has() first, then
+ *     delegate to the wrapped bag":
+ *       - insert(val): if (!sb->has(val)) sb->insert(val)  <- the ONLY
+ *         place the "no duplicates" rule actually lives
+ *       - insert(array, size): loop and call insert(val) one by one —
+ *         reuse the rule above instead of duplicating it
+ *       - has/print/clear: just forward to sb->has/print/clear
+ *  3. no default constructor on purpose: a set with no wrapped bag has
+ *     no valid state, so the only constructor takes a searchable_bag&
+ *  4. copy ctor / operator= copy the POINTER (sb), not the bag itself —
+ *     a set is a VIEW over someone else's bag, so the destructor must
+ *     NOT delete or clear it (whoever created the bag owns its lifetime)
+ */
 
 /*! @brief A wrapper class that turns a searchable_bag into a set (no duplicates). */
 class set 

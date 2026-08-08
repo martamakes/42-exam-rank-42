@@ -54,6 +54,16 @@ vect2& vect2::operator++() {
     return *this;
 }
 
+/*! PSEUDOCODE — prefix ++v vs postfix v++ (same trick for --):
+ *  1. prefix ++v: modify x and y in place, return *this by reference
+ *     (caller sees the NEW value)
+ *  2. postfix v++ (dummy `int` param only to let the compiler tell the
+ *     two overloads apart, value never used):
+ *       - copy = *this (snapshot the CURRENT/OLD state)
+ *       - call ++(*this) to actually do the increment
+ *       - return `copy` by VALUE (can't return a reference to the old
+ *         state — it no longer exists once *this changes)
+ */
 // v++  →  devuelve el valor ANTIGUO, luego incrementa
 // Truco: guardamos una copia antes de modificar, y devolvemos esa copia.
 // El "int" en el parámetro es solo para que el compilador distinga ++v de v++.
@@ -112,10 +122,27 @@ vect2& vect2::operator*=(int scalar) {
 // 3 * v  →  igual resultado, pero el 3 va PRIMERO.
 // Como el 3 no es un vect2, esta función NO puede ser un método de la clase.
 // Va fuera, como función libre.
+/*! PSEUDOCODE — 3 * v (scalar on the LEFT):
+ *  1. `v * 3` works as a MEMBER because vect2 is the left operand
+ *  2. `3 * v` can NOT be a member — the left operand (int) isn't a
+ *     vect2, so there's no `this` to call it on
+ *  3. fix: a FREE function operator*(int, const vect2&) outside the
+ *     class, that just flips the arguments and calls the member
+ *     version you already wrote (`vec * scalar`)
+ */
 vect2 operator*(int scalar, const vect2& vec) {
     return vec * scalar;  // llama a operator*(int) de arriba, que sí es método
 }
 
+/*! PSEUDOCODE — unary -v vs binary v1 - v2 (same symbol, different arity):
+ *  1. operator-(const vect2&) const  -> takes ONE explicit argument ->
+ *     called for `v1 - v2`
+ *  2. operator-() const               -> takes ZERO arguments -> called
+ *     for `-v`
+ *  3. the compiler picks the overload automatically based on how many
+ *     operands appear around the `-`
+ *  4. -v just negates both members: return vect2(-x, -y)
+ */
 // -v  →  {-x, -y}  (negación unaria, un solo operando)
 vect2 vect2::operator-() const {
     return vect2(-x, -y);
@@ -126,6 +153,14 @@ vect2 vect2::operator-() const {
 // v[0] → x,  v[1] → y
 // ============================================================
 
+/*! PSEUDOCODE — operator[] (two overloads):
+ *  1. non-const version returns int& -> lets you WRITE: v[0] = 42;
+ *  2. const version returns const int& -> lets you READ from a const
+ *     vect2 (the compiler picks it automatically for a const object)
+ *  3. both do the same lookup: index 0 -> x, anything else -> y
+ *  4. without the const overload, `const vect2 v(1,2); cout << v[0];`
+ *     would fail to compile
+ */
 // Versión ESCRITORA: devuelve referencia → podemos hacer v[0] = 42;
 int& vect2::operator[](int index) {
     return (index == 0) ? x : y;
