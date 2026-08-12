@@ -54,6 +54,10 @@ duras se convierten en un componente arquitectónico central (ej. el bucle de ev
 en una clase cualquiera. Este modelo de dominio recién diseñado es lo que alimenta el Paso 3 —
 los nodos del grafo de compilación ya no vienen dados por 42, los decidiste aquí.
 
+Los puntos 1 y 2 (reglas técnicas duras, funciones/librerías permitidas) son exactamente lo que
+va a `workspace/<módulo>/CONSTRAINTS.md` (`constraints-format.md`) — se escriben aquí, no se
+descartan tras diseñar el modelo de dominio.
+
 ### Paso 1 — Leer el subject completo, extraer el contrato
 
 Del `subject.txt` (o `subject.en.txt`) real del ejercicio:
@@ -63,6 +67,10 @@ Del `subject.txt` (o `subject.en.txt`) real del ejercicio:
 - **Qué se da ya hecho**: código base, clases abstractas, un `main.cpp` de test que debe
   compilar tal cual con el código del alumno.
 - **Restricciones explícitas**: forma canónica ortodoxa, normas de estilo, prohibiciones.
+
+Con esto extraído, escribo o actualizo `workspace/<módulo>/CONSTRAINTS.md`
+(`constraints-format.md`) — así Modo 1 y sesiones futuras de Modo 2 lo consultan sin releer el
+subject entero.
 
 ### Paso 2 — Mapear lo dado vs. lo pedido
 
@@ -90,7 +98,9 @@ Ejemplo de forma (genérico, no memorizar un caso concreto — se construye leye
 
 ### Paso 4 — Por cada clase, en el orden del grafo
 
-1. **Contrato**: qué métodos exige la clase abstracta/interfaz que hereda o implementa.
+1. **Contrato**: qué métodos exige la clase abstracta/interfaz que hereda o implementa —
+   consultando primero `CONSTRAINTS.md` si existe, para no proponer una firma o técnica
+   prohibida.
 2. **Esqueleto**: firmas vacías primero — que compile antes de tener lógica.
 3. **Implementación mínima**: la lógica real, una función a la vez.
 4. **Verificación incremental**: compilar y probar esa pieza contra el main dado (o un test

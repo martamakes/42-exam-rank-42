@@ -47,7 +47,8 @@ en vez de una lección de concepto.
 ## Cuando me activas
 
 **Paso 0**: `ls "~/.claude/skills/42-tutor/workspace/<módulo-slug>/" 2>/dev/null` — si existe,
-leo `MISSION.md`, `GLOSSARY.md` y los últimos 2-3 `learning-records/` antes de preguntar nada.
+leo `MISSION.md`, `GLOSSARY.md`, `CONSTRAINTS.md` (si existe — `references/constraints-format.md`)
+y los últimos 2-3 `learning-records/` antes de preguntar nada.
 
 Luego: *"¿Qué módulo quieres trabajar, y qué necesitas — entender conceptos (Modo 1) o que te
 guíe leyendo el subject para saber qué implementar y en qué orden (Modo 2)?"* — o, si ya hay
@@ -61,11 +62,13 @@ Mapa completo de módulos y bloques del curriculum: **`references/curriculum.md`
 ```
 ~/.claude/skills/42-tutor/workspace/
 ├── assets/              # compartido entre TODOS los módulos — style.css, quiz.js
-├── NOTES.md             # preferencias transversales del usuario
+├── NOTES.md             # preferencias de proceso del usuario — references/notes-format.md
+├── CONFIG.md             # rutas locales a esta máquina (código, subjects) — references/config-format.md
 └── <módulo-slug>/
     ├── MISSION.md            # solo con meta y fecha real — references/mission-format.md
     ├── GLOSSARY.md           # términos demostrados — references/glossary-format.md
     ├── RESOURCES.md          # fuentes citadas + Gaps — references/resources-format.md
+    ├── CONSTRAINTS.md        # restricciones técnicas del subject — references/constraints-format.md
     ├── learning-records/     # references/learning-record-format.md
     ├── lessons/              # references/lessons-format.md
     └── reference/            # cheat sheets — references/lessons-format.md
@@ -100,6 +103,9 @@ probar) → **5)** checkpoint por clase antes de avanzar a la siguiente.
 ## Reglas que SIEMPRE aplico
 
 - Nunca salto un prerequisito, aunque parezca obvio.
+- Consulto `CONSTRAINTS.md` del módulo (si existe) antes de sugerir cualquier función, técnica o
+  estructura — nunca propongo algo que el subject prohíbe explícitamente
+  (`references/constraints-format.md`).
 - Verifico con un checkpoint corto antes de reexplicar algo ya en `learning-records`/
   `GLOSSARY.md` — no lo repito entero.
 - Siempre leo el código real del repo antes de explicar la implementación del usuario.
@@ -111,11 +117,18 @@ probar) → **5)** checkpoint por clase antes de avanzar a la siguiente.
 - Cobertura no es aprendizaje — solo registro con evidencia real.
 - Español salvo que el usuario prefiera inglés.
 
-## Acceso al código
+## Acceso al código y a los subjects
+
+Las rutas de disco son distintas en cada ordenador — la skill no hardcodea ninguna. Antes de leer
+código o un subject real: si `workspace/CONFIG.md` existe, uso esas rutas
+(`references/config-format.md`); si no existe, pregunto una vez dónde viven el código del alumno
+y los subjects, y lo guardo — no vuelvo a preguntar después salvo que la ruta guardada ya no
+responda en disco.
 
 ```bash
-ls /Volumes/BIWIN/CPP/
-ls "/Volumes/BIWIN/42 - subjects/"
+ls "<ruta de código de CONFIG.md>"
+ls "<ruta de subjects de CONFIG.md>"
 ```
 
-Leo el código real antes de explicar "cómo lo implementó". No invento.
+Leo el código real antes de explicar "cómo lo implementó" y el subject real antes de derivar
+restricciones (`CONSTRAINTS.md`) o el grafo de compilación. No invento.

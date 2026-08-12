@@ -8,13 +8,21 @@ especifica.
 > se cruzó con [MarkosComK/42-Common-Core-Guide](https://github.com/MarkosComK/42-Common-Core-Guide)
 > (repo comunitario, no documentación oficial). Si tu campus difiere, dímelo y lo ajusto.
 
+> **Nota — dos tracks paralelos**: el campus del usuario tiene Common Core en C (CCC) y Common
+> Core en Python (CCP) como itinerarios paralelos (reportado por el usuario, 2026-08-12). Varios
+> módulos son compartidos entre ambos tracks (Libft, push_swap, Born2beroot, ft_printf
+> confirmados; Get Next Line sin confirmar todavía) pero **el número de círculo puede diferir
+> entre tracks para el mismo módulo compartido** (ej. push_swap: círculo 2 en CCC, círculo 1 en
+> CCP; Born2beroot: círculo 1 en CCC, círculo 2 en CCP) — la tabla de abajo sigue la numeración
+> de CCC por defecto; cuando difiera se anota en la fila del módulo.
+
 ### Círculo 1 — fundamentos de C
 
 | Módulo | Qué es | Conceptos clave |
 |---|---|---|
-| Libft | Biblioteca estática propia (`libft.a`), reimplementa funciones de la libc y se reutiliza en el resto del cursus | memoria dinámica, punteros, strings, listas enlazadas, Makefile |
-| ft_printf | Reimplementación de `printf` | funciones variádicas (`va_list`/`va_start`/`va_arg`/`va_end`), parsing de especificadores, conversión de bases |
-| Born2beroot | Instalación y securización de una VM Linux (Debian) | particionado, usuarios/sudo, políticas de contraseña, SSH, firewall, scripts de monitorización |
+| Libft *(compartido CCC/CCP)* | Biblioteca estática propia (`libft.a`), reimplementa funciones de la libc y se reutiliza en el resto del cursus | memoria dinámica, punteros, strings, listas enlazadas, Makefile |
+| ft_printf *(compartido CCC/CCP — círculo 1 en ambos)* | Reimplementación de `printf` | funciones variádicas (`va_list`/`va_start`/`va_arg`/`va_end`), parsing de especificadores, conversión de bases |
+| Born2beroot *(compartido CCC/CCP — círculo 1 en CCC, círculo 2 en CCP)* | Instalación y securización de una VM Linux (Debian o Rocky) | particionado LVM, usuarios/sudo, políticas de contraseña, SSH, firewall, scripts de monitorización, AppArmor/SELinux |
 
 ### Círculo 2 — algoritmia, procesos y primer gráfico
 
@@ -23,10 +31,10 @@ especifica.
 | get_next_line | Lee un fd línea a línea, preservando estado entre llamadas | variables estáticas, buffers, fds, múltiples fds simultáneos (bonus) |
 | pipex | Recrea pipes/redirecciones de Unix entre dos comandos | `fork`, `pipe`, `dup2`, `execve`, variables de entorno |
 | minitalk | Cliente-servidor por señales Unix, un bit por señal | IPC, señales, PID, operaciones a nivel de bit |
-| so_long | Videojuego 2D con MiniLibX sobre mapas propios | MiniLibX, parsing/validación de mapas, eventos, sprites |
-| FdF | Wireframe 3D isométrico a partir de un mapa de alturas | proyección isométrica, algoritmos de trazado de líneas, MiniLibX |
-| fract-ol | Explorador interactivo de fractales (Mandelbrot/Julia) | números complejos, render por píxel, zoom/pan, MiniLibX |
-| push_swap | Ordena enteros con 2 pilas y un set restringido de operaciones, minimizando movimientos | estructuras de datos, complejidad algorítmica, optimización |
+| so_long *(elección 1 de 3: so_long / FdF / fract'ol)* | Videojuego 2D con MiniLibX sobre mapas propios | MiniLibX, parsing/validación de mapas, eventos, sprites |
+| FdF *(elección 1 de 3: so_long / FdF / fract'ol)* | Wireframe 3D isométrico a partir de un mapa de alturas | proyección isométrica, algoritmos de trazado de líneas, MiniLibX |
+| fract'ol *(elección 1 de 3: so_long / FdF / fract'ol)* | Explorador interactivo de fractales (Mandelbrot/Julia) | números complejos, render por píxel, zoom/pan, MiniLibX |
+| push_swap *(compartido CCC/CCP, proyecto en grupo de 2 — círculo 2 en CCC, círculo 1 en CCP; la numeración de círculo difiere por track, ver nota abajo)* | Ordena enteros con 2 pilas y un set restringido de operaciones, minimizando movimientos | estructuras de datos, complejidad algorítmica, optimización |
 | Exam Rank 02 | Examen individual cronometrado: lógica en C, strings, memoria, conversión de bases | — |
 
 ### Círculo 3 — concurrencia y shell
