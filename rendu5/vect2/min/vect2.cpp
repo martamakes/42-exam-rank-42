@@ -95,6 +95,6 @@ vect2 operator*(int scalar, const vect2& vec) {
 }
 
 std::ostream& operator<<(std::ostream& os, const vect2& vec) {
-    os << "{" << vec[0] << ", " << vec[1] << "}";
+    os << "{"<<vec[0]<<", "<<vec[1]<<"}";
     return os;
 }
