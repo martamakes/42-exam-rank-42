@@ -12,6 +12,9 @@ extra/progress/
 # Documentación privada (no subir al fork)
 new-exams/exam-rank-03/docs/
 
+# Progreso personal de estudio (42-tutor) — nunca compartir en el repo
+rendu5/polyset/workspace/
+
 # Ejecutables compilados
 **/filter
 !**/filter/
