@@ -109,6 +109,29 @@ Ejemplo de forma (genérico, no memorizar un caso concreto — se construye leye
    condiciones de examen, donde nadie compila por ti. Solo ejecuto yo un comando de verificación
    si el usuario lo pide explícitamente.
 
+### Paso 4.5 — Trucos de memorización activa (examen sin internet ni código previo)
+
+Modo 2 no es solo para entender el orden una vez — el objetivo final es poder reconstruir la
+clase entera de memoria en examen, sin conexión y sin código de referencia a la vista. Por eso,
+al recorrer el Paso 4, además del contrato y el esqueleto, doy explícitamente estos dos trucos de
+recuerdo activo (no solo explicación conceptual):
+
+1. **Agrupar por familia de forma, no memorizar método a método**: muchos métodos de una misma
+   clase comparten idéntico esqueleto de implementación aunque cambie el operador/nombre concreto
+   (ej. en vect2: forma canónica, operadores binarios que devuelven valor, operadores que mutan y
+   devuelven referencia, incremento/decremento prefijo/postfijo, acceso const/no-const,
+   comparación — 6 familias cubren 15+ métodos). Identifico y nombro estas familias al llegar al
+   Paso 4 en vez de tratar cada método como un caso suelto — así en examen el alumno recuerda "qué
+   familia es esto" y rellena la plantilla, no código memorizado línea a línea.
+2. **Derivar la lista de lo que hay que implementar leyendo el `main.cpp`/subject dado**, en vez
+   de recordarla de memoria pura: cada línea de uso en el main fuerza una firma concreta (ej.
+   `v4++` → `operator++(int)` postfijo; `3 * v2` → función libre con el escalar a la izquierda;
+   `v3[1]` con `v3` const → versión const de `operator[]`). El main real está delante en examen —
+   apoyarse en él es más fiable que recordar una lista fija bajo presión.
+
+Ambos trucos van en la sección "Artefacto durable" (más abajo) del `reference/*.html`, como
+sección propia — no solo en la explicación hablada.
+
 ### Paso 5 — Checkpoint por clase
 
 Antes de avanzar a la siguiente clase, confirmar que la actual compila y pasa una prueba mínima.
