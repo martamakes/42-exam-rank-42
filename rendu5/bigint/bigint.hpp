@@ -2,6 +2,7 @@
 #define BIG_INT
 
 #include <string>
+#include <iostream>
 #include <sstream>
 
 /*! @brief Class representing an arbitrary precision unsigned integer. */
