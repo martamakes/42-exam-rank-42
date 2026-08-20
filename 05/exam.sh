@@ -76,9 +76,12 @@ validate_exercise() {
         return 1
     fi
     
+    # Dar permisos de ejecución al script de test
+    chmod +x "$test_script"
+
     echo -e "${BLUE}Ejecutando tests para $exercise...${NC}"
     cd "$grademe_dir"
-    
+
     # Ejecutar el script de tests
     ./test.sh
     local test_result=$?
