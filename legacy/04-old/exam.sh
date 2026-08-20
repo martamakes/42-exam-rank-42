@@ -200,6 +200,7 @@ EOL
         cd "$MICROSHELL_DIR/grademe"
         cp "$RENDU_DIR/microshell" .
         chmod +x microshell
+        chmod +x test.sh
         ./test.sh
         rm -f microshell
         cd "$CURRENT_DIR"
