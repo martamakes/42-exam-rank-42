@@ -90,7 +90,7 @@ while true; do
         7)
             clear
             echo -e "${BLUE}============== RENDU DIRECTORY ==============${NC}"
-            if [ -f "rendu/mini_serv.c" ]; then
+            if [ -f "../rendu/mini_serv.c" ]; then
                 echo -e "${GREEN}mini_serv.c found in rendu directory.${NC}"
                 ls -la rendu
             else
